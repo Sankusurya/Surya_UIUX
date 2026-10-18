@@ -1,12 +1,25 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { usePortfolio } from '../../context/PortfolioContext';
 
 export const Navbar = () => {
   const { currentRoute, theme, toggleTheme, openResume } = usePortfolio();
+  const [isWorkDropdownOpen, setIsWorkDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
   const isWorkActive = currentRoute === 'work' || currentRoute.startsWith('case-');
   const isThinkingActive = currentRoute === 'thinking';
   const isAboutActive = currentRoute === 'about';
+
+  // Close dropdown on click outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsWorkDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleContactClick = (e) => {
     e.preventDefault();
@@ -18,9 +31,17 @@ export const Navbar = () => {
     }
   };
 
+  const handleWorkClick = (e) => {
+    e.preventDefault();
+    if (currentRoute !== 'work') {
+      window.location.hash = 'work';
+    }
+    setIsWorkDropdownOpen((prev) => !prev);
+  };
+
   return (
     <nav className="nav-container" aria-label="Main Navigation">
-      <div className="nav-pill-dock">
+      <div className="nav-pill-dock" ref={dropdownRef}>
         {/* Orange Circular Avatar with Italic 'S' */}
         <a
           href="#home"
@@ -31,15 +52,56 @@ export const Navbar = () => {
           S
         </a>
 
-        {/* Work Pill Nav Link */}
-        <a
-          href="#work"
-          className={`nav-work-pill ${
-            isWorkActive ? 'nav-work-active' : ''
-          }`}
-        >
-          <span>Work</span>
-        </a>
+        {/* Work Pill Button with Dropdown Chevron */}
+        <div className="relative">
+          <button
+            type="button"
+            onClick={handleWorkClick}
+            className={`nav-work-pill cursor-pointer ${
+              isWorkActive ? 'nav-work-active' : ''
+            }`}
+            aria-expanded={isWorkDropdownOpen}
+            aria-haspopup="true"
+          >
+            <span>Work</span>
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className={`transition-transform duration-200 ${
+                isWorkDropdownOpen ? 'rotate-180' : ''
+              }`}
+            >
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+
+          {/* Work Dropdown Menu - shows only Admin Panel */}
+          {isWorkDropdownOpen && (
+            <div className="nav-dropdown-menu min-w-[170px]">
+              <a
+                href="#admin"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => {
+                  setIsWorkDropdownOpen(false);
+                }}
+                className="nav-dropdown-item font-semibold flex items-center justify-between py-2.5 px-3 hover:text-signal transition-colors"
+              >
+                <span className="flex items-center gap-2">
+                  <span className="text-signal text-sm">⚙</span>
+                  <span>Admin Panel</span>
+                </span>
+                <span className="text-xs opacity-60">↗</span>
+              </a>
+            </div>
+          )}
+        </div>
 
         {/* Thinking Link */}
         <a
