@@ -198,7 +198,7 @@ export const CaseStudyView = () => {
               src={project.coverImg}
               alt={`${project.title} Cover`}
               loading="eager"
-              className="w-full h-auto object-contain block mx-auto"
+              style={{ maxWidth: '100%', width: 'auto', height: 'auto', display: 'block', margin: '0 auto' }}
             />
             <div className="absolute bottom-3 right-3 px-3 py-1 rounded-full bg-black/70 text-white text-[11px] font-mono opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none backdrop-blur-xs flex items-center gap-1.5">
               <span>🔍 Click to expand</span>
@@ -221,7 +221,7 @@ export const CaseStudyView = () => {
                   src={img.url}
                   alt={img.alt || `${project.title} design slice ${idx + 1}`}
                   loading="lazy"
-                  className="w-full h-auto object-contain block mx-auto"
+                  style={{ maxWidth: '100%', width: 'auto', height: 'auto', display: 'block', margin: '0 auto' }}
                 />
                 <div className="absolute bottom-3 right-3 px-3 py-1 rounded-full bg-black/70 text-white text-[11px] font-mono opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none backdrop-blur-xs flex items-center gap-1.5">
                   <span>🔍 Zoom</span>

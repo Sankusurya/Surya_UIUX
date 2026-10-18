@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { usePortfolio } from '../../context/PortfolioContext';
-import { uploadImageToStorage } from '../../utils/imageStorage';
+import { uploadImageToStorage, formatBytes } from '../../utils/imageStorage';
 import { normalizeProject } from '../../data/initialData';
 import { Tags } from '../common/Tags';
 import { ImageViewer } from '../common/ImageViewer';
@@ -130,7 +130,13 @@ export const AdminProjectsTab = () => {
     try {
       const result = await uploadImageToStorage(file, 'covers');
       if (result.success) {
-        setFormData((prev) => ({ ...prev, coverImg: result.url }));
+        setFormData((prev) => ({
+          ...prev,
+          coverImg: result.url,
+          coverImgWidth: result.width || 0,
+          coverImgHeight: result.height || 0,
+          coverImgSize: file.size,
+        }));
         showToast('success', 'Cover Artwork Uploaded ✓', result.sizeInfo);
       } else {
         showToast('error', 'Cover Upload Failed', result.error);
@@ -162,6 +168,9 @@ export const AdminProjectsTab = () => {
             id: `img-${Date.now()}-${i}-${Math.random().toString(36).substr(2, 6)}`,
             url: result.url,
             alt: file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' '),
+            width: result.width || 0,
+            height: result.height || 0,
+            fileSize: file.size,
           });
         } else {
           showToast('error', `Failed to upload ${file.name}`, result.error);
@@ -193,6 +202,9 @@ export const AdminProjectsTab = () => {
         updatedImages[index] = {
           ...updatedImages[index],
           url: result.url,
+          width: result.width || 0,
+          height: result.height || 0,
+          fileSize: file.size,
         };
         setFormData((prev) => ({ ...prev, images: updatedImages }));
         showToast('success', 'Image Replaced ✓', result.sizeInfo);
@@ -661,6 +673,20 @@ export const AdminProjectsTab = () => {
                   alt="Cover Preview"
                   className="w-full max-h-[300px] object-contain rounded-lg border border-line bg-sheet block mx-auto"
                 />
+                {/* Dimensions + size info */}
+                {(formData.coverImgWidth > 0) && (
+                  <div className="mt-2 space-y-1">
+                    <p className="text-[11px] font-mono text-ink-3">
+                      {formData.coverImgWidth} × {formData.coverImgHeight} px
+                      {formData.coverImgSize ? ` · ${formatBytes(formData.coverImgSize)}` : ''}
+                    </p>
+                    {formData.coverImgWidth < 1600 && (
+                      <p className="text-[11px] font-mono font-semibold text-amber-500 flex items-center gap-1.5">
+                        ⚠️ This image is small and may look blurry. Export it from Figma at 2× for sharp results.
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -740,8 +766,8 @@ export const AdminProjectsTab = () => {
                       <img src={img.url} alt={img.alt} className="w-full h-full object-cover" />
                     </div>
 
-                    {/* Alt description input */}
-                    <div className="flex-1 min-w-0">
+                    {/* Alt description input + dim info */}
+                    <div className="flex-1 min-w-0 space-y-1">
                       <input
                         type="text"
                         value={img.alt || ''}
@@ -749,6 +775,20 @@ export const AdminProjectsTab = () => {
                         placeholder="Description for accessibility / caption"
                         className="w-full px-3 py-1.5 rounded-lg border border-line bg-sheet text-ink text-xs focus:outline-none focus:border-signal"
                       />
+                      {/* Pixel dimensions + file size */}
+                      {img.width > 0 && (
+                        <div className="space-y-0.5">
+                          <p className="text-[11px] font-mono text-ink-3">
+                            {img.width} × {img.height} px
+                            {img.fileSize ? ` · ${formatBytes(img.fileSize)}` : ''}
+                          </p>
+                          {img.width < 1600 && (
+                            <p className="text-[11px] font-mono font-semibold text-amber-500 flex items-center gap-1">
+                              ⚠️ Small image — may look blurry. Export from Figma at 2× for sharp results.
+                            </p>
+                          )}
+                        </div>
+                      )}
                     </div>
 
                     {/* Controls: Up, Down, Replace, Delete */}

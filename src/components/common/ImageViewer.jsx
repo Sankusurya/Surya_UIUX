@@ -19,6 +19,7 @@ export const ImageViewer = ({
   onNavigate
 }) => {
   const [zoom, setZoom] = useState(1);
+  const [fitMode, setFitMode] = useState(true); // true = fit to viewport; false = 1:1 pixel view
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const dragStartRef = useRef({ x: 0, y: 0 });
@@ -31,6 +32,7 @@ export const ImageViewer = ({
   // Reset zoom and pan when image changes or viewer opens
   useEffect(() => {
     setZoom(1);
+    setFitMode(true);
     setPan({ x: 0, y: 0 });
   }, [currentIndex, isOpen]);
 
@@ -62,25 +64,36 @@ export const ImageViewer = ({
   }, [currentIndex, images.length, onNavigate]);
 
   const handleZoomIn = () => {
-    setZoom((z) => Math.min(z + 0.5, 4));
+    setFitMode(false);
+    setZoom((z) => Math.min(z + 0.5, 8));
   };
 
   const handleZoomOut = () => {
     setZoom((z) => {
-      const next = Math.max(z - 0.5, 1);
-      if (next === 1) setPan({ x: 0, y: 0 });
+      const next = Math.max(z - 0.5, 0.25);
+      if (next <= 1) setPan({ x: 0, y: 0 });
       return next;
     });
   };
 
   const handleResetZoom = () => {
     setZoom(1);
+    setFitMode(true);
+    setPan({ x: 0, y: 0 });
+  };
+
+  const handleOneToOne = () => {
+    setFitMode(false);
+    setZoom(1);
     setPan({ x: 0, y: 0 });
   };
 
   const handleToggleZoom = (e) => {
     e.stopPropagation();
-    if (zoom === 1) {
+    if (fitMode) {
+      // First double-click: go to 1:1 natural size
+      handleOneToOne();
+    } else if (zoom < 2) {
       setZoom(2);
     } else {
       handleResetZoom();
@@ -104,6 +117,8 @@ export const ImageViewer = ({
         handleZoomOut();
       } else if (e.key === '0') {
         handleResetZoom();
+      } else if (e.key === '1') {
+        handleOneToOne();
       }
     };
 
@@ -113,14 +128,14 @@ export const ImageViewer = ({
 
   // Mouse pan handlers when zoomed
   const handleMouseDown = (e) => {
-    if (zoom <= 1) return;
+    if (fitMode && zoom <= 1) return;
     setIsDragging(true);
     dragStartRef.current = { x: e.clientX, y: e.clientY };
     panStartRef.current = { ...pan };
   };
 
   const handleMouseMove = (e) => {
-    if (!isDragging || zoom <= 1) return;
+    if (!isDragging || (fitMode && zoom <= 1)) return;
     const dx = e.clientX - dragStartRef.current.x;
     const dy = e.clientY - dragStartRef.current.y;
     setPan({
@@ -141,7 +156,7 @@ export const ImageViewer = ({
         y: e.touches[0].clientY,
         time: Date.now(),
       };
-      if (zoom > 1) {
+      if (zoom > 1 || !fitMode) {
         setIsDragging(true);
         panStartRef.current = { ...pan };
       }
@@ -212,28 +227,42 @@ export const ImageViewer = ({
           <button
             type="button"
             onClick={handleZoomOut}
-            disabled={zoom <= 1}
+            disabled={!fitMode && zoom <= 0.25}
             title="Zoom Out (-)"
             className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center transition-all cursor-pointer text-base"
           >
             −
           </button>
 
-          {/* Zoom Percentage */}
+          {/* Zoom label / reset */}
           <button
             type="button"
             onClick={handleResetZoom}
-            title="Reset Zoom (0)"
-            className="px-2.5 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-mono font-medium flex items-center justify-center transition-all cursor-pointer"
+            title="Fit to screen (0)"
+            className={`px-2.5 h-9 rounded-full text-white text-xs font-mono font-medium flex items-center justify-center transition-all cursor-pointer ${
+              fitMode ? 'bg-signal/50 ring-1 ring-signal' : 'bg-white/10 hover:bg-white/20'
+            }`}
           >
-            {Math.round(zoom * 100)}%
+            {fitMode ? 'Fit' : `${Math.round(zoom * 100)}%`}
+          </button>
+
+          {/* 1:1 pixel button */}
+          <button
+            type="button"
+            onClick={handleOneToOne}
+            title="View at real pixel size (1)"
+            className={`px-2.5 h-9 rounded-full text-white text-xs font-mono font-medium flex items-center justify-center transition-all cursor-pointer ${
+              !fitMode && zoom === 1 ? 'bg-signal/50 ring-1 ring-signal' : 'bg-white/10 hover:bg-white/20'
+            }`}
+          >
+            1:1
           </button>
 
           {/* Zoom In */}
           <button
             type="button"
             onClick={handleZoomIn}
-            disabled={zoom >= 4}
+            disabled={zoom >= 8}
             title="Zoom In (+)"
             className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center transition-all cursor-pointer text-base"
           >
@@ -267,10 +296,13 @@ export const ImageViewer = ({
           draggable={false}
           style={{
             transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
-            cursor: zoom > 1 ? (isDragging ? 'grabbing' : 'grab') : 'zoom-in',
+            cursor: (!fitMode || zoom > 1) ? (isDragging ? 'grabbing' : 'grab') : 'zoom-in',
             transition: isDragging ? 'none' : 'transform 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
-            maxHeight: zoom === 1 ? '92vh' : 'none',
-            maxWidth: zoom === 1 ? '94vw' : 'none',
+            // fitMode: constrain to viewport. 1:1 mode: no max constraints → natural pixels
+            maxHeight: fitMode ? '92vh' : 'none',
+            maxWidth: fitMode ? '94vw' : 'none',
+            width: fitMode ? 'auto' : undefined,
+            height: fitMode ? 'auto' : undefined,
           }}
           className="object-contain select-none"
         />
@@ -306,7 +338,7 @@ export const ImageViewer = ({
 
       {/* Bottom Hint */}
       <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 pointer-events-none text-white/50 text-[11px] font-mono text-center">
-        Double click to zoom · Swipe or arrows to navigate · Esc to close
+        Double-click for 1:1 pixel view · <kbd className="opacity-60">1</kbd> = real size · <kbd className="opacity-60">0</kbd> = fit · Esc to close
       </div>
     </div>
   );

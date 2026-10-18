@@ -1,14 +1,43 @@
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
-import { formatBytes } from './imageCompressor';
 
 const BUCKET_NAME = 'portfolio-assets';
+
+/** Format bytes to human-readable string, e.g. "1.4 MB" */
+export const formatBytes = (bytes, decimals = 1) => {
+  if (!bytes || bytes === 0) return '0 B';
+  const k = 1024;
+  const dm = decimals < 0 ? 0 : decimals;
+  const sizes = ['B', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+};
+
+/**
+ * Read the natural pixel dimensions of a File/Blob without modifying it.
+ * @param {File} file
+ * @returns {Promise<{ width: number, height: number }>}
+ */
+export const getImageDimensions = (file) =>
+  new Promise((resolve) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      resolve({ width: img.naturalWidth, height: img.naturalHeight });
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      resolve({ width: 0, height: 0 });
+    };
+    img.src = url;
+  });
 
 /**
  * Uploads an image to Supabase Storage in 100% full original quality (no compression or downscaling).
  * Essential for UI/UX case studies so Figma mockups, wireframes, charts, and typography remain pixel-perfect.
  * @param {File} file - Original user-selected file
  * @param {string} folder - Destination folder ('covers' | 'casestudies' | 'general')
- * @returns {Promise<{ success: boolean, url: string, error?: string, sizeInfo?: string }>}
+ * @returns {Promise<{ success: boolean, url: string, error?: string, sizeInfo?: string, width?: number, height?: number }>}
  */
 export const uploadImageToStorage = async (file, folder = 'general') => {
   if (!file) {
@@ -17,6 +46,9 @@ export const uploadImageToStorage = async (file, folder = 'general') => {
 
   const originalSize = file.size;
   const sizeInfo = `100% Original Quality (${formatBytes(originalSize)})`;
+
+  // Read natural dimensions before uploading
+  const { width, height } = await getImageDimensions(file);
 
   try {
     // 1. If Supabase is configured, upload the exact original file directly to Supabase Storage
@@ -50,6 +82,8 @@ export const uploadImageToStorage = async (file, folder = 'general') => {
           success: false,
           error: errorMsg,
           sizeInfo,
+          width,
+          height,
         };
       }
 
@@ -62,6 +96,8 @@ export const uploadImageToStorage = async (file, folder = 'general') => {
         success: true,
         url: urlData.publicUrl,
         sizeInfo,
+        width,
+        height,
       };
     }
 
@@ -74,6 +110,8 @@ export const uploadImageToStorage = async (file, folder = 'general') => {
           success: true,
           url: e.target.result,
           sizeInfo: `${sizeInfo} (Saved in original resolution)`,
+          width,
+          height,
         });
       };
       reader.readAsDataURL(file);
@@ -82,7 +120,8 @@ export const uploadImageToStorage = async (file, folder = 'general') => {
     return {
       success: false,
       error: `Failed to process image: ${err.message || 'Unknown upload error'}`,
+      width,
+      height,
     };
   }
 };
-
