@@ -14,7 +14,7 @@ export const ContactSection = () => {
 
   const handleCopyEmail = async () => {
     try {
-      await navigator.clipboard.writeText(profile.email || 'sankusurya@gmail.com');
+      await navigator.clipboard.writeText(profile.email || 'suryasanku800@gmail.com');
       setCopyText('Copied ✓');
     } catch {
       setCopyText('Selected, press Ctrl+C');
@@ -61,9 +61,9 @@ export const ContactSection = () => {
             </p>
 
             {/* Email pill */}
-            <div className="mailrow inline-flex items-center gap-2 p-1.5 rounded-full border border-line bg-sheet shadow-xs max-w-md">
+            <div className="mailrow inline-flex items-center gap-2 p-1.5 rounded-full border border-line bg-paper shadow-xs max-w-md">
               <span className="mail font-mono text-xs sm:text-sm px-3 text-ink select-all" id="mail">
-                {profile.email || 'sankusurya@gmail.com'}
+                {profile.email || 'suryasanku800@gmail.com'}
               </span>
               <button
                 type="button"
@@ -87,7 +87,7 @@ export const ContactSection = () => {
               </a>
               <span className="text-ink-3">·</span>
               <a
-                href="https://github.com"
+                href="https://github.com/Sankusurya"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-signal transition-colors underline font-medium"
@@ -98,7 +98,7 @@ export const ContactSection = () => {
               <button
                 type="button"
                 onClick={openResume}
-                className="hover:text-signal transition-colors underline font-medium cursor-pointer"
+                className="hover:text-signal transition-colors underline font-medium cursor-pointer bg-transparent border-0 p-0 text-inherit text-sm font-sans"
               >
                 View Resume 📄
               </button>
@@ -106,7 +106,7 @@ export const ContactSection = () => {
           </div>
 
           {/* Right Column: Direct Interactive Inquiry Form */}
-          <div className="lg:col-span-6 bg-sheet border border-line rounded-2xl p-6 sm:p-8 shadow-sm">
+          <div className="lg:col-span-6 bg-paper border border-line rounded-2xl p-6 sm:p-8 shadow-sm">
             <div className="mb-4">
               <span className="font-mono text-xs uppercase tracking-wider text-signal font-semibold">
                 Direct Inquiry
@@ -140,7 +140,7 @@ export const ContactSection = () => {
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       placeholder="e.g. Alex Miller"
-                      className="w-full px-3.5 py-2 rounded-xl border border-line bg-paper text-ink text-sm focus:outline-none focus:border-signal"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-line bg-sheet text-ink text-sm focus:outline-none focus:border-signal"
                     />
                   </div>
 
@@ -154,7 +154,7 @@ export const ContactSection = () => {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="alex@company.com"
-                      className="w-full px-3.5 py-2 rounded-xl border border-line bg-paper text-ink text-sm focus:outline-none focus:border-signal"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-line bg-sheet text-ink text-sm focus:outline-none focus:border-signal"
                     />
                   </div>
                 </div>
@@ -166,7 +166,7 @@ export const ContactSection = () => {
                   <select
                     value={topic}
                     onChange={(e) => setTopic(e.target.value)}
-                    className="w-full px-3.5 py-2 rounded-xl border border-line bg-paper text-ink text-sm focus:outline-none focus:border-signal"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-line bg-sheet text-ink text-sm focus:outline-none focus:border-signal"
                   >
                     <option value="Full-time Junior UX/UI Role">Full-time Junior UX/UI & Product Role</option>
                     <option value="Contract / Freelance Project">Contract / Freelance Project</option>
@@ -186,13 +186,14 @@ export const ContactSection = () => {
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     placeholder="Tell me about your team, problem, or role..."
-                    className="w-full px-3.5 py-2 rounded-xl border border-line bg-paper text-ink text-sm focus:outline-none focus:border-signal"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-line bg-sheet text-ink text-sm focus:outline-none focus:border-signal"
                   />
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full py-2.5 rounded-full bg-signal text-white font-semibold text-xs sm:text-sm hover:opacity-90 transition-opacity cursor-pointer shadow-xs"
+                  className="w-full py-2.5 rounded-full font-semibold text-xs sm:text-sm hover:opacity-95 active:scale-[0.99] transition-all cursor-pointer shadow-xs"
+                  style={{ backgroundColor: 'var(--signal)', color: 'var(--signal-ink, #ffffff)' }}
                 >
                   Send Inquiry Message →
                 </button>

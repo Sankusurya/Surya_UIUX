@@ -68,8 +68,8 @@ export const ResumeModal = () => {
 
             <div className="text-xs text-ink-2 sm:text-right space-y-1 font-mono">
               <div>
-                <a href={`mailto:${profile.email || 'sankusurya@gmail.com'}`} className="hover:text-signal underline">
-                  {profile.email || 'sankusurya@gmail.com'}
+                <a href={`mailto:${profile.email || 'suryasanku800@gmail.com'}`} className="hover:text-signal underline">
+                  {profile.email || 'suryasanku800@gmail.com'}
                 </a>
               </div>
               <div>
@@ -183,7 +183,7 @@ export const ResumeModal = () => {
             Close
           </button>
           <a
-            href={`mailto:${profile.email || 'sankusurya@gmail.com'}?subject=Discussion%20regarding%20Product%20Design%20Role`}
+            href={`mailto:${profile.email || 'suryasanku800@gmail.com'}?subject=Discussion%20regarding%20Product%20Design%20Role`}
             className="px-5 py-2 rounded-full bg-signal text-white text-xs font-semibold hover:opacity-90 transition-opacity cursor-pointer"
           >
             Contact Surya →

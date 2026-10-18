@@ -377,7 +377,7 @@ export const DEFAULT_PROFILE = {
   coreToolkit: "Figma, FigJam, HTML5, CSS Grid, JavaScript",
   location: "Andhra Pradesh, India · Open to Remote & Relocation",
   status: "Available for Junior UX/UI & Product Roles",
-  email: "sankusurya@gmail.com",
+  email: "suryasanku800@gmail.com",
   resumeUrl: "#resume",
   socials: [
     { label: "LinkedIn", note: "view profile", href: "https://linkedin.com" },

@@ -10,7 +10,7 @@ import {
 const PortfolioContext = createContext(null);
 
 const DEFAULT_MASTER_PASSWORD = "Surya@0206";
-export const REGISTERED_ADMIN_EMAIL = "sankusurya@gmail.com";
+export const REGISTERED_ADMIN_EMAIL = "suryasanku800@gmail.com";
 
 export const PortfolioProvider = ({ children }) => {
   // Theme state ('light' | 'dark')
@@ -56,6 +56,7 @@ export const PortfolioProvider = ({ children }) => {
         return {
           ...DEFAULT_PROFILE,
           ...parsed,
+          email: (parsed.email && parsed.email !== 'sankusurya@gmail.com') ? parsed.email : DEFAULT_PROFILE.email,
           roleLine1: parsed.roleLine1 && parsed.roleLine1 !== 'UX/UI' ? parsed.roleLine1 : DEFAULT_PROFILE.roleLine1,
           roleLine2: parsed.roleLine2 && parsed.roleLine2 !== 'Designer' ? parsed.roleLine2 : DEFAULT_PROFILE.roleLine2,
           name: parsed.name && parsed.name !== 'Surya' ? parsed.name : DEFAULT_PROFILE.name,

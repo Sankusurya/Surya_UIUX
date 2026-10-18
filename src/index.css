@@ -1724,22 +1724,24 @@ details .in {
 
 /* Contact */
 .contact {
-  background: var(--pill);
-  color: var(--pill-ink);
+  background: var(--sheet);
+  border: 1px solid var(--line);
+  color: var(--ink);
   border-radius: 28px;
   margin-block: 56px 24px;
-  padding-block: 64px;
-  padding-inline: clamp(20px, 5vw, 64px);
-  display: grid;
-  gap: 28px;
+  padding-block: 56px;
+  padding-inline: clamp(20px, 5vw, 56px);
+  box-shadow: 0 4px 24px -2px rgba(0, 0, 0, 0.2);
 }
 
 .contact h2 {
   font-family: var(--f-display);
-  font-weight: 400;
+  font-weight: 800;
   text-transform: uppercase;
-  font-size: clamp(48px, 8vw, 104px);
-  line-height: .88;
+  letter-spacing: -0.01em;
+  font-size: clamp(32px, 5vw, 56px);
+  line-height: 1.05;
+  color: var(--ink);
 }
 
 /* Bright orange in contact heading */
@@ -1751,33 +1753,35 @@ details .in {
 }
 
 .mailrow {
-  display: flex;
+  display: inline-flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
 }
 
 .mail {
-  font-family: var(--f-name);
-  font-size: clamp(26px, 4vw, 44px);
+  font-family: var(--f-mono);
+  font-size: 14px;
   user-select: all;
   word-break: break-all;
 }
 
-.contact button {
+.contact #copy,
+.mailrow button {
   font: inherit;
-  font-size: 14px;
-  font-weight: 500;
-  background: var(--pill-ink);
-  color: var(--pill);
+  font-size: 13px;
+  font-weight: 600;
+  background: var(--pill);
+  color: var(--pill-ink);
   border: 0;
   border-radius: 999px;
-  padding: 9px 16px;
+  padding: 8px 16px;
   cursor: pointer;
   transition: opacity .15s ease;
 }
 
-.contact button:hover {
+.contact #copy:hover,
+.mailrow button:hover {
   opacity: .9;
 }
 

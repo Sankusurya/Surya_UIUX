@@ -1,4 +1,4 @@
-﻿# Surya Teja — UX/UI & Product Designer Portfolio
+# Surya Teja — UX/UI & Product Designer Portfolio
 
 A modern, high-performance portfolio crafted in **React + Vite + Tailwind CSS**, preserving the exact editorial typography, layouts, CSS-drawn project covers, case study workflows, and built-in Admin CMS Studio from index (1).html.
 
@@ -49,7 +49,7 @@ npm run build
 The portfolio includes an integrated Admin Studio CMS to publish and manage content without editing code:
 
 - **Master Password**: Surya@0206
-- **Admin Contact**: sankusurya@gmail.com
+- **Admin Contact**: suryasanku800@gmail.com
 - **How to Access**:
   - Navigate to #admin in your URL bar.
   - Click the **Owner only** lock badge on the Admin project card.
