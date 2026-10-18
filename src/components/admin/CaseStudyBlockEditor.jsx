@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
+import { usePortfolio } from '../../context/PortfolioContext';
 import { CaseStudyBlockRenderer } from '../casestudy/CaseStudyBlockRenderer';
 import { isTrustedEmbedUrl, getDomainFromUrl } from '../../utils/embedSecurity';
+import { uploadImageToStorage } from '../../utils/imageStorage';
 
 export const CaseStudyBlockEditor = ({
   caseStudy = { role: '', timeline: '', team: '', tools: '', blocks: [] },
   onChange,
   projectTitle = ''
 }) => {
+  const { showToast } = usePortfolio();
   const [isPreviewMode, setIsPreviewMode] = useState(false);
 
   const blocks = Array.isArray(caseStudy.blocks) ? caseStudy.blocks : [];
@@ -125,23 +128,28 @@ export const CaseStudyBlockEditor = ({
     updateBlocks(updated);
   };
 
-  // Image upload via FileReader
-  const handleFileUpload = (e, callback) => {
+  // Image upload with compression and online cloud storage
+  const handleFileUpload = async (e, callback) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
-      alert('Please upload an image file (PNG, JPG, SVG, WebP).');
+      showToast?.('warning', 'Invalid File Format', 'Please upload an image file (PNG, JPG, WebP, SVG).');
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      if (event.target?.result) {
-        callback(event.target.result);
+    showToast?.('info', 'Optimizing Image...', 'Resizing and compressing WebP image before cloud storage.');
+    try {
+      const result = await uploadImageToStorage(file, 'casestudies');
+      if (result.success) {
+        callback(result.url);
+        showToast?.('success', 'Image Uploaded to Cloud Storage ✓', result.sizeInfo);
+      } else {
+        showToast?.('error', 'Image Upload Failed', result.error);
       }
-    };
-    reader.readAsDataURL(file);
+    } catch (err) {
+      showToast?.('error', 'Image Upload Error', err.message);
+    }
   };
 
   return (

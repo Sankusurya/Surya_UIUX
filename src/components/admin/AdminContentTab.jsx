@@ -64,7 +64,6 @@ export const AdminContentTab = () => {
     saveSteps(stepsData);
     savePrinciples(principlesData);
     saveAbout(aboutData);
-    alert('Design thinking, principles, and about information saved successfully!');
   };
 
   return (

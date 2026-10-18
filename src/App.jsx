@@ -10,6 +10,7 @@ import { CaseStudyView } from './components/casestudy/CaseStudyView';
 import { ContactSection } from './components/home/ContactSection';
 import { AdminPanel } from './components/admin/AdminPanel';
 import { ResumeModal } from './components/common/ResumeModal';
+import { Toast } from './components/common/Toast';
 
 export const App = () => {
   const { currentRoute } = usePortfolio();
@@ -52,8 +53,9 @@ export const App = () => {
         </>
       )}
 
-      {/* Global Modals */}
+      {/* Global Modals & Notifications */}
       <ResumeModal />
+      <Toast />
     </>
   );
 };

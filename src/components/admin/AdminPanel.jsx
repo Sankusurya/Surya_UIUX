@@ -7,8 +7,28 @@ import { AdminContentTab } from './AdminContentTab';
 import { AdminInquiriesTab } from './AdminInquiriesTab';
 
 export const AdminPanel = () => {
-  const { isAdminAuth, logoutAdmin, resetToDefaults, messages, projects, profile, steps, principles, about, saveProjects, saveProfile } = usePortfolio();
+  const {
+    isAdminAuth,
+    logoutAdmin,
+    resetToDefaults,
+    messages,
+    projects,
+    profile,
+    steps,
+    principles,
+    about,
+    saveProjects,
+    saveProfile,
+    saveSteps,
+    savePrinciples,
+    saveAbout,
+    syncAllToCloud,
+    isSupabaseConfigured,
+    showToast,
+  } = usePortfolio();
+
   const [activeTab, setActiveTab] = useState('projects');
+  const [isSyncing, setIsSyncing] = useState(false);
 
   if (!isAdminAuth) {
     return <AdminAuthView />;
@@ -38,23 +58,36 @@ export const AdminPanel = () => {
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();
+    showToast('success', 'Backup Exported ✓', 'Full portfolio JSON file downloaded.');
   };
 
-  const handleImportData = (e) => {
+  const handleImportData = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = (event) => {
+    reader.onload = async (event) => {
       try {
         const parsed = JSON.parse(event.target.result);
-        if (parsed.projects) saveProjects(parsed.projects);
-        if (parsed.profile) saveProfile(parsed.profile);
-        alert('Portfolio data successfully restored from backup file!');
+        if (parsed.projects) await saveProjects(parsed.projects);
+        if (parsed.profile) await saveProfile(parsed.profile);
+        if (parsed.steps) await saveSteps(parsed.steps);
+        if (parsed.principles) await savePrinciples(parsed.principles);
+        if (parsed.about) await saveAbout(parsed.about);
+        showToast('success', 'Backup Restored ✓', 'All portfolio data restored and synced online.');
       } catch (err) {
-        alert('Invalid JSON file format.');
+        showToast('error', 'Import Failed', 'Invalid JSON backup file format.');
       }
     };
     reader.readAsText(file);
+  };
+
+  const handleManualSync = async () => {
+    setIsSyncing(true);
+    try {
+      await syncAllToCloud();
+    } finally {
+      setIsSyncing(false);
+    }
   };
 
   return (
@@ -62,7 +95,20 @@ export const AdminPanel = () => {
       {/* Studio Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-line pb-6">
         <div>
-          <span className="mono text-signal block mb-1">Studio CMS · Owner Panel</span>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="mono text-signal">Studio CMS · Owner Panel</span>
+            {isSupabaseConfigured ? (
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-mono bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                Cloud Database Connected
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-mono bg-amber-500/10 text-amber-600 border border-amber-500/20">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                Browser Storage (Cloud Setup Pending)
+              </span>
+            )}
+          </div>
           <h1 className="text-3xl sm:text-4xl font-extrabold font-display uppercase tracking-wider text-ink">
             Portfolio Studio Editor
           </h1>
@@ -78,6 +124,26 @@ export const AdminPanel = () => {
           >
             ← View Site
           </a>
+
+          <button
+            type="button"
+            disabled={isSyncing}
+            onClick={handleManualSync}
+            className="px-4 py-2 rounded-full border border-signal/40 bg-signal/10 text-xs font-semibold text-signal hover:bg-signal/20 transition-all cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
+            title="Push all current content to online database"
+          >
+            {isSyncing ? (
+              <>
+                <span className="w-3 h-3 border-2 border-signal border-t-transparent rounded-full animate-spin"></span>
+                Syncing...
+              </>
+            ) : (
+              <>
+                <span>☁</span>
+                <span>Sync to Cloud</span>
+              </>
+            )}
+          </button>
 
           <button
             type="button"

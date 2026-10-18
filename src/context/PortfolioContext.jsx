@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import {
   DEFAULT_PROJECTS,
   DEFAULT_PROFILE,
@@ -15,14 +15,50 @@ import {
   DEFAULT_PROTECTED_HASH
 } from '../lib/supabase';
 
+import {
+  fetchCloudContent,
+  saveCloudContent,
+  seedCloudDatabase,
+  fetchCloudMessages,
+  saveCloudMessage,
+  markCloudMessageRead,
+  deleteCloudMessage
+} from '../services/portfolioDb';
+
+import { sendContactEmail } from '../services/emailService';
+
 const PortfolioContext = createContext(null);
 export const REGISTERED_ADMIN_EMAIL = ALLOWED_ADMIN_EMAIL;
+
+// Setup cross-tab sync channel
+const syncChannel = typeof window !== 'undefined' && 'BroadcastChannel' in window
+  ? new BroadcastChannel('surya_portfolio_sync')
+  : null;
 
 export const PortfolioProvider = ({ children }) => {
   // Theme state ('light' | 'dark')
   const [theme, setTheme] = useState(() => {
     return localStorage.getItem('surya_theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
   });
+
+  // Global Toast State
+  const [toast, setToast] = useState(null);
+  const toastTimeoutRef = useRef(null);
+
+  const showToast = (type, message, detail = '', duration = 5000) => {
+    if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+    setToast({ type, message, detail, id: Date.now() });
+    if (duration > 0) {
+      toastTimeoutRef.current = setTimeout(() => {
+        setToast(null);
+      }, duration);
+    }
+  };
+
+  const dismissToast = () => {
+    if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+    setToast(null);
+  };
 
   // Routing
   const [currentRoute, setCurrentRoute] = useState(() => {
@@ -80,46 +116,6 @@ export const PortfolioProvider = ({ children }) => {
     }
   });
 
-  // Contact form messages storage
-  const [messages, setMessages] = useState(() => {
-    try {
-      const saved = localStorage.getItem('surya_portfolio_messages');
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
-    }
-  });
-
-  const addMessage = (msg) => {
-    const newMsg = {
-      id: Date.now().toString(),
-      date: new Date().toLocaleString(),
-      read: false,
-      ...msg,
-    };
-    const updated = [newMsg, ...messages];
-    setMessages(updated);
-    localStorage.setItem('surya_portfolio_messages', JSON.stringify(updated));
-    return newMsg;
-  };
-
-  const deleteMessage = (id) => {
-    const updated = messages.filter((m) => m.id !== id);
-    setMessages(updated);
-    localStorage.setItem('surya_portfolio_messages', JSON.stringify(updated));
-  };
-
-  const markMessageRead = (id) => {
-    const updated = messages.map((m) => (m.id === id ? { ...m, read: true } : m));
-    setMessages(updated);
-    localStorage.setItem('surya_portfolio_messages', JSON.stringify(updated));
-  };
-
-  // Resume modal state
-  const [isResumeOpen, setIsResumeOpen] = useState(false);
-  const openResume = () => setIsResumeOpen(true);
-  const closeResume = () => setIsResumeOpen(false);
-
   const [steps, setSteps] = useState(() => {
     try {
       const saved = localStorage.getItem('surya_portfolio_steps');
@@ -146,6 +142,98 @@ export const PortfolioProvider = ({ children }) => {
       return DEFAULT_ABOUT;
     }
   });
+
+  // Contact form messages storage
+  const [messages, setMessages] = useState(() => {
+    try {
+      const saved = localStorage.getItem('surya_portfolio_messages');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  // Cloud Data Synchronization on Initial Load
+  const [isCloudLoaded, setIsCloudLoaded] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadInitialCloudData = async () => {
+      try {
+        const cloudContent = await fetchCloudContent();
+        if (!isMounted) return;
+
+        if (cloudContent) {
+          if (cloudContent.projects && Array.isArray(cloudContent.projects)) {
+            setProjects(cloudContent.projects);
+            localStorage.setItem('surya_portfolio_projects', JSON.stringify(cloudContent.projects));
+          }
+          if (cloudContent.profile) {
+            setProfile(cloudContent.profile);
+            localStorage.setItem('surya_portfolio_profile', JSON.stringify(cloudContent.profile));
+          }
+          if (cloudContent.steps) {
+            setSteps(cloudContent.steps);
+            localStorage.setItem('surya_portfolio_steps', JSON.stringify(cloudContent.steps));
+          }
+          if (cloudContent.principles) {
+            setPrinciples(cloudContent.principles);
+            localStorage.setItem('surya_portfolio_principles', JSON.stringify(cloudContent.principles));
+          }
+          if (cloudContent.about) {
+            setAbout(cloudContent.about);
+            localStorage.setItem('surya_portfolio_about', JSON.stringify(cloudContent.about));
+          }
+        } else if (isSupabaseConfigured) {
+          // If cloud is connected but empty, auto-seed with current portfolio content
+          seedCloudDatabase({
+            projects,
+            profile,
+            steps,
+            principles,
+            about
+          }).catch(() => {});
+        }
+
+        // Fetch cloud messages
+        const cloudMessages = await fetchCloudMessages();
+        if (!isMounted) return;
+        if (cloudMessages && Array.isArray(cloudMessages)) {
+          setMessages(cloudMessages);
+          localStorage.setItem('surya_portfolio_messages', JSON.stringify(cloudMessages));
+        }
+
+        setIsCloudLoaded(true);
+      } catch (err) {
+        console.warn('Initial cloud synchronization notice:', err);
+      }
+    };
+
+    loadInitialCloudData();
+
+    // Cross-tab broadcast receiver
+    if (syncChannel) {
+      syncChannel.onmessage = (event) => {
+        const { type, payload } = event.data || {};
+        if (type === 'PROJECTS_SYNC') setProjects(payload);
+        if (type === 'PROFILE_SYNC') setProfile(payload);
+        if (type === 'STEPS_SYNC') setSteps(payload);
+        if (type === 'PRINCIPLES_SYNC') setPrinciples(payload);
+        if (type === 'ABOUT_SYNC') setAbout(payload);
+        if (type === 'MESSAGES_SYNC') setMessages(payload);
+      };
+    }
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // Resume modal state
+  const [isResumeOpen, setIsResumeOpen] = useState(false);
+  const openResume = () => setIsResumeOpen(true);
+  const closeResume = () => setIsResumeOpen(false);
 
   // Admin Auth state via Supabase session
   const [isAdminAuth, setIsAdminAuth] = useState(false);
@@ -262,32 +350,164 @@ export const PortfolioProvider = ({ children }) => {
     }
   }, [currentRoute, projects]);
 
-  const saveProjects = (newProjects) => {
+  // Online Database & LocalStorage Unified Save Handlers
+  const saveProjects = async (newProjects) => {
     setProjects(newProjects);
     localStorage.setItem('surya_portfolio_projects', JSON.stringify(newProjects));
+    syncChannel?.postMessage({ type: 'PROJECTS_SYNC', payload: newProjects });
+
+    const result = await saveCloudContent('projects', newProjects);
+    if (result.success) {
+      showToast('success', 'Projects Saved to Online Database ✓', 'Visible immediately to all visitors across every device.');
+    } else if (result.isOffline) {
+      showToast('info', 'Projects Saved Locally (Offline)', result.error);
+    } else {
+      showToast('error', 'Cloud Save Failed', result.error);
+    }
+    return result;
   };
 
-  const saveProfile = (newProfile) => {
+  const saveProfile = async (newProfile) => {
     setProfile(newProfile);
     localStorage.setItem('surya_portfolio_profile', JSON.stringify(newProfile));
+    syncChannel?.postMessage({ type: 'PROFILE_SYNC', payload: newProfile });
+
+    const result = await saveCloudContent('profile', newProfile);
+    if (result.success) {
+      showToast('success', 'Profile Saved to Online Database ✓', 'Hero & Identity updates are now live online.');
+    } else if (result.isOffline) {
+      showToast('info', 'Profile Saved Locally (Offline)', result.error);
+    } else {
+      showToast('error', 'Cloud Save Failed', result.error);
+    }
+    return result;
   };
 
-  const saveSteps = (newSteps) => {
+  const saveSteps = async (newSteps) => {
     setSteps(newSteps);
     localStorage.setItem('surya_portfolio_steps', JSON.stringify(newSteps));
+    syncChannel?.postMessage({ type: 'STEPS_SYNC', payload: newSteps });
+
+    const result = await saveCloudContent('steps', newSteps);
+    if (result.success) {
+      showToast('success', 'Process Steps Saved to Online Database ✓', 'Updated on homepage and thinking page.');
+    } else if (result.isOffline) {
+      showToast('info', 'Steps Saved Locally', result.error);
+    } else {
+      showToast('error', 'Cloud Save Failed', result.error);
+    }
+    return result;
   };
 
-  const savePrinciples = (newPrinciples) => {
+  const savePrinciples = async (newPrinciples) => {
     setPrinciples(newPrinciples);
     localStorage.setItem('surya_portfolio_principles', JSON.stringify(newPrinciples));
+    syncChannel?.postMessage({ type: 'PRINCIPLES_SYNC', payload: newPrinciples });
+
+    const result = await saveCloudContent('principles', newPrinciples);
+    if (result.success) {
+      showToast('success', 'Principles Saved to Online Database ✓', 'Updated across public views.');
+    } else if (result.isOffline) {
+      showToast('info', 'Principles Saved Locally', result.error);
+    } else {
+      showToast('error', 'Cloud Save Failed', result.error);
+    }
+    return result;
   };
 
-  const saveAbout = (newAbout) => {
+  const saveAbout = async (newAbout) => {
     setAbout(newAbout);
     localStorage.setItem('surya_portfolio_about', JSON.stringify(newAbout));
+    syncChannel?.postMessage({ type: 'ABOUT_SYNC', payload: newAbout });
+
+    const result = await saveCloudContent('about', newAbout);
+    if (result.success) {
+      showToast('success', 'About Page Saved to Online Database ✓', 'Updated bio and background online.');
+    } else if (result.isOffline) {
+      showToast('info', 'About Saved Locally', result.error);
+    } else {
+      showToast('error', 'Cloud Save Failed', result.error);
+    }
+    return result;
   };
 
-  const resetToDefaults = () => {
+  // Sync All Portfolio Content to Online Database
+  const syncAllToCloud = async () => {
+    showToast('info', 'Syncing Content to Cloud...', 'Uploading all projects, case studies, profile, and design thinking.');
+    const result = await seedCloudDatabase({
+      projects,
+      profile,
+      steps,
+      principles,
+      about,
+    });
+
+    if (result.success) {
+      showToast('success', 'All Content Synced to Online Database! ✓', 'Every project, case study, and bio text is now saved online for all visitors.');
+    } else {
+      showToast('error', 'Cloud Sync Failed', result.error);
+    }
+    return result;
+  };
+
+  // Visitor Message Submission & Storage
+  const addMessage = async (msg) => {
+    const newMsg = {
+      id: `msg-${Date.now()}`,
+      date: new Date().toLocaleString(),
+      read: false,
+      name: msg.name,
+      email: msg.email,
+      topic: msg.topic || 'General Inquiry',
+      message: msg.message,
+      created_at: new Date().toISOString(),
+    };
+
+    const updated = [newMsg, ...messages];
+    setMessages(updated);
+    localStorage.setItem('surya_portfolio_messages', JSON.stringify(updated));
+    syncChannel?.postMessage({ type: 'MESSAGES_SYNC', payload: updated });
+
+    // 1. Save message to online Supabase table
+    const dbResult = await saveCloudMessage(newMsg);
+
+    // 2. Deliver email to suryasanku800@gmail.com
+    const emailResult = await sendContactEmail(msg);
+
+    if (emailResult.success) {
+      showToast('success', 'Inquiry Emailed & Saved ✓', 'Your message was delivered to suryasanku800@gmail.com and saved to the inbox.');
+    } else if (emailResult.needsKey) {
+      showToast('info', 'Inquiry Saved to Online Inbox ✓', 'Message recorded in the portfolio database. (Direct email requires VITE_WEB3FORMS_ACCESS_KEY).');
+    } else {
+      showToast('warning', 'Message Saved (Email Delivery Notice)', emailResult.error);
+    }
+
+    return {
+      success: true,
+      dbResult,
+      emailResult,
+      newMsg
+    };
+  };
+
+  const deleteMessage = async (id) => {
+    const updated = messages.filter((m) => m.id !== id);
+    setMessages(updated);
+    localStorage.setItem('surya_portfolio_messages', JSON.stringify(updated));
+    syncChannel?.postMessage({ type: 'MESSAGES_SYNC', payload: updated });
+    await deleteCloudMessage(id);
+    showToast('info', 'Message Deleted', 'Removed from online database.');
+  };
+
+  const markMessageRead = async (id) => {
+    const updated = messages.map((m) => (m.id === id ? { ...m, read: true } : m));
+    setMessages(updated);
+    localStorage.setItem('surya_portfolio_messages', JSON.stringify(updated));
+    syncChannel?.postMessage({ type: 'MESSAGES_SYNC', payload: updated });
+    await markCloudMessageRead(id);
+  };
+
+  const resetToDefaults = async () => {
     if (window.confirm("Are you sure you want to restore original default portfolio content?")) {
       setProjects(DEFAULT_PROJECTS);
       setProfile(DEFAULT_PROFILE);
@@ -301,7 +521,25 @@ export const PortfolioProvider = ({ children }) => {
       localStorage.removeItem('surya_portfolio_about');
       localStorage.removeItem('surya_portfolio_messages');
       setMessages([]);
-      alert("All content reset to original defaults!");
+
+      syncChannel?.postMessage({ type: 'PROJECTS_SYNC', payload: DEFAULT_PROJECTS });
+      syncChannel?.postMessage({ type: 'PROFILE_SYNC', payload: DEFAULT_PROFILE });
+      syncChannel?.postMessage({ type: 'STEPS_SYNC', payload: DEFAULT_STEPS });
+      syncChannel?.postMessage({ type: 'PRINCIPLES_SYNC', payload: DEFAULT_PRINCIPLES });
+      syncChannel?.postMessage({ type: 'ABOUT_SYNC', payload: DEFAULT_ABOUT });
+      syncChannel?.postMessage({ type: 'MESSAGES_SYNC', payload: [] });
+
+      if (isSupabaseConfigured) {
+        await seedCloudDatabase({
+          projects: DEFAULT_PROJECTS,
+          profile: DEFAULT_PROFILE,
+          steps: DEFAULT_STEPS,
+          principles: DEFAULT_PRINCIPLES,
+          about: DEFAULT_ABOUT
+        });
+      }
+
+      showToast('success', 'Reset Completed', 'All content restored to original defaults.');
     }
   };
 
@@ -446,6 +684,7 @@ export const PortfolioProvider = ({ children }) => {
         savePrinciples,
         about,
         saveAbout,
+        syncAllToCloud,
         resetToDefaults,
         messages,
         addMessage,
@@ -458,10 +697,14 @@ export const PortfolioProvider = ({ children }) => {
         authLoading,
         adminUser,
         isSupabaseConfigured,
+        isCloudLoaded,
         loginAdmin,
         logoutAdmin,
         sendPasswordReset,
         updatePassword,
+        toast,
+        showToast,
+        dismissToast,
       }}
     >
       {children}

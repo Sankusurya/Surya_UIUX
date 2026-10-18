@@ -10,7 +10,9 @@ export const ContactSection = () => {
   const [email, setEmail] = useState('');
   const [topic, setTopic] = useState('Full-time Junior UX/UI Role');
   const [message, setMessage] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [submitFeedback, setSubmitFeedback] = useState(null);
 
   const handleCopyEmail = async () => {
     try {
@@ -24,25 +26,40 @@ export const ContactSection = () => {
     }, 2000);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!name.trim() || !email.trim() || !message.trim()) return;
 
-    addMessage({
-      name,
-      email,
-      topic,
-      message,
-    });
+    setIsSubmitting(true);
+    try {
+      const result = await addMessage({
+        name,
+        email,
+        topic,
+        message,
+      });
 
-    setSubmitted(true);
-    setName('');
-    setEmail('');
-    setMessage('');
+      setSubmitted(true);
+      setSubmitFeedback({
+        isEmailed: Boolean(result?.emailResult?.success),
+        notice: result?.emailResult?.needsKey
+          ? 'Saved directly to the portfolio online database and Admin inbox.'
+          : 'Delivered directly to suryasanku800@gmail.com & saved to the Admin inbox.'
+      });
+
+      setName('');
+      setEmail('');
+      setMessage('');
+    } catch (err) {
+      alert(`Could not send message: ${err.message || 'Please check your connection and try again.'}`);
+    } finally {
+      setIsSubmitting(false);
+    }
 
     setTimeout(() => {
       setSubmitted(false);
-    }, 6000);
+      setSubmitFeedback(null);
+    }, 7000);
   };
 
   return (
@@ -120,12 +137,17 @@ export const ContactSection = () => {
             </div>
 
             {submitted ? (
-              <div className="p-5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 space-y-2 text-center animate-in">
-                <span className="text-2xl block">✓</span>
-                <p className="font-semibold text-sm">Message Sent Successfully!</p>
-                <p className="text-xs opacity-90">
-                  Thank you for reaching out. Surya will review your note and respond shortly.
+              <div className="p-6 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 space-y-2.5 text-center animate-in">
+                <span className="text-3xl block">✓</span>
+                <p className="font-bold text-base">Message Sent Successfully!</p>
+                <p className="text-xs opacity-90 max-w-sm mx-auto">
+                  {submitFeedback?.notice || 'Thank you for reaching out. Surya will review your note and respond shortly.'}
                 </p>
+                <div className="pt-2">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] bg-emerald-500/20 font-mono">
+                    ✓ Logged in Studio CMS Inbox
+                  </span>
+                </div>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
@@ -137,10 +159,11 @@ export const ContactSection = () => {
                     <input
                       type="text"
                       required
+                      disabled={isSubmitting}
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       placeholder="e.g. Alex Miller"
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-line bg-sheet text-ink text-sm focus:outline-none focus:border-signal"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-line bg-sheet text-ink text-sm focus:outline-none focus:border-signal disabled:opacity-60"
                     />
                   </div>
 
@@ -151,10 +174,11 @@ export const ContactSection = () => {
                     <input
                       type="email"
                       required
+                      disabled={isSubmitting}
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="alex@company.com"
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-line bg-sheet text-ink text-sm focus:outline-none focus:border-signal"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-line bg-sheet text-ink text-sm focus:outline-none focus:border-signal disabled:opacity-60"
                     />
                   </div>
                 </div>
@@ -165,8 +189,9 @@ export const ContactSection = () => {
                   </label>
                   <select
                     value={topic}
+                    disabled={isSubmitting}
                     onChange={(e) => setTopic(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-line bg-sheet text-ink text-sm focus:outline-none focus:border-signal"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-line bg-sheet text-ink text-sm focus:outline-none focus:border-signal disabled:opacity-60"
                   >
                     <option value="Full-time Junior UX/UI Role">Full-time Junior UX/UI & Product Role</option>
                     <option value="Contract / Freelance Project">Contract / Freelance Project</option>
@@ -183,19 +208,28 @@ export const ContactSection = () => {
                   <textarea
                     required
                     rows={3}
+                    disabled={isSubmitting}
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     placeholder="Tell me about your team, problem, or role..."
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-line bg-sheet text-ink text-sm focus:outline-none focus:border-signal"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-line bg-sheet text-ink text-sm focus:outline-none focus:border-signal disabled:opacity-60"
                   />
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full py-2.5 rounded-full font-semibold text-xs sm:text-sm hover:opacity-95 active:scale-[0.99] transition-all cursor-pointer shadow-xs"
+                  disabled={isSubmitting}
+                  className="w-full py-2.5 rounded-full font-semibold text-xs sm:text-sm hover:opacity-95 active:scale-[0.99] transition-all cursor-pointer shadow-xs disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   style={{ backgroundColor: 'var(--signal)', color: 'var(--signal-ink, #ffffff)' }}
                 >
-                  Send Inquiry Message →
+                  {isSubmitting ? (
+                    <>
+                      <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                      <span>Sending to Surya...</span>
+                    </>
+                  ) : (
+                    <span>Send Inquiry Message →</span>
+                  )}
                 </button>
               </form>
             )}

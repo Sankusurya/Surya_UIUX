@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { usePortfolio } from '../../context/PortfolioContext';
 import { CaseStudyBlockEditor } from './CaseStudyBlockEditor';
+import { uploadImageToStorage } from '../../utils/imageStorage';
 
 export const AdminProjectsTab = () => {
-  const { projects, saveProjects } = usePortfolio();
+  const { projects, saveProjects, showToast } = usePortfolio();
 
   const [isEditing, setIsEditing] = useState(false);
   const [editingSlug, setEditingSlug] = useState(null);
+  const [isUploadingCover, setIsUploadingCover] = useState(false);
 
   const emptyProject = {
     slug: '',
@@ -235,7 +237,6 @@ export const AdminProjectsTab = () => {
     setIsEditing(false);
     setEditingSlug(null);
     setFormData(emptyProject);
-    alert('Project successfully saved!');
   };
 
   return (
@@ -416,26 +417,45 @@ export const AdminProjectsTab = () => {
                 Custom Cover Image (Optional - overrides theme)
               </label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (!file) return;
-                    const reader = new FileReader();
-                    reader.onload = (ev) => {
-                      if (ev.target?.result) setFormData({ ...formData, coverImg: ev.target.result });
-                    };
-                    reader.readAsDataURL(file);
-                  }}
-                  className="w-full text-xs text-ink-3 file:mr-2 file:py-1 file:px-3 file:rounded-xl file:border file:border-line file:bg-paper file:text-xs file:font-medium file:cursor-pointer hover:file:bg-sheet"
-                />
+                <div className="relative">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    disabled={isUploadingCover}
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      setIsUploadingCover(true);
+                      showToast('info', 'Optimizing Cover Image...', 'Resizing and compressing WebP image before online storage.');
+                      try {
+                        const result = await uploadImageToStorage(file, 'covers');
+                        if (result.success) {
+                          setFormData((prev) => ({ ...prev, coverImg: result.url }));
+                          showToast('success', 'Cover Image Uploaded to Cloud ✓', result.sizeInfo);
+                        } else {
+                          showToast('error', 'Image Upload Failed', result.error);
+                        }
+                      } catch (err) {
+                        showToast('error', 'Image Upload Error', err.message);
+                      } finally {
+                        setIsUploadingCover(false);
+                      }
+                    }}
+                    className="w-full text-xs text-ink-3 file:mr-2 file:py-1 file:px-3 file:rounded-xl file:border file:border-line file:bg-paper file:text-xs file:font-medium file:cursor-pointer hover:file:bg-sheet disabled:opacity-50"
+                  />
+                  {isUploadingCover && (
+                    <div className="text-[11px] text-signal font-mono mt-1 flex items-center gap-1.5 animate-pulse">
+                      <span className="w-2.5 h-2.5 border-2 border-signal border-t-transparent rounded-full animate-spin"></span>
+                      Uploading to cloud storage...
+                    </div>
+                  )}
+                </div>
                 <div className="flex items-center gap-2">
                   <input
                     type="text"
                     value={formData.coverImg || ''}
                     onChange={(e) => setFormData({ ...formData, coverImg: e.target.value })}
-                    placeholder="Or paste cover image URL"
+                    placeholder="Or paste public image URL"
                     className="flex-1 px-3.5 py-1.5 rounded-xl border border-line bg-paper text-ink text-xs focus:outline-none focus:border-signal"
                   />
                   {formData.coverImg && (
