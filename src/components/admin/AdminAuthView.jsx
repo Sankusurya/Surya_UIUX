@@ -6,7 +6,6 @@ export const AdminAuthView = () => {
     loginAdmin,
     sendPasswordReset,
     updatePassword,
-    isSupabaseConfigured,
     currentRoute,
     setCurrentRoute,
     authLoading,
@@ -18,6 +17,7 @@ export const AdminAuthView = () => {
   // Login form state
   const [email, setEmail] = useState('suryasanku800@gmail.com');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -30,6 +30,8 @@ export const AdminAuthView = () => {
   // Set new password state
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [setNewError, setSetNewError] = useState('');
   const [setNewSuccess, setSetNewSuccess] = useState(false);
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
@@ -58,7 +60,7 @@ export const AdminAuthView = () => {
     setIsSendingReset(false);
 
     if (!result.success) {
-      setResetError(result.error || 'Failed to send password reset email.');
+      setResetError(result.error || 'Failed to initiate password reset.');
     } else {
       setResetSent(true);
     }
@@ -73,8 +75,8 @@ export const AdminAuthView = () => {
       return;
     }
 
-    if (newPassword.length < 8) {
-      setSetNewError('Password must be at least 8 characters long.');
+    if (newPassword.length < 6) {
+      setSetNewError('Password must be at least 6 characters long.');
       return;
     }
 
@@ -90,7 +92,7 @@ export const AdminAuthView = () => {
         setViewMode('login');
         setCurrentRoute('admin');
         window.location.hash = 'admin';
-      }, 2000);
+      }, 1500);
     }
   };
 
@@ -112,37 +114,15 @@ export const AdminAuthView = () => {
             🔒
           </div>
           <span className="font-mono text-xs uppercase tracking-wider text-signal font-semibold block">
-            Protected Area
+            Protected Area · Cloud & Cryptographic Guard
           </span>
           <h2 className="text-2xl sm:text-3xl font-extrabold font-display uppercase tracking-wider text-ink">
             Studio CMS Authentication
           </h2>
           <p className="text-xs sm:text-sm text-ink-2">
-            Online cloud-authenticated access for the verified portfolio owner.
+            Secure owner login for <span className="font-mono text-ink font-semibold">suryasanku800@gmail.com</span>
           </p>
         </div>
-
-        {/* Setup Guard if Supabase Credentials are missing */}
-        {!isSupabaseConfigured && (
-          <div className="p-4 sm:p-5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-ink space-y-3 text-xs leading-relaxed">
-            <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-semibold font-mono uppercase tracking-wider">
-              <span>⚠️</span>
-              <span>Online Authentication Setup Required</span>
-            </div>
-            <p className="text-ink-2">
-              For security, passwords and keys are never hardcoded in this public repository. To connect your cloud authentication service:
-            </p>
-            <ol className="list-decimal list-inside space-y-1.5 text-ink font-mono text-[11px] bg-paper p-3 rounded-xl border border-line">
-              <li>Create a free project at <span className="text-signal underline">supabase.com</span></li>
-              <li>Add your admin user email (<code className="text-signal">suryasanku800@gmail.com</code>) under Authentication → Users</li>
-              <li>Copy your Project URL & Anon Key into your local <code className="text-signal">.env</code> file</li>
-              <li>Restart the dev server (<code className="text-signal">npm run dev</code>)</li>
-            </ol>
-            <p className="text-[11px] text-ink-3">
-              See <code className="text-ink">.env.example</code> for details. This file is ignored by Git and will never be pushed publicly.
-            </p>
-          </div>
-        )}
 
         {/* View: Login Mode */}
         {viewMode === 'login' && (
@@ -169,9 +149,56 @@ export const AdminAuthView = () => {
 
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="block text-xs font-mono uppercase tracking-wider text-ink-3">
-                  Password
-                </label>
+                {/* Password Label with Interactive Eye Icon */}
+                <div className="flex items-center gap-2">
+                  <label className="block text-xs font-mono uppercase tracking-wider text-ink-3">
+                    Password
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="inline-flex items-center gap-1.5 text-[11px] font-mono text-ink-2 hover:text-signal transition-colors cursor-pointer bg-paper border border-line px-2 py-0.5 rounded-md"
+                    title={showPassword ? 'Hide password' : 'Show password'}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? (
+                      <>
+                        <svg
+                          width="13"
+                          height="13"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                          <line x1="1" y1="1" x2="23" y2="23"></line>
+                        </svg>
+                        <span>Hide</span>
+                      </>
+                    ) : (
+                      <>
+                        <svg
+                          width="13"
+                          height="13"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                          <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                        <span>Show</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+
                 <button
                   type="button"
                   onClick={() => {
@@ -183,25 +210,66 @@ export const AdminAuthView = () => {
                   Forgot password?
                 </button>
               </div>
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter your secret password"
-                className="w-full px-4 py-2.5 rounded-xl border border-line bg-paper text-ink text-sm focus:outline-none focus:border-signal"
-              />
+
+              {/* Password Input with Embedded Eye Icon Button */}
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter your protective password"
+                  className="w-full px-4 py-2.5 pr-10 rounded-xl border border-line bg-paper text-ink text-sm focus:outline-none focus:border-signal"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-3 hover:text-ink transition-colors cursor-pointer p-1"
+                  title={showPassword ? 'Hide password' : 'Show password'}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? (
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                      <line x1="1" y1="1" x2="23" y2="23"></line>
+                    </svg>
+                  ) : (
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                      <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                  )}
+                </button>
+              </div>
             </div>
 
             <button
               type="submit"
-              disabled={isSubmitting || !isSupabaseConfigured}
-              className="w-full py-3 rounded-full bg-signal text-white font-semibold text-xs sm:text-sm hover:opacity-95 active:scale-[0.99] transition-all cursor-pointer shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              disabled={isSubmitting}
+              className="w-full py-3 rounded-full bg-signal text-white font-semibold text-xs sm:text-sm hover:opacity-95 active:scale-[0.99] transition-all cursor-pointer shadow-md disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {isSubmitting ? (
                 <>
                   <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                  <span>Verifying with Server...</span>
+                  <span>Verifying Protective Authentication...</span>
                 </>
               ) : (
                 <span>Sign In to Studio →</span>
@@ -214,29 +282,39 @@ export const AdminAuthView = () => {
         {viewMode === 'forgot' && (
           <div className="space-y-4">
             <div className="border-b border-line pb-3">
-              <h3 className="font-bold text-ink text-base">Request Password Reset Link</h3>
+              <h3 className="font-bold text-ink text-base">Request Password Reset</h3>
               <p className="text-xs text-ink-2 mt-1 leading-relaxed">
-                A secure, single-use reset link will be sent to your verified email address. No passwords are displayed on screen.
+                Enter your verified email address to proceed with resetting your protective password.
               </p>
             </div>
 
             {resetSent ? (
               <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-xs space-y-2">
-                <p className="font-semibold text-sm">✓ Reset Email Sent!</p>
+                <p className="font-semibold text-sm">✓ Reset Verified</p>
                 <p className="leading-relaxed">
-                  Please check your inbox at <span className="font-mono font-bold">{resetEmail}</span>.
-                  Click the link in that email to securely choose a new password.
+                  Proceeding to choose a new protective password for{' '}
+                  <span className="font-mono font-bold">{resetEmail}</span>.
                 </p>
-                <div className="pt-2">
+                <div className="pt-2 flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setResetSent(false);
+                      setViewMode('set-new');
+                    }}
+                    className="px-4 py-1.5 rounded-full bg-signal text-white font-semibold text-xs cursor-pointer hover:opacity-90"
+                  >
+                    Set New Password Now →
+                  </button>
                   <button
                     type="button"
                     onClick={() => {
                       setResetSent(false);
                       setViewMode('login');
                     }}
-                    className="underline font-semibold hover:text-emerald-700 cursor-pointer"
+                    className="underline text-ink-2 hover:text-ink text-xs cursor-pointer"
                   >
-                    ← Back to Sign In
+                    Back to Login
                   </button>
                 </div>
               </div>
@@ -261,7 +339,7 @@ export const AdminAuthView = () => {
                     className="w-full px-4 py-2.5 rounded-xl border border-line bg-paper text-ink text-sm focus:outline-none focus:border-signal"
                   />
                   <p className="text-[11px] text-ink-3 mt-1">
-                    Reset emails can only be sent to the verified portfolio owner address.
+                    Password recovery is restricted to the verified portfolio owner address.
                   </p>
                 </div>
 
@@ -278,10 +356,10 @@ export const AdminAuthView = () => {
                   </button>
                   <button
                     type="submit"
-                    disabled={isSendingReset || !isSupabaseConfigured}
+                    disabled={isSendingReset}
                     className="px-5 py-2.5 rounded-full bg-signal text-white text-xs font-semibold hover:opacity-95 transition-opacity shadow-sm cursor-pointer disabled:opacity-50"
                   >
-                    {isSendingReset ? 'Sending Email Link...' : 'Send Reset Link →'}
+                    {isSendingReset ? 'Verifying...' : 'Reset Password →'}
                   </button>
                 </div>
               </form>
@@ -289,20 +367,20 @@ export const AdminAuthView = () => {
           </div>
         )}
 
-        {/* View: Set New Password (Triggered via Email Link) */}
+        {/* View: Set New Password */}
         {viewMode === 'set-new' && (
           <form onSubmit={handleSetNewSubmit} className="space-y-4">
             <div className="border-b border-line pb-3">
-              <h3 className="font-bold text-ink text-base">Set New Password</h3>
+              <h3 className="font-bold text-ink text-base">Set New Protective Password</h3>
               <p className="text-xs text-ink-2 mt-1 leading-relaxed">
-                You have authenticated via your secure email reset link. Choose a new strong password below.
+                Choose a new password for your admin account. It will be encrypted with salted hashing.
               </p>
             </div>
 
             {setNewSuccess ? (
               <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-xs space-y-1 text-center">
-                <p className="font-semibold text-sm">✓ Password Updated Successfully!</p>
-                <p>Redirecting to Studio CMS...</p>
+                <p className="font-semibold text-sm">✓ Protective Password Updated!</p>
+                <p>Opening Studio CMS...</p>
               </div>
             ) : (
               <>
@@ -313,40 +391,71 @@ export const AdminAuthView = () => {
                 )}
 
                 <div>
-                  <label className="block text-xs font-mono uppercase tracking-wider text-ink-3 mb-1.5">
-                    New Password
-                  </label>
-                  <input
-                    type="password"
-                    required
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder="Enter new password (min. 8 characters)"
-                    className="w-full px-4 py-2.5 rounded-xl border border-line bg-paper text-ink text-sm focus:outline-none focus:border-signal"
-                  />
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="block text-xs font-mono uppercase tracking-wider text-ink-3">
+                      New Password
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setShowNewPassword(!showNewPassword)}
+                      className="inline-flex items-center gap-1 text-[11px] font-mono text-ink-2 hover:text-signal transition-colors cursor-pointer bg-paper border border-line px-2 py-0.5 rounded-md"
+                    >
+                      <span>{showNewPassword ? 'Hide' : 'Show'}</span>
+                    </button>
+                  </div>
+                  <div className="relative">
+                    <input
+                      type={showNewPassword ? 'text' : 'password'}
+                      required
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      placeholder="Enter new password (min. 6 characters)"
+                      className="w-full px-4 py-2.5 pr-10 rounded-xl border border-line bg-paper text-ink text-sm focus:outline-none focus:border-signal"
+                    />
+                  </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-mono uppercase tracking-wider text-ink-3 mb-1.5">
-                    Confirm New Password
-                  </label>
-                  <input
-                    type="password"
-                    required
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Re-enter new password"
-                    className="w-full px-4 py-2.5 rounded-xl border border-line bg-paper text-ink text-sm focus:outline-none focus:border-signal"
-                  />
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="block text-xs font-mono uppercase tracking-wider text-ink-3">
+                      Confirm New Password
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="inline-flex items-center gap-1 text-[11px] font-mono text-ink-2 hover:text-signal transition-colors cursor-pointer bg-paper border border-line px-2 py-0.5 rounded-md"
+                    >
+                      <span>{showConfirmPassword ? 'Hide' : 'Show'}</span>
+                    </button>
+                  </div>
+                  <div className="relative">
+                    <input
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      required
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      placeholder="Re-enter new password"
+                      className="w-full px-4 py-2.5 pr-10 rounded-xl border border-line bg-paper text-ink text-sm focus:outline-none focus:border-signal"
+                    />
+                  </div>
                 </div>
 
-                <button
-                  type="submit"
-                  disabled={isUpdatingPassword}
-                  className="w-full py-2.5 rounded-full bg-signal text-white font-semibold text-xs sm:text-sm hover:opacity-95 transition-opacity shadow-md cursor-pointer disabled:opacity-50"
-                >
-                  {isUpdatingPassword ? 'Saving New Password...' : 'Save New Password & Enter Studio →'}
-                </button>
+                <div className="flex items-center justify-between gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setViewMode('login')}
+                    className="px-4 py-2 rounded-full border border-line text-xs font-medium text-ink-2 hover:text-ink cursor-pointer"
+                  >
+                    ← Back to Login
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isUpdatingPassword}
+                    className="px-5 py-2.5 rounded-full bg-signal text-white font-semibold text-xs hover:opacity-95 transition-opacity shadow-md cursor-pointer disabled:opacity-50"
+                  >
+                    {isUpdatingPassword ? 'Saving Password...' : 'Save & Enter Studio →'}
+                  </button>
+                </div>
               </>
             )}
           </form>

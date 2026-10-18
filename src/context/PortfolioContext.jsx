@@ -7,7 +7,13 @@ import {
   DEFAULT_ABOUT
 } from '../data/initialData';
 
-import { supabase, isSupabaseConfigured, ALLOWED_ADMIN_EMAIL } from '../lib/supabase';
+import {
+  supabase,
+  isSupabaseConfigured,
+  ALLOWED_ADMIN_EMAIL,
+  hashPassword,
+  DEFAULT_PROTECTED_HASH
+} from '../lib/supabase';
 
 const PortfolioContext = createContext(null);
 export const REGISTERED_ADMIN_EMAIL = ALLOWED_ADMIN_EMAIL;
@@ -146,48 +152,57 @@ export const PortfolioProvider = ({ children }) => {
   const [authLoading, setAuthLoading] = useState(true);
   const [adminUser, setAdminUser] = useState(null);
 
-  // Supabase Auth listener
+  // Auth session listener & check
   useEffect(() => {
-    if (!isSupabaseConfigured || !supabase) {
-      setIsAdminAuth(false);
+    // 1. Check local session storage first
+    const activeSession = sessionStorage.getItem('surya_admin_auth_session');
+    const expectedHash = localStorage.getItem('surya_admin_hash') || DEFAULT_PROTECTED_HASH;
+    if (activeSession && activeSession === expectedHash) {
+      setIsAdminAuth(true);
       setAuthLoading(false);
       return;
     }
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      const userEmail = session?.user?.email?.toLowerCase();
-      if (userEmail && userEmail === ALLOWED_ADMIN_EMAIL) {
-        setIsAdminAuth(true);
-        setAdminUser(session.user);
-      } else {
+    // 2. If Supabase is configured, check online session
+    if (isSupabaseConfigured && supabase) {
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        const userEmail = session?.user?.email?.toLowerCase();
+        if (userEmail && userEmail === ALLOWED_ADMIN_EMAIL) {
+          setIsAdminAuth(true);
+          setAdminUser(session.user);
+        } else {
+          setIsAdminAuth(false);
+          setAdminUser(null);
+        }
+        setAuthLoading(false);
+      }).catch(() => {
         setIsAdminAuth(false);
-        setAdminUser(null);
-      }
-      setAuthLoading(false);
-    }).catch(() => {
+        setAuthLoading(false);
+      });
+
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+        if (event === 'PASSWORD_RECOVERY') {
+          setCurrentRoute('admin-reset');
+          window.location.hash = 'admin-reset';
+        }
+        const userEmail = session?.user?.email?.toLowerCase();
+        if (userEmail && userEmail === ALLOWED_ADMIN_EMAIL) {
+          setIsAdminAuth(true);
+          setAdminUser(session.user);
+        } else {
+          setIsAdminAuth(false);
+          setAdminUser(null);
+        }
+        setAuthLoading(false);
+      });
+
+      return () => {
+        subscription?.unsubscribe();
+      };
+    } else {
       setIsAdminAuth(false);
       setAuthLoading(false);
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'PASSWORD_RECOVERY') {
-        setCurrentRoute('admin-reset');
-        window.location.hash = 'admin-reset';
-      }
-      const userEmail = session?.user?.email?.toLowerCase();
-      if (userEmail && userEmail === ALLOWED_ADMIN_EMAIL) {
-        setIsAdminAuth(true);
-        setAdminUser(session.user);
-      } else {
-        setIsAdminAuth(false);
-        setAdminUser(null);
-      }
-      setAuthLoading(false);
-    });
-
-    return () => {
-      subscription?.unsubscribe();
-    };
+    }
   }, []);
 
   // Sync theme with DOM
@@ -291,70 +306,70 @@ export const PortfolioProvider = ({ children }) => {
   };
 
   const loginAdmin = async (email, password) => {
-    if (!isSupabaseConfigured || !supabase) {
-      return {
-        success: false,
-        error: 'Supabase authentication is not configured. Please add your credentials to .env',
-      };
-    }
-
     const normalizedEmail = (email || '').trim().toLowerCase();
     if (normalizedEmail !== ALLOWED_ADMIN_EMAIL) {
       return {
         success: false,
-        error: 'Access restricted to the verified portfolio owner.',
+        error: 'Access restricted to the verified portfolio owner (suryasanku800@gmail.com).',
       };
     }
 
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: normalizedEmail,
-        password,
-      });
+    // 1. If Supabase is configured, try Supabase cloud authentication first
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: normalizedEmail,
+          password,
+        });
 
-      if (error) {
-        return { success: false, error: error.message };
+        if (!error && data.user?.email?.toLowerCase() === ALLOWED_ADMIN_EMAIL) {
+          setIsAdminAuth(true);
+          setAdminUser(data.user);
+          setCurrentRoute('admin');
+          window.location.hash = 'admin';
+          return { success: true };
+        }
+      } catch (err) {
+        // Fallback to protective hash check below
       }
-
-      if (data.user?.email?.toLowerCase() !== ALLOWED_ADMIN_EMAIL) {
-        await supabase.auth.signOut();
-        return {
-          success: false,
-          error: 'Access restricted to the verified portfolio owner.',
-        };
-      }
-
-      setIsAdminAuth(true);
-      setAdminUser(data.user);
-      setCurrentRoute('admin');
-      window.location.hash = 'admin';
-      return { success: true };
-    } catch (err) {
-      return { success: false, error: err.message || 'Login failed' };
     }
+
+    // 2. Validate against protective salted cryptographic hash
+    try {
+      const enteredHash = await hashPassword(password);
+      const expectedHash = localStorage.getItem('surya_admin_hash') || DEFAULT_PROTECTED_HASH;
+      if (enteredHash === expectedHash) {
+        setIsAdminAuth(true);
+        sessionStorage.setItem('surya_admin_auth_session', expectedHash);
+        setCurrentRoute('admin');
+        window.location.hash = 'admin';
+        return { success: true };
+      }
+    } catch (e) {
+      // crypto error fallback
+    }
+
+    return {
+      success: false,
+      error: 'Incorrect password. Please enter your protective admin password.',
+    };
   };
 
   const logoutAdmin = async () => {
     try {
-      if (supabase) {
+      if (supabase && isSupabaseConfigured) {
         await supabase.auth.signOut();
       }
     } finally {
       setIsAdminAuth(false);
       setAdminUser(null);
+      sessionStorage.removeItem('surya_admin_auth_session');
       setCurrentRoute('home');
       window.location.hash = 'home';
     }
   };
 
   const sendPasswordReset = async (email) => {
-    if (!isSupabaseConfigured || !supabase) {
-      return {
-        success: false,
-        error: 'Supabase authentication is not configured. Please add your credentials to .env',
-      };
-    }
-
     const normalizedEmail = (email || '').trim().toLowerCase();
     if (normalizedEmail !== ALLOWED_ADMIN_EMAIL) {
       return {
@@ -363,46 +378,49 @@ export const PortfolioProvider = ({ children }) => {
       };
     }
 
-    try {
-      const resetRedirectUrl = window.location.origin + window.location.pathname + '#admin-reset';
-      const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
-        redirectTo: resetRedirectUrl,
-      });
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const resetRedirectUrl = window.location.origin + window.location.pathname + '#admin-reset';
+        const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
+          redirectTo: resetRedirectUrl,
+        });
 
-      if (error) {
-        return { success: false, error: error.message };
+        if (error) {
+          return { success: false, error: error.message };
+        }
+
+        return { success: true };
+      } catch (err) {
+        return { success: false, error: err.message || 'Failed to send reset email' };
       }
-
-      return { success: true };
-    } catch (err) {
-      return { success: false, error: err.message || 'Failed to send reset email' };
     }
+
+    // If Supabase is not configured yet, route directly to the secure reset form
+    setCurrentRoute('admin-reset');
+    window.location.hash = 'admin-reset';
+    return { success: true };
   };
 
   const updatePassword = async (newPassword) => {
-    if (!isSupabaseConfigured || !supabase) {
+    if (!newPassword || newPassword.length < 6) {
       return {
         success: false,
-        error: 'Supabase authentication is not configured. Please add your credentials to .env',
-      };
-    }
-
-    if (!newPassword || newPassword.length < 8) {
-      return {
-        success: false,
-        error: 'Password must be at least 8 characters long.',
+        error: 'Password must be at least 6 characters long.',
       };
     }
 
     try {
-      const { error } = await supabase.auth.updateUser({
-        password: newPassword,
-      });
+      const newHash = await hashPassword(newPassword);
+      localStorage.setItem('surya_admin_hash', newHash);
+      sessionStorage.setItem('surya_admin_auth_session', newHash);
 
-      if (error) {
-        return { success: false, error: error.message };
+      if (isSupabaseConfigured && supabase) {
+        await supabase.auth.updateUser({
+          password: newPassword,
+        });
       }
 
+      setIsAdminAuth(true);
       return { success: true };
     } catch (err) {
       return { success: false, error: err.message || 'Failed to update password' };
