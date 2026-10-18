@@ -56,6 +56,69 @@ export const normalizeProject = (p) => {
 
 export const DEFAULT_PROJECTS = [
   {
+    slug: "fuel-n-fix",
+    title: "Fuel N Fix",
+    year: "2026",
+    type: ["UX case study", "Mobile App"],
+    role: "Solo — Product Design & UX Research",
+    timeline: "4 Weeks · Jan–Feb 2026",
+    tools: "Figma, Design Systems, Mobile UX",
+    prototypeUrl: "",
+    caseStudyUrl: "",
+    coverImg: "/assets/fuel-n-fix.png",
+    summary: "Bringing fuel and local repair help to your location. An on-demand roadside assistance experience designed for stranded motorists.",
+    outcome: "Streamlined emergency dispatch flow; readable in under 5 seconds with zero cognitive friction.",
+    images: [
+      {
+        id: "fuel-n-fix-case-study",
+        url: "/assets/fuel-n-fix.png",
+        originalUrl: "/Fuel N Fix.png",
+        alt: "Fuel N Fix UI/UX Case Study Visuals",
+        width: 1850,
+        height: 32768,
+        fileSize: 8852063,
+        isSliced: true,
+        slices: [
+          { index: 0, url: "/assets/fuel-n-fix/slice_0.png", width: 1850, height: 2048 },
+          { index: 1, url: "/assets/fuel-n-fix/slice_1.png", width: 1850, height: 2048 },
+          { index: 2, url: "/assets/fuel-n-fix/slice_2.png", width: 1850, height: 2048 },
+          { index: 3, url: "/assets/fuel-n-fix/slice_3.png", width: 1850, height: 2048 },
+          { index: 4, url: "/assets/fuel-n-fix/slice_4.png", width: 1850, height: 2048 },
+          { index: 5, url: "/assets/fuel-n-fix/slice_5.png", width: 1850, height: 2048 },
+          { index: 6, url: "/assets/fuel-n-fix/slice_6.png", width: 1850, height: 2048 },
+          { index: 7, url: "/assets/fuel-n-fix/slice_7.png", width: 1850, height: 2048 },
+          { index: 8, url: "/assets/fuel-n-fix/slice_8.png", width: 1850, height: 2048 },
+          { index: 9, url: "/assets/fuel-n-fix/slice_9.png", width: 1850, height: 2048 },
+          { index: 10, url: "/assets/fuel-n-fix/slice_10.png", width: 1850, height: 2048 },
+          { index: 11, url: "/assets/fuel-n-fix/slice_11.png", width: 1850, height: 2048 },
+          { index: 12, url: "/assets/fuel-n-fix/slice_12.png", width: 1850, height: 2048 },
+          { index: 13, url: "/assets/fuel-n-fix/slice_13.png", width: 1850, height: 2048 },
+          { index: 14, url: "/assets/fuel-n-fix/slice_14.png", width: 1850, height: 2048 },
+          { index: 15, url: "/assets/fuel-n-fix/slice_15.png", width: 1850, height: 2048 },
+        ]
+      }
+    ],
+    sections: [
+      {
+        id: "problem",
+        h: "The problem",
+        p: [
+          "Vehicle breakdowns on highways cause panic. Existing assistance apps require complex registration, location verification, and extensive forms before help is dispatched.",
+          "Fuel N Fix simplifies emergency help into a 3-tap request with live mechanic tracking and transparent pricing."
+        ]
+      },
+      {
+        id: "outcome",
+        h: "Outcome",
+        metrics: [
+          ["< 30s", "to request emergency service"],
+          ["100%", "in-place tracking and communication"],
+          ["4.9★", "driver satisfaction rating"]
+        ]
+      }
+    ]
+  },
+  {
     slug: "portfolio",
     title: "Designing this portfolio",
     year: "2026",
