@@ -71,17 +71,17 @@ CREATE POLICY "Allow modify portfolio messages"
   WITH CHECK (true);
 
 
--- 3. STORAGE BUCKET FOR COMPRESSED IMAGES ('portfolio-assets')
--- Creates the public bucket if it does not already exist
+-- 3. STORAGE BUCKET FOR HIGH-RESOLUTION CASE STUDY IMAGES ('portfolio-assets')
+-- Creates the public bucket with generous 50MB limit to preserve 100% original quality
 INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 VALUES (
   'portfolio-assets',
   'portfolio-assets',
   true,
-  10485760, -- 10MB maximum file size
-  ARRAY['image/webp', 'image/png', 'image/jpeg', 'image/jpg', 'image/svg+xml']
+  52428800, -- 50MB maximum file size to support 100% uncompressed high-res case study mockups
+  ARRAY['image/webp', 'image/png', 'image/jpeg', 'image/jpg', 'image/svg+xml', 'image/gif']
 )
-ON CONFLICT (id) DO UPDATE SET public = true;
+ON CONFLICT (id) DO UPDATE SET public = true, file_size_limit = 52428800;
 
 -- Allow everyone to read images from the CDN
 DROP POLICY IF EXISTS "Public access to portfolio assets" ON storage.objects;

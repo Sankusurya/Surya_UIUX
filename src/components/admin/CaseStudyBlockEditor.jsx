@@ -138,7 +138,7 @@ export const CaseStudyBlockEditor = ({
       return;
     }
 
-    showToast?.('info', 'Optimizing Image...', 'Resizing and compressing WebP image before cloud storage.');
+    showToast?.('info', 'Uploading Case Study Image...', 'Uploading in 100% original pixel-perfect quality without compression.');
     try {
       const result = await uploadImageToStorage(file, 'casestudies');
       if (result.success) {

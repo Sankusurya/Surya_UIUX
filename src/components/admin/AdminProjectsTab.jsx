@@ -426,7 +426,7 @@ export const AdminProjectsTab = () => {
                       const file = e.target.files?.[0];
                       if (!file) return;
                       setIsUploadingCover(true);
-                      showToast('info', 'Optimizing Cover Image...', 'Resizing and compressing WebP image before online storage.');
+                      showToast('info', 'Uploading Cover Image...', 'Uploading in 100% original quality without compression.');
                       try {
                         const result = await uploadImageToStorage(file, 'covers');
                         if (result.success) {
