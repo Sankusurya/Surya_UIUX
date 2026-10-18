@@ -6,7 +6,7 @@ import { TodoText } from '../common/TodoText';
 import { CaseStudyBlockRenderer, slugifyHeading } from './CaseStudyBlockRenderer';
 
 export const CaseStudyView = () => {
-  const { currentRoute, projects, openAdminLogin } = usePortfolio();
+  const { currentRoute, projects } = usePortfolio();
 
   const slug = currentRoute.replace('case-', '');
   const projectIndex = projects.findIndex((p) => p.slug === slug);
@@ -182,27 +182,7 @@ export const CaseStudyView = () => {
             </div>
           </dl>
 
-          {/* Interactive Feature for Admin Case Study */}
-          {project.slug === 'admin' && (
-            <div className="my-8 p-5 rounded-2xl border border-line bg-sheet flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
-              <div>
-                <span className="mono text-signal text-xs uppercase tracking-wider block mb-1">
-                  Interactive Live CMS
-                </span>
-                <h4 className="font-semibold text-ink text-base">Experience the Admin Studio CMS</h4>
-                <p className="text-ink-2 text-sm mt-0.5">
-                  Build and customize case studies, write block content, and manage portfolio live in real-time.
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={openAdminLogin}
-                className="px-5 py-2.5 rounded-full bg-signal text-white font-semibold text-xs hover:opacity-95 transition-opacity cursor-pointer whitespace-nowrap shadow-sm"
-              >
-                Launch Admin Studio →
-              </button>
-            </div>
-          )}
+
 
           {/* Main Case Study Content with Sticky TOC on Large Screens */}
           <div className="lg:grid lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-12 xl:gap-16 items-start">

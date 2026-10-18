@@ -7,10 +7,10 @@ import {
   DEFAULT_ABOUT
 } from '../data/initialData';
 
-const PortfolioContext = createContext(null);
+import { supabase, isSupabaseConfigured, ALLOWED_ADMIN_EMAIL } from '../lib/supabase';
 
-const DEFAULT_MASTER_PASSWORD = "Surya@0206";
-export const REGISTERED_ADMIN_EMAIL = "suryasanku800@gmail.com";
+const PortfolioContext = createContext(null);
+export const REGISTERED_ADMIN_EMAIL = ALLOWED_ADMIN_EMAIL;
 
 export const PortfolioProvider = ({ children }) => {
   // Theme state ('light' | 'dark')
@@ -141,27 +141,54 @@ export const PortfolioProvider = ({ children }) => {
     }
   });
 
-  // Admin Master Password state
-  const [adminPassword, setAdminPassword] = useState(() => {
-    return localStorage.getItem('surya_admin_pwd') || DEFAULT_MASTER_PASSWORD;
-  });
+  // Admin Auth state via Supabase session
+  const [isAdminAuth, setIsAdminAuth] = useState(false);
+  const [authLoading, setAuthLoading] = useState(true);
+  const [adminUser, setAdminUser] = useState(null);
 
-  // Admin Auth state - checks both session & localStorage for cross-tab persistence
-  const [isAdminAuth, setIsAdminAuth] = useState(() => {
-    return (
-      sessionStorage.getItem('surya_admin_logged_in') === 'true' ||
-      localStorage.getItem('surya_admin_logged_in') === 'true'
-    );
-  });
+  // Supabase Auth listener
+  useEffect(() => {
+    if (!isSupabaseConfigured || !supabase) {
+      setIsAdminAuth(false);
+      setAuthLoading(false);
+      return;
+    }
 
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(() => {
-    const isAuth =
-      sessionStorage.getItem('surya_admin_logged_in') === 'true' ||
-      localStorage.getItem('surya_admin_logged_in') === 'true';
-    const hash = window.location.hash.slice(1);
-    return hash === 'admin' && !isAuth;
-  });
-  const [isForgotModalOpen, setIsForgotModalOpen] = useState(false);
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      const userEmail = session?.user?.email?.toLowerCase();
+      if (userEmail && userEmail === ALLOWED_ADMIN_EMAIL) {
+        setIsAdminAuth(true);
+        setAdminUser(session.user);
+      } else {
+        setIsAdminAuth(false);
+        setAdminUser(null);
+      }
+      setAuthLoading(false);
+    }).catch(() => {
+      setIsAdminAuth(false);
+      setAuthLoading(false);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        setCurrentRoute('admin-reset');
+        window.location.hash = 'admin-reset';
+      }
+      const userEmail = session?.user?.email?.toLowerCase();
+      if (userEmail && userEmail === ALLOWED_ADMIN_EMAIL) {
+        setIsAdminAuth(true);
+        setAdminUser(session.user);
+      } else {
+        setIsAdminAuth(false);
+        setAdminUser(null);
+      }
+      setAuthLoading(false);
+    });
+
+    return () => {
+      subscription?.unsubscribe();
+    };
+  }, []);
 
   // Sync theme with DOM
   useEffect(() => {
@@ -191,17 +218,13 @@ export const PortfolioProvider = ({ children }) => {
         }
         return;
       }
-      if (hash === 'admin' && !isAdminAuth) {
-        setIsLoginModalOpen(true);
-      } else {
-        setCurrentRoute(hash);
-        window.scrollTo(0, 0);
-      }
+      setCurrentRoute(hash);
+      window.scrollTo(0, 0);
     };
 
     window.addEventListener('hashchange', handleHashChange);
     return () => window.removeEventListener('hashchange', handleHashChange);
-  }, [isAdminAuth]);
+  }, []);
 
   // Update document title dynamically matching original portfolio
   useEffect(() => {
@@ -267,42 +290,122 @@ export const PortfolioProvider = ({ children }) => {
     }
   };
 
-  const loginAdmin = (password) => {
-    if (password === adminPassword) {
+  const loginAdmin = async (email, password) => {
+    if (!isSupabaseConfigured || !supabase) {
+      return {
+        success: false,
+        error: 'Supabase authentication is not configured. Please add your credentials to .env',
+      };
+    }
+
+    const normalizedEmail = (email || '').trim().toLowerCase();
+    if (normalizedEmail !== ALLOWED_ADMIN_EMAIL) {
+      return {
+        success: false,
+        error: 'Access restricted to the verified portfolio owner.',
+      };
+    }
+
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: normalizedEmail,
+        password,
+      });
+
+      if (error) {
+        return { success: false, error: error.message };
+      }
+
+      if (data.user?.email?.toLowerCase() !== ALLOWED_ADMIN_EMAIL) {
+        await supabase.auth.signOut();
+        return {
+          success: false,
+          error: 'Access restricted to the verified portfolio owner.',
+        };
+      }
+
       setIsAdminAuth(true);
-      sessionStorage.setItem('surya_admin_logged_in', 'true');
-      localStorage.setItem('surya_admin_logged_in', 'true');
-      setIsLoginModalOpen(false);
+      setAdminUser(data.user);
       setCurrentRoute('admin');
       window.location.hash = 'admin';
-      return true;
+      return { success: true };
+    } catch (err) {
+      return { success: false, error: err.message || 'Login failed' };
     }
-    return false;
   };
 
-  const logoutAdmin = () => {
-    setIsAdminAuth(false);
-    sessionStorage.removeItem('surya_admin_logged_in');
-    localStorage.removeItem('surya_admin_logged_in');
-    setCurrentRoute('home');
-    window.location.hash = 'home';
-  };
-
-  const openAdminLogin = () => {
-    const adminUrl = window.location.origin + window.location.pathname + '#admin';
-    window.open(adminUrl, '_blank', 'noopener,noreferrer');
-  };
-
-  const updateMasterPassword = (newPassword) => {
-    setAdminPassword(newPassword);
-    localStorage.setItem('surya_admin_pwd', newPassword);
-  };
-
-  const closeAdminLogin = () => {
-    setIsLoginModalOpen(false);
-    if (!isAdminAuth && (currentRoute === 'admin' || window.location.hash.slice(1) === 'admin')) {
+  const logoutAdmin = async () => {
+    try {
+      if (supabase) {
+        await supabase.auth.signOut();
+      }
+    } finally {
+      setIsAdminAuth(false);
+      setAdminUser(null);
       setCurrentRoute('home');
       window.location.hash = 'home';
+    }
+  };
+
+  const sendPasswordReset = async (email) => {
+    if (!isSupabaseConfigured || !supabase) {
+      return {
+        success: false,
+        error: 'Supabase authentication is not configured. Please add your credentials to .env',
+      };
+    }
+
+    const normalizedEmail = (email || '').trim().toLowerCase();
+    if (normalizedEmail !== ALLOWED_ADMIN_EMAIL) {
+      return {
+        success: false,
+        error: 'Password reset links can only be dispatched to the verified owner email address.',
+      };
+    }
+
+    try {
+      const resetRedirectUrl = window.location.origin + window.location.pathname + '#admin-reset';
+      const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
+        redirectTo: resetRedirectUrl,
+      });
+
+      if (error) {
+        return { success: false, error: error.message };
+      }
+
+      return { success: true };
+    } catch (err) {
+      return { success: false, error: err.message || 'Failed to send reset email' };
+    }
+  };
+
+  const updatePassword = async (newPassword) => {
+    if (!isSupabaseConfigured || !supabase) {
+      return {
+        success: false,
+        error: 'Supabase authentication is not configured. Please add your credentials to .env',
+      };
+    }
+
+    if (!newPassword || newPassword.length < 8) {
+      return {
+        success: false,
+        error: 'Password must be at least 8 characters long.',
+      };
+    }
+
+    try {
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword,
+      });
+
+      if (error) {
+        return { success: false, error: error.message };
+      }
+
+      return { success: true };
+    } catch (err) {
+      return { success: false, error: err.message || 'Failed to update password' };
     }
   };
 
@@ -334,17 +437,13 @@ export const PortfolioProvider = ({ children }) => {
         openResume,
         closeResume,
         isAdminAuth,
+        authLoading,
+        adminUser,
+        isSupabaseConfigured,
         loginAdmin,
         logoutAdmin,
-        isLoginModalOpen,
-        openAdminLogin,
-        openLoginModal: () => setIsLoginModalOpen(true),
-        closeAdminLogin,
-        isForgotModalOpen,
-        openForgotModal: () => setIsForgotModalOpen(true),
-        closeForgotModal: () => setIsForgotModalOpen(false),
-        adminPassword,
-        updateMasterPassword,
+        sendPasswordReset,
+        updatePassword,
       }}
     >
       {children}

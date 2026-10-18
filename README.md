@@ -40,26 +40,32 @@ npm run build
   - portfolio: CSS typography overlay on dark canvas with top pill.
   - movies: Midnight canvas with rotated multi-gradient filmstrip and <HTML5/> badge.
   - store: Gentleman Boutique serif F monogram on luxury canvas.
-  - dmin: Miniature interactive dashboard mockup with sidebar, grid cards, and Owner only badge.
+  - admin: Miniature interactive dashboard mockup with sidebar and grid cards.
 
 ---
 
-## 🔐 Built-in Admin Studio CMS
+## 🔐 Admin Studio CMS (Private Area)
 
-The portfolio includes an integrated Admin Studio CMS to publish and manage content without editing code:
+The portfolio includes a private Studio CMS to publish and manage content without editing code:
 
-- **Master Password**: Surya@0206
-- **Admin Contact**: suryasanku800@gmail.com
-- **How to Access**:
-  - Navigate to #admin in your URL bar.
-  - Click the **Owner only** lock badge on the Admin project card.
-  - Click **[Studio]** located next to the copyright in the footer.
-  - Click **Launch Admin Studio →** from within the Admin case study page.
+- **How to Access**: Navigate directly to `/#admin` in your browser URL bar. (All public links and entry points are hidden from regular visitors).
+- **Security & Authentication**:
+  - Protected by cloud authentication service (Supabase Auth).
+  - No passwords or private keys are stored in the repository.
+  - Only the registered owner email can sign in.
+  - Password recovery works exclusively via secure, single-use reset links delivered directly to your verified email inbox.
+- **Environment Setup**:
+  - Copy `.env.example` to `.env`:
+    ```bash
+    cp .env.example .env
+    ```
+  - Add your Supabase project URL and public Anon Key to `.env`.
 - **Capabilities**:
   - **Projects**: Add new projects, edit live case studies, reorder (↑ / ↓), or delete entries.
-  - **Hero & Contact**: Update greeting, roles, pitch statement, snap details, availability status, and social links.
+  - **Hero & Identity**: Update greeting, roles, pitch statement, snap details, availability status, and social links.
   - **Process & About**: Modify the 5-step process, 5 design principles, experience timeline, and tools tags.
-  - **Persistence**: All changes are automatically stored in localStorage with a **Reset Defaults** button to revert back anytime.
+  - **Inquiries**: Review, read, and manage direct messages sent by visitors.
+  - **Backup & Restore**: Export full JSON backups or restore data anytime.
 
 ---
 

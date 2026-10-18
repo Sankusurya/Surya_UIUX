@@ -9,15 +9,13 @@ import { AboutView } from './components/about/AboutView';
 import { CaseStudyView } from './components/casestudy/CaseStudyView';
 import { ContactSection } from './components/home/ContactSection';
 import { AdminPanel } from './components/admin/AdminPanel';
-import { AdminLoginModal } from './components/admin/AdminLoginModal';
-import { ForgotPasswordModal } from './components/admin/ForgotPasswordModal';
 import { ResumeModal } from './components/common/ResumeModal';
 
 export const App = () => {
   const { currentRoute } = usePortfolio();
 
   const renderView = () => {
-    if (currentRoute === 'admin') {
+    if (currentRoute === 'admin' || currentRoute === 'admin-reset') {
       return <AdminPanel />;
     }
     if (currentRoute === 'work') {
@@ -35,7 +33,7 @@ export const App = () => {
     return <HomeView />;
   };
 
-  const isAdmin = currentRoute === 'admin';
+  const isAdmin = currentRoute === 'admin' || currentRoute === 'admin-reset';
 
   return (
     <>
@@ -55,8 +53,6 @@ export const App = () => {
       )}
 
       {/* Global Modals */}
-      <AdminLoginModal />
-      <ForgotPasswordModal />
       <ResumeModal />
     </>
   );

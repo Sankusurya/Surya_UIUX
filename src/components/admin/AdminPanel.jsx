@@ -1,46 +1,17 @@
 import React, { useState } from 'react';
 import { usePortfolio } from '../../context/PortfolioContext';
+import { AdminAuthView } from './AdminAuthView';
 import { AdminProjectsTab } from './AdminProjectsTab';
 import { AdminProfileTab } from './AdminProfileTab';
 import { AdminContentTab } from './AdminContentTab';
 import { AdminInquiriesTab } from './AdminInquiriesTab';
 
 export const AdminPanel = () => {
-  const { isAdminAuth, openLoginModal, logoutAdmin, resetToDefaults, messages, projects, profile, steps, principles, about, saveProjects, saveProfile } = usePortfolio();
+  const { isAdminAuth, logoutAdmin, resetToDefaults, messages, projects, profile, steps, principles, about, saveProjects, saveProfile } = usePortfolio();
   const [activeTab, setActiveTab] = useState('projects');
 
   if (!isAdminAuth) {
-    return (
-      <div className="pt-24 pb-32 max-w-md mx-auto text-center space-y-6 animate-in">
-        <div className="w-16 h-16 rounded-full bg-signal/10 border border-signal/30 text-signal flex items-center justify-center text-3xl mx-auto shadow-sm">
-          🔒
-        </div>
-        <div>
-          <span className="mono text-signal text-xs uppercase tracking-wider block mb-1">Protected Area</span>
-          <h2 className="text-2xl font-bold font-display uppercase tracking-wider text-ink">
-            Studio Locked
-          </h2>
-          <p className="text-sm text-ink-2 mt-2 leading-relaxed">
-            Please log in with your master password to access the project CMS and studio management tools.
-          </p>
-        </div>
-        <div className="flex items-center justify-center gap-3 pt-2">
-          <a
-            href="#home"
-            className="px-5 py-2.5 rounded-full border border-line text-xs font-semibold text-ink-2 hover:text-ink hover:bg-paper transition-all"
-          >
-            ← View Portfolio
-          </a>
-          <button
-            type="button"
-            onClick={openLoginModal}
-            className="px-6 py-2.5 rounded-full bg-signal text-white text-xs font-semibold hover:opacity-95 transition-opacity shadow-md cursor-pointer"
-          >
-            Log In to Studio →
-          </button>
-        </div>
-      </div>
-    );
+    return <AdminAuthView />;
   }
 
   const tabs = [

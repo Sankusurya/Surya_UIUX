@@ -2,7 +2,7 @@ import React from 'react';
 import { usePortfolio } from '../../context/PortfolioContext';
 
 export const Cover = ({ type, title = '', coverImg = null }) => {
-  const { openAdminLogin, profile } = usePortfolio();
+  const { profile } = usePortfolio();
 
   if (coverImg) {
     return (
@@ -67,18 +67,6 @@ export const Cover = ({ type, title = '', coverImg = null }) => {
               <div></div>
             </div>
           </div>
-          <button
-            type="button"
-            className="lock"
-            title="Open Studio Admin Panel"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              openAdminLogin();
-            }}
-          >
-            Owner only
-          </button>
         </div>
       );
 
