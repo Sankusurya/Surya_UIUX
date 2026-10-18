@@ -3,6 +3,7 @@ import { usePortfolio } from '../../context/PortfolioContext';
 import { Cover } from '../common/Cover';
 import { Tags } from '../common/Tags';
 import { TodoText } from '../common/TodoText';
+import { normalizeProject } from '../../data/initialData';
 
 const CATEGORIES = ["All", "UX case study", "UI", "Web dev"];
 
@@ -36,16 +37,21 @@ export const WorkView = () => {
       </div>
 
       <div className="grid2" id="grid">
-        {filteredProjects.map((p) => (
-          <a key={p.slug} className="tile" href={`#case-${p.slug}`}>
-            <Cover type={p.cover} title={p.title} coverImg={p.coverImg} />
-            <Tags types={p.type} year={p.year} />
-            <h3>{p.title}</h3>
-            <p>
-              <TodoText text={p.summary} />
-            </p>
-          </a>
-        ))}
+        {filteredProjects.map((rawP) => {
+          const p = normalizeProject(rawP);
+          return (
+            <a key={p.slug} className="tile group" href={`#case-${p.slug}`}>
+              <Cover title={p.title} coverImg={p.coverImg} />
+              <Tags types={p.type} year={p.year} />
+              <h3 className="group-hover:text-signal transition-colors">{p.title}</h3>
+              {p.summary && (
+                <p>
+                  <TodoText text={p.summary} />
+                </p>
+              )}
+            </a>
+          );
+        })}
       </div>
     </section>
   );

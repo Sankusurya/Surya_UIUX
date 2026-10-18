@@ -4,6 +4,7 @@ import { Cover } from '../common/Cover';
 import { Tags } from '../common/Tags';
 import { TodoText } from '../common/TodoText';
 import { StepsGrid } from '../common/StepsGrid';
+import { normalizeProject } from '../../data/initialData';
 
 export const HomeView = () => {
   const { projects, profile, openResume } = usePortfolio();
@@ -113,23 +114,30 @@ export const HomeView = () => {
         </div>
 
         <div className="cards">
-          {featured.map((p) => (
-            <a key={p.slug} className="card" href={`#case-${p.slug}`}>
-              <Cover type={p.cover} title={p.title} coverImg={p.coverImg} />
-              <div className="meta">
-                <Tags types={p.type} year={p.year} />
-                <h3>{p.title}</h3>
-                <p>
-                  <TodoText text={p.summary} />
-                </p>
-                <p className="outcome">
-                  <b>Outcome · </b>
-                  <TodoText text={p.outcome} />
-                </p>
-                <span className="textlink">Read case study</span>
-              </div>
-            </a>
-          ))}
+          {featured.map((rawP) => {
+            const p = normalizeProject(rawP);
+            return (
+              <a key={p.slug} className="card group" href={`#case-${p.slug}`}>
+                <Cover title={p.title} coverImg={p.coverImg} />
+                <div className="meta">
+                  <Tags types={p.type} year={p.year} />
+                  <h3 className="group-hover:text-signal transition-colors">{p.title}</h3>
+                  {p.summary && (
+                    <p>
+                      <TodoText text={p.summary} />
+                    </p>
+                  )}
+                  {p.outcome && (
+                    <p className="outcome">
+                      <b>Outcome · </b>
+                      <TodoText text={p.outcome} />
+                    </p>
+                  )}
+                  <span className="textlink">Read case study</span>
+                </div>
+              </a>
+            );
+          })}
         </div>
       </section>
 

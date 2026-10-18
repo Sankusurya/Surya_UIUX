@@ -1,15 +1,89 @@
+/**
+ * Normalizes any project (legacy or new) to the clean, streamlined case study structure:
+ * - images: array of uncompressed full-fidelity case study images [{ id, url, alt }]
+ * - prototypeUrl: link to Figma/Framer/Live prototype
+ * - caseStudyUrl: link to Behance/full case study
+ * - role, timeline, tools: optional metadata facts
+ */
+export const normalizeProject = (p) => {
+  if (!p) return null;
+
+  // Extract images
+  let images = Array.isArray(p.images) ? [...p.images] : [];
+  if (images.length === 0 && p.caseStudy?.blocks) {
+    p.caseStudy.blocks.forEach((b, idx) => {
+      if (b.type === 'image' && b.url) {
+        images.push({
+          id: b.id || `migrated-${idx}`,
+          url: b.url,
+          alt: b.alt || b.caption || `${p.title} case study visual`,
+        });
+      } else if (b.type === 'gallery' && Array.isArray(b.images)) {
+        b.images.forEach((gImg, gIdx) => {
+          if (gImg.url) {
+            images.push({
+              id: `migrated-gallery-${idx}-${gIdx}`,
+              url: gImg.url,
+              alt: gImg.alt || gImg.caption || `${p.title} visual`,
+            });
+          }
+        });
+      }
+    });
+  }
+
+  // Extract prototypeUrl from embed if not explicitly defined
+  let prototypeUrl = p.prototypeUrl || '';
+  if (!prototypeUrl && p.caseStudy?.blocks) {
+    const embedBlock = p.caseStudy.blocks.find((b) => b.type === 'embed' && b.url);
+    if (embedBlock) {
+      prototypeUrl = embedBlock.url;
+    }
+  }
+
+  return {
+    ...p,
+    role: p.role || p.caseStudy?.role || '',
+    timeline: p.timeline || p.caseStudy?.timeline || '',
+    tools: p.tools || p.caseStudy?.tools || '',
+    prototypeUrl,
+    caseStudyUrl: p.caseStudyUrl || '',
+    coverImg: p.coverImg || '',
+    images,
+  };
+};
+
 export const DEFAULT_PROJECTS = [
   {
     slug: "portfolio",
     title: "Designing this portfolio",
     year: "2026",
     type: ["UX case study", "Web dev"],
-    role: "Solo — research, UX, UI, front-end, admin panel",
-    timeline: "[4–6 weeks]",
-    tools: "Figma, HTML/CSS/JS, [backend]",
-    cover: "portfolio",
+    role: "Solo — UX Research, Product Design & Front-End",
+    timeline: "4 Weeks · Jan–Feb 2026",
+    tools: "Figma, React, Tailwind CSS, Vite",
+    prototypeUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    caseStudyUrl: "https://github.com/Sankusurya/Surya_UIUX",
+    coverImg: "data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='680' viewBox='0 0 1200 680' fill='none'%3E%3Crect width='1200' height='680' rx='20' fill='%23161514'/%3E%3Crect x='1' y='1' width='1198' height='678' rx='19' stroke='%23292524' stroke-width='2'/%3E%3Ctext x='70' y='120' fill='%23FF8A4C' font-family='monospace' font-size='14' letter-spacing='3'%3EDESIGN CASE STUDY %C2%B7 2026%3C/text%3E%3Ctext x='70' y='210' fill='%23F5F3EF' font-family='sans-serif' font-weight='900' font-size='64' letter-spacing='1'%3EDESIGNING THIS PORTFOLIO%3C/text%3E%3Ctext x='70' y='280' fill='%23A8A29E' font-family='sans-serif' font-size='22'%3EA portfolio designed around how tech recruiters actually scan candidates in 60 seconds.%3C/text%3E%3Crect x='70' y='340' width='1060' height='1' fill='%23292524'/%3E%3Crect x='70' y='380' width='320' height='220' rx='16' fill='%231F1D1A' stroke='%2338332E'/%3E%3Ctext x='100' y='430' fill='%23FF8A4C' font-family='monospace' font-size='14'%3E01 %C2%B7 ROLE IDENTIFIED%3C/text%3E%3Ctext x='100' y='480' fill='%23F5F3EF' font-family='sans-serif' font-weight='bold' font-size='28'%3E%3C 5 Seconds%3C/text%3E%3Ctext x='100' y='520' fill='%23A8A29E' font-family='sans-serif' font-size='15'%3EImmediate role classification%3C/text%3E%3Crect x='430' y='380' width='320' height='220' rx='16' fill='%231F1D1A' stroke='%2338332E'/%3E%3Ctext x='460' y='430' fill='%23FF8A4C' font-family='monospace' font-size='14'%3E02 %C2%B7 NO REDIRECTS%3C/text%3E%3Ctext x='460' y='480' fill='%23F5F3EF' font-family='sans-serif' font-weight='bold' font-size='28'%3E100%25 In-Place%3C/text%3E%3Ctext x='460' y='520' fill='%23A8A29E' font-family='sans-serif' font-size='15'%3EZero external bounce friction%3C/text%3E%3Crect x='790' y='380' width='340' height='220' rx='16' fill='%231F1D1A' stroke='%2338332E'/%3E%3Ctext x='820' y='430' fill='%23FF8A4C' font-family='monospace' font-size='14'%3E03 %C2%B7 CMS POWERED%3C/text%3E%3Ctext x='820' y='480' fill='%23F5F3EF' font-family='sans-serif' font-weight='bold' font-size='28'%3ECloud Admin%3C/text%3E%3Ctext x='820' y='520' fill='%23A8A29E' font-family='sans-serif' font-size='15'%3EReal-time instant publishing%3C/text%3E%3C/svg%3E",
     summary: "A portfolio is a product with one tired user: a recruiter with three minutes. I redesigned mine around how they actually scan.",
     outcome: "Role readable in under 5 seconds; every case study one click from the homepage, no external redirects.",
+    images: [
+      {
+        id: "img-funnel",
+        url: "data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='560' viewBox='0 0 1200 560' fill='none'%3E%3Crect width='1200' height='560' rx='20' fill='%231C1917'/%3E%3Crect x='1' y='1' width='1198' height='558' rx='19' stroke='%23292524' stroke-width='2'/%3E%3Ccircle cx='60' cy='60' r='10' fill='%23FF5A1F'/%3E%3Ctext x='85' y='66' fill='%2378716C' font-family='monospace' font-size='14' letter-spacing='2'%3EUSER RESEARCH INSIGHT%3C/text%3E%3Ctext x='60' y='130' fill='%23F5F3EF' font-family='sans-serif' font-size='34' font-weight='800' letter-spacing='0.5'%3ETHE 3-PASS RECRUITER EVALUATION FUNNEL%3C/text%3E%3Crect x='60' y='165' width='1080' height='1' fill='%23292524'/%3E%3Crect x='60' y='210' width='340' height='280' rx='16' fill='%23121110' stroke='%23292524'/%3E%3Ctext x='85' y='255' fill='%23FF8A4C' font-family='monospace' font-size='13' font-weight='bold'%3EPASS 1: 0%E2%80%935 SECONDS%3C/text%3E%3Ctext x='85' y='295' fill='%23F5F3EF' font-family='sans-serif' font-size='20' font-weight='bold'%3EInstant Classification%3C/text%3E%3Ctext x='85' y='335' fill='%23A8A29E' font-family='sans-serif' font-size='15'%3E%E2%80%A2 Name \u0026 clear role title%3C/text%3E%3Ctext x='85' y='370' fill='%23A8A29E' font-family='sans-serif' font-size='15'%3E%E2%80%A2 Location \u0026 availability%3C/text%3E%3Ctext x='85' y='405' fill='%23A8A29E' font-family='sans-serif' font-size='15'%3E%E2%80%A2 3 best featured projects%3C/text%3E%3Crect x='430' y='210' width='340' height='280' rx='16' fill='%23121110' stroke='%23FF5A1F' stroke-width='2'/%3E%3Ctext x='455' y='255' fill='%23FF8A4C' font-family='monospace' font-size='13' font-weight='bold'%3EPASS 2: 5%E2%80%9360 SECONDS%3C/text%3E%3Ctext x='455' y='295' fill='%23F5F3EF' font-family='sans-serif' font-size='20' font-weight='bold'%3EEvidence of Execution%3C/text%3E%3Ctext x='455' y='335' fill='%23A8A29E' font-family='sans-serif' font-size='15'%3E%E2%80%A2 In-place case study reading%3C/text%3E%3Ctext x='455' y='370' fill='%23A8A29E' font-family='sans-serif' font-size='15'%3E%E2%80%A2 Component design systems%3C/text%3E%3Ctext x='455' y='405' fill='%23A8A29E' font-family='sans-serif' font-size='15'%3E%E2%80%A2 Interactive prototypes%3C/text%3E%3Crect x='800' y='210' width='340' height='280' rx='16' fill='%23121110' stroke='%23292524'/%3E%3Ctext x='825' y='255' fill='%23FF8A4C' font-family='monospace' font-size='13' font-weight='bold'%3EPASS 3: 1%E2%80%933 MINUTES%3C/text%3E%3Ctext x='825' y='295' fill='%23F5F3EF' font-family='sans-serif' font-size='20' font-weight='bold'%3EDecision Rationale%3C/text%3E%3Ctext x='825' y='335' fill='%23A8A29E' font-family='sans-serif' font-size='15'%3E%E2%80%A2 Trade-off analysis%3C/text%3E%3Ctext x='825' y='370' fill='%23A8A29E' font-family='sans-serif' font-size='15'%3E%E2%80%A2 Quantified user results%3C/text%3E%3Ctext x='825' y='405' fill='%23A8A29E' font-family='sans-serif' font-size='15'%3E%E2%80%A2 Candidate shortlisting%3C/text%3E%3C/svg%3E",
+        alt: "Diagram of 3-Pass Recruiter Evaluation Model",
+      },
+      {
+        id: "img-hero",
+        url: "data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='640' viewBox='0 0 1200 640' fill='none'%3E%3Crect width='1200' height='640' rx='20' fill='%231C1917'/%3E%3Crect x='1' y='1' width='1198' height='638' rx='19' stroke='%23292524' stroke-width='2'/%3E%3Ccircle cx='60' cy='60' r='10' fill='%2322C55E'/%3E%3Ctext x='85' y='66' fill='%2378716C' font-family='monospace' font-size='14'%3EHERO SECTION TYPOGRAPHY \u0026 INSTANT CLASSIFICATION%3C/text%3E%3Ctext x='60' y='160' fill='%23FAF8F5' font-family='serif' font-style='italic' font-size='56'%3ESurya Teja%3C/text%3E%3Ctext x='60' y='250' fill='%23EDE8DE' font-family='sans-serif' font-weight='900' font-size='76'%3EPRODUCT%3C/text%3E%3Ctext x='60' y='330' fill='%23FF7A45' font-family='sans-serif' font-weight='900' font-size='76'%3EDESIGNER%3C/text%3E%3Crect x='60' y='390' width='1080' height='1' fill='%23292524'/%3E%3Ctext x='60' y='450' fill='%23A8A29E' font-family='sans-serif' font-size='22'%3EHigh-impact display typography ensures recruiters understand the candidate's exact focus within seconds.%3C/text%3E%3Crect x='60' y='500' width='200' height='54' rx='27' fill='%23FFFFFF'/%3E%3Ctext x='105' y='534' fill='%23121212' font-family='sans-serif' font-weight='bold' font-size='16'%3EView Case Studies%3C/text%3E%3C/svg%3E",
+        alt: "Hero typography hierarchy and layout wireframe",
+      },
+      {
+        id: "img-dock",
+        url: "data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='540' viewBox='0 0 1200 540' fill='none'%3E%3Crect width='1200' height='540' rx='20' fill='%231C1917'/%3E%3Crect x='1' y='1' width='1198' height='538' rx='19' stroke='%23292524' stroke-width='2'/%3E%3Ctext x='60' y='70' fill='%23FF8A4C' font-family='monospace' font-size='14'%3ETHUMB-FRIENDLY FLOATING DOCK NAVIGATION%3C/text%3E%3Crect x='80' y='140' width='1040' height='100' rx='50' fill='%23161616' stroke='%23383838' stroke-width='2'/%3E%3Ccircle cx='145' cy='190' r='28' fill='%23FF7A45'/%3E%3Ctext x='137' y='200' fill='%23FFFFFF' font-family='serif' font-style='italic' font-weight='bold' font-size='26'%3ES%3C/text%3E%3Crect x='205' y='165' width='110' height='50' rx='25' fill='%232A2A2A'/%3E%3Ctext x='235' y='196' fill='%23FFFFFF' font-family='sans-serif' font-size='16' font-weight='bold'%3EWork %E2%8C%84%3C/text%3E%3Ctext x='355' y='196' fill='%23D4D0C7' font-family='sans-serif' font-size='16'%3EThinking%3C/text%3E%3Ctext x='485' y='196' fill='%23D4D0C7' font-family='sans-serif' font-size='16'%3EAbout%3C/text%3E%3Crect x='615' y='165' width='130' height='50' rx='25' fill='%23FFFFFF'/%3E%3Ctext x='645' y='196' fill='%23111111' font-family='sans-serif' font-size='16' font-weight='bold'%3EContact%3C/text%3E%3Ccircle cx='800' cy='190' r='22' fill='none' stroke='%2378716C' stroke-width='2'/%3E%3Ctext x='60' y='330' fill='%23F5F3EF' font-family='sans-serif' font-size='28' font-weight='bold'%3EAcrylic dock maintains thumb reachability across mobile screens%3C/text%3E%3Ctext x='60' y='380' fill='%23A8A29E' font-family='sans-serif' font-size='18'%3EAllows one-tap navigation to work, design thinking, and contact from anywhere on the page.%3C/text%3E%3C/svg%3E",
+        alt: "Floating dock navigation component wireframe",
+      }
+    ],
     caseStudy: {
       role: "Solo — UX Research, Product Design & Front-End",
       timeline: "4 Weeks · Jan–Feb 2026",

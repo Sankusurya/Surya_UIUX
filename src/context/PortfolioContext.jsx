@@ -4,7 +4,8 @@ import {
   DEFAULT_PROFILE,
   DEFAULT_STEPS,
   DEFAULT_PRINCIPLES,
-  DEFAULT_ABOUT
+  DEFAULT_ABOUT,
+  normalizeProject
 } from '../data/initialData';
 
 import {
@@ -74,19 +75,11 @@ export const PortfolioProvider = ({ children }) => {
       const saved = localStorage.getItem('surya_portfolio_projects');
       if (saved) {
         const parsed = JSON.parse(saved);
-        return parsed.map((p) => {
-          if (p.slug === 'portfolio' && (!p.caseStudy || !p.caseStudy.blocks?.length)) {
-            return {
-              ...p,
-              caseStudy: DEFAULT_PROJECTS[0].caseStudy
-            };
-          }
-          return p;
-        });
+        return parsed.map(normalizeProject);
       }
-      return DEFAULT_PROJECTS;
+      return DEFAULT_PROJECTS.map(normalizeProject);
     } catch {
-      return DEFAULT_PROJECTS;
+      return DEFAULT_PROJECTS.map(normalizeProject);
     }
   });
 
@@ -166,8 +159,9 @@ export const PortfolioProvider = ({ children }) => {
 
         if (cloudContent) {
           if (cloudContent.projects && Array.isArray(cloudContent.projects)) {
-            setProjects(cloudContent.projects);
-            localStorage.setItem('surya_portfolio_projects', JSON.stringify(cloudContent.projects));
+            const normProjects = cloudContent.projects.map(normalizeProject);
+            setProjects(normProjects);
+            localStorage.setItem('surya_portfolio_projects', JSON.stringify(normProjects));
           }
           if (cloudContent.profile) {
             setProfile(cloudContent.profile);
@@ -216,7 +210,7 @@ export const PortfolioProvider = ({ children }) => {
     if (syncChannel) {
       syncChannel.onmessage = (event) => {
         const { type, payload } = event.data || {};
-        if (type === 'PROJECTS_SYNC') setProjects(payload);
+        if (type === 'PROJECTS_SYNC') setProjects(Array.isArray(payload) ? payload.map(normalizeProject) : []);
         if (type === 'PROFILE_SYNC') setProfile(payload);
         if (type === 'STEPS_SYNC') setSteps(payload);
         if (type === 'PRINCIPLES_SYNC') setPrinciples(payload);
@@ -352,11 +346,12 @@ export const PortfolioProvider = ({ children }) => {
 
   // Online Database & LocalStorage Unified Save Handlers
   const saveProjects = async (newProjects) => {
-    setProjects(newProjects);
-    localStorage.setItem('surya_portfolio_projects', JSON.stringify(newProjects));
-    syncChannel?.postMessage({ type: 'PROJECTS_SYNC', payload: newProjects });
+    const normalized = Array.isArray(newProjects) ? newProjects.map(normalizeProject) : [];
+    setProjects(normalized);
+    localStorage.setItem('surya_portfolio_projects', JSON.stringify(normalized));
+    syncChannel?.postMessage({ type: 'PROJECTS_SYNC', payload: normalized });
 
-    const result = await saveCloudContent('projects', newProjects);
+    const result = await saveCloudContent('projects', normalized);
     if (result.success) {
       showToast('success', 'Projects Saved to Online Database ✓', 'Visible immediately to all visitors across every device.');
     } else if (result.isOffline) {
