@@ -381,7 +381,7 @@ export const DEFAULT_PROFILE = {
   resumeUrl: "#resume",
   socials: [
     { label: "LinkedIn", note: "view profile", href: "https://linkedin.com" },
-    { label: "GitHub", note: "view code", href: "https://github.com" },
+    { label: "GitHub", note: "view code", href: "https://github.com/Sankusurya" },
     { label: "Resume", note: "view resume", href: "#resume" }
   ]
 };
