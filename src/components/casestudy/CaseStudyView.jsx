@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { usePortfolio } from '../../context/PortfolioContext';
 import { Tags } from '../common/Tags';
 import { TodoText } from '../common/TodoText';
-import { ImageViewer } from '../common/ImageViewer';
+import { CaseStudyFullScreenViewer } from './CaseStudyFullScreenViewer';
 import { normalizeProject } from '../../data/initialData';
 
 export const CaseStudyView = () => {
@@ -12,9 +12,10 @@ export const CaseStudyView = () => {
   const rawProject = projects.find((p) => p.slug === slug) || projects[0];
   const project = normalizeProject(rawProject);
 
-  // Lightbox / Full-screen Image Viewer state
-  const [viewerOpen, setViewerOpen] = useState(false);
-  const [viewerIndex, setViewerIndex] = useState(0);
+  // Full-Screen Continuous Case Study Reader State
+  const [fullScreenViewerOpen, setFullScreenViewerOpen] = useState(false);
+  const [activeSlices, setActiveSlices] = useState([]);
+  const [viewerTitle, setViewerTitle] = useState('');
 
   if (!project) {
     return (
@@ -32,36 +33,21 @@ export const CaseStudyView = () => {
     );
   }
 
-  // Collect all images for the viewer: cover image first (if present), then case study images
-  const allViewerImages = [];
-  if (project.coverImg) {
-    allViewerImages.push({
-      url: project.coverImg,
-      alt: `${project.title} - Cover Artwork`,
-    });
-  }
-  if (Array.isArray(project.images)) {
-    project.images.forEach((img) => {
-      if (img && img.url) {
-        allViewerImages.push({
-          url: img.url,
-          alt: img.alt || `${project.title} Case Study Visual`,
-        });
-      }
-    });
-  }
-
   const openViewerForCover = () => {
     if (!project.coverImg) return;
-    setViewerIndex(0);
-    setViewerOpen(true);
+    setActiveSlices([{ url: project.coverImg, width: 0, height: 0, index: 0 }]);
+    setViewerTitle(`${project.title} · Cover Artwork`);
+    setFullScreenViewerOpen(true);
   };
 
-  const openViewerForCaseStudyImage = (imgIdx) => {
-    // If cover is in viewer list, offset by 1
-    const targetIdx = project.coverImg ? imgIdx + 1 : imgIdx;
-    setViewerIndex(targetIdx);
-    setViewerOpen(true);
+  const openViewerForCaseStudy = (img) => {
+    const slices = Array.isArray(img.slices) && img.slices.length > 0
+      ? img.slices
+      : [{ url: img.url, width: img.width || 0, height: img.height || 0, index: 0 }];
+
+    setActiveSlices(slices);
+    setViewerTitle(project.title);
+    setFullScreenViewerOpen(true);
   };
 
   // Other projects for "More projects" section (exclude current project)
@@ -192,16 +178,17 @@ export const CaseStudyView = () => {
           <div
             onClick={openViewerForCover}
             title="Click to view full screen"
-            className="w-full overflow-hidden rounded-2xl border border-line bg-sheet shadow-sm cursor-zoom-in transition-transform duration-200 hover:border-signal/40 relative"
+            className="w-full overflow-hidden rounded-2xl border border-line bg-sheet shadow-sm cursor-zoom-in transition-all duration-200 hover:border-signal/50 relative"
           >
             <img
               src={project.coverImg}
               alt={`${project.title} Cover`}
               loading="eager"
-              style={{ maxWidth: '100%', width: 'auto', height: 'auto', display: 'block', margin: '0 auto' }}
+              className="w-full h-auto block m-0 p-0"
+              style={{ width: '100%', height: 'auto', display: 'block' }}
             />
-            <div className="absolute bottom-3 right-3 px-3 py-1 rounded-full bg-black/70 text-white text-[11px] font-mono opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none backdrop-blur-xs flex items-center gap-1.5">
-              <span>🔍 Click to expand</span>
+            <div className="absolute bottom-3 right-3 px-3 py-1.5 rounded-full bg-black/75 text-white text-[11px] font-mono opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none backdrop-blur-xs flex items-center gap-1.5 border border-white/10 shadow-md">
+              <span>🔍 Full Screen</span>
             </div>
           </div>
         </figure>
@@ -209,31 +196,66 @@ export const CaseStudyView = () => {
 
       {/* 8. The Case Study: All Images Stacked Continuously at Full Width */}
       {Array.isArray(project.images) && project.images.length > 0 && (
-        <section aria-label="Case Study Deliverables" className="w-full space-y-4 sm:space-y-6 my-10">
-          {project.images.map((img, idx) => (
-            <figure key={img.id || idx} className="w-full group">
-              <div
-                onClick={() => openViewerForCaseStudyImage(idx)}
-                title="Click to inspect design in full resolution"
-                className="w-full overflow-hidden rounded-2xl border border-line bg-sheet shadow-sm cursor-zoom-in transition-all duration-200 hover:border-signal/40 relative"
-              >
-                <img
-                  src={img.url}
-                  alt={img.alt || `${project.title} design slice ${idx + 1}`}
-                  loading="lazy"
-                  style={{ maxWidth: '100%', width: 'auto', height: 'auto', display: 'block', margin: '0 auto' }}
-                />
-                <div className="absolute bottom-3 right-3 px-3 py-1 rounded-full bg-black/70 text-white text-[11px] font-mono opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none backdrop-blur-xs flex items-center gap-1.5">
-                  <span>🔍 Zoom</span>
+        <section aria-label="Case Study Deliverables" className="w-full space-y-10 my-10">
+          {project.images.map((img, idx) => {
+            const imgSlices = Array.isArray(img.slices) && img.slices.length > 0
+              ? img.slices
+              : [{ url: img.url, width: img.width || 0, height: img.height || 0, index: 0 }];
+
+            return (
+              <figure key={img.id || idx} className="w-full group">
+                <div
+                  onClick={() => openViewerForCaseStudy(img)}
+                  title="Click anywhere to view full-screen case study reader"
+                  className="w-full rounded-2xl border border-line bg-sheet overflow-hidden shadow-sm cursor-zoom-in transition-all duration-200 hover:border-signal/50 relative"
+                  style={{ lineHeight: 0 }}
+                >
+                  {/* Seamless vertical stack of slices with zero gap */}
+                  <div className="w-full flex flex-col m-0 p-0" style={{ lineHeight: 0 }}>
+                    {imgSlices.map((slice, sIdx) => {
+                      const hasAspect = slice.width && slice.height;
+                      return (
+                        <div
+                          key={slice.url || sIdx}
+                          className="w-full relative m-0 p-0 overflow-hidden bg-white/[0.02]"
+                          style={{
+                            aspectRatio: hasAspect ? `${slice.width} / ${slice.height}` : undefined,
+                            lineHeight: 0,
+                          }}
+                        >
+                          <img
+                            src={slice.url}
+                            alt={img.alt || `${project.title} Case Study Visual - Part ${sIdx + 1}`}
+                            loading={sIdx === 0 ? "eager" : "lazy"}
+                            decoding="async"
+                            className="w-full h-auto block m-0 p-0 border-0 outline-none"
+                            style={{
+                              width: '100%',
+                              height: 'auto',
+                              display: 'block',
+                              verticalAlign: 'middle',
+                              margin: 0,
+                              padding: 0,
+                            }}
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  <div className="absolute bottom-4 right-4 px-3.5 py-1.5 rounded-full bg-black/80 text-white text-xs font-mono opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none backdrop-blur-sm flex items-center gap-2 border border-white/10 shadow-lg">
+                    <span>🔍 Click to expand full-screen</span>
+                  </div>
                 </div>
-              </div>
-              {img.alt && img.alt !== `${project.title} case study visual` && (
-                <figcaption className="text-xs text-ink-3 text-center mt-2 font-mono">
-                  {img.alt}
-                </figcaption>
-              )}
-            </figure>
-          ))}
+
+                {img.alt && img.alt !== `${project.title} case study visual` && img.alt !== `${project.title} Case Study Visual` && (
+                  <figcaption className="text-xs text-ink-3 text-center mt-2.5 font-mono">
+                    {img.alt}
+                  </figcaption>
+                )}
+              </figure>
+            );
+          })}
         </section>
       )}
 
@@ -353,13 +375,12 @@ export const CaseStudyView = () => {
         </section>
       )}
 
-      {/* Lightbox / Full-screen Zoom Modal */}
-      <ImageViewer
-        images={allViewerImages}
-        currentIndex={viewerIndex}
-        isOpen={viewerOpen}
-        onClose={() => setViewerOpen(false)}
-        onNavigate={(newIdx) => setViewerIndex(newIdx)}
+      {/* Full-Screen Continuous Case Study Reader */}
+      <CaseStudyFullScreenViewer
+        isOpen={fullScreenViewerOpen}
+        onClose={() => setFullScreenViewerOpen(false)}
+        slices={activeSlices}
+        title={viewerTitle || project.title}
       />
     </div>
   );

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { usePortfolio } from '../../context/PortfolioContext';
-import { uploadImageToStorage, formatBytes } from '../../utils/imageStorage';
+import { uploadImageToStorage, formatBytes, processCaseStudyImage } from '../../utils/imageStorage';
 import { normalizeProject } from '../../data/initialData';
 import { Tags } from '../common/Tags';
 import { ImageViewer } from '../common/ImageViewer';
@@ -149,7 +149,7 @@ export const AdminProjectsTab = () => {
     }
   };
 
-  // Multi-Image Upload Handler for Case Study Deliverables
+  // Multi-Image Upload Handler for Case Study Deliverables (with automatic tall image slicing for phone sharpness)
   const handleMultiImageUpload = async (e) => {
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
@@ -162,15 +162,25 @@ export const AdminProjectsTab = () => {
       const file = files[i];
       setUploadProgress({ current: i + 1, total: files.length, name: file.name });
       try {
-        const result = await uploadImageToStorage(file, 'casestudies');
+        const result = await processCaseStudyImage(file, (p) => {
+          setUploadProgress({
+            current: i + 1,
+            total: files.length,
+            name: `${file.name} · ${p.step}`,
+          });
+        });
+
         if (result.success) {
           newImages.push({
             id: `img-${Date.now()}-${i}-${Math.random().toString(36).substr(2, 6)}`,
             url: result.url,
+            originalUrl: result.originalUrl || result.url,
             alt: file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' '),
             width: result.width || 0,
             height: result.height || 0,
-            fileSize: file.size,
+            fileSize: result.fileSize || file.size,
+            slices: result.slices || [{ url: result.url, width: result.width, height: result.height, index: 0 }],
+            isSliced: result.isSliced || false,
           });
         } else {
           showToast('error', `Failed to upload ${file.name}`, result.error);
@@ -187,24 +197,27 @@ export const AdminProjectsTab = () => {
 
     setIsUploadingImages(false);
     setUploadProgress(null);
-    showToast('success', `${newImages.length} image(s) uploaded in 100% original quality ✓`);
+    showToast('success', `${newImages.length} case study deliverable(s) uploaded ✓`);
     e.target.value = '';
   };
 
   // Single Image Replace Handler
   const handleReplaceImage = async (index, file) => {
     if (!file) return;
-    showToast('info', 'Replacing Image...', 'Uploading new visual in 100% original quality.');
+    showToast('info', 'Replacing Visual...', 'Processing and uploading in 100% full original quality.');
     try {
-      const result = await uploadImageToStorage(file, 'casestudies');
+      const result = await processCaseStudyImage(file);
       if (result.success) {
         const updatedImages = [...formData.images];
         updatedImages[index] = {
           ...updatedImages[index],
           url: result.url,
+          originalUrl: result.originalUrl || result.url,
           width: result.width || 0,
           height: result.height || 0,
-          fileSize: file.size,
+          fileSize: result.fileSize || file.size,
+          slices: result.slices || [{ url: result.url, width: result.width, height: result.height, index: 0 }],
+          isSliced: result.isSliced || false,
         };
         setFormData((prev) => ({ ...prev, images: updatedImages }));
         showToast('success', 'Image Replaced ✓', result.sizeInfo);
@@ -668,25 +681,36 @@ export const AdminProjectsTab = () => {
                 <span className="text-[10px] font-mono text-ink-3 uppercase block mb-1.5">
                   Cover Preview (Uncropped):
                 </span>
-                <img
-                  src={formData.coverImg}
-                  alt="Cover Preview"
-                  className="w-full max-h-[300px] object-contain rounded-lg border border-line bg-sheet block mx-auto"
-                />
-                {/* Dimensions + size info */}
-                {(formData.coverImgWidth > 0) && (
-                  <div className="mt-2 space-y-1">
+                <div className="w-full rounded-lg border border-line bg-sheet overflow-hidden">
+                  <img
+                    src={formData.coverImg}
+                    alt="Cover Preview"
+                    className="w-full h-auto block mx-auto"
+                    style={{ width: '100%', height: 'auto', display: 'block' }}
+                  />
+                </div>
+                {/* Dimensions + size info + warnings */}
+                <div className="mt-2.5 space-y-1.5">
+                  {formData.coverImgWidth > 0 && (
                     <p className="text-[11px] font-mono text-ink-3">
                       {formData.coverImgWidth} × {formData.coverImgHeight} px
                       {formData.coverImgSize ? ` · ${formatBytes(formData.coverImgSize)}` : ''}
                     </p>
-                    {formData.coverImgWidth < 1600 && (
-                      <p className="text-[11px] font-mono font-semibold text-amber-500 flex items-center gap-1.5">
-                        ⚠️ This image is small and may look blurry. Export it from Figma at 2× for sharp results.
-                      </p>
-                    )}
-                  </div>
-                )}
+                  )}
+                  {formData.coverImgWidth > 0 && formData.coverImgWidth < 1600 && (
+                    <p className="text-[11px] font-mono font-semibold text-amber-500 flex items-center gap-1.5">
+                      ⚠️ This cover artwork is {formData.coverImgWidth}px wide (narrower than 1,600px) and may look blurry on high-resolution screens. We recommend exporting from Figma at 2× for the sharpest results.
+                    </p>
+                  )}
+                  {formData.coverImgHeight > 0 && (formData.coverImgHeight > formData.coverImgWidth * 1.5 || formData.coverImgHeight > 2000) && (
+                    <p className="text-[11px] font-mono text-ink-2 bg-sheet p-2.5 rounded-lg border border-line flex items-start gap-2">
+                      <span>💡</span>
+                      <span>
+                        <strong>Note:</strong> This cover artwork is quite tall ({formData.coverImgWidth} × {formData.coverImgHeight} px). Very tall vertical designs are usually best placed under &apos;Case Study Visuals&apos; so visitors can scroll down to read through them, but it is fully supported as a cover image if you prefer.
+                      </span>
+                    </p>
+                  )}
+                </div>
               </div>
             )}
           </div>
@@ -775,16 +799,23 @@ export const AdminProjectsTab = () => {
                         placeholder="Description for accessibility / caption"
                         className="w-full px-3 py-1.5 rounded-lg border border-line bg-sheet text-ink text-xs focus:outline-none focus:border-signal"
                       />
-                      {/* Pixel dimensions + file size */}
+                      {/* Pixel dimensions + file size + slicing status */}
                       {img.width > 0 && (
-                        <div className="space-y-0.5">
-                          <p className="text-[11px] font-mono text-ink-3">
-                            {img.width} × {img.height} px
-                            {img.fileSize ? ` · ${formatBytes(img.fileSize)}` : ''}
-                          </p>
+                        <div className="space-y-1">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="text-[11px] font-mono text-ink-3">
+                              {img.width} × {img.height} px
+                              {img.fileSize ? ` · ${formatBytes(img.fileSize)}` : ''}
+                            </span>
+                            {Array.isArray(img.slices) && img.slices.length > 1 && (
+                              <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                                ✨ Sliced into {img.slices.length} pieces for mobile sharpness
+                              </span>
+                            )}
+                          </div>
                           {img.width < 1600 && (
                             <p className="text-[11px] font-mono font-semibold text-amber-500 flex items-center gap-1">
-                              ⚠️ Small image — may look blurry. Export from Figma at 2× for sharp results.
+                              ⚠️ This image is {img.width}px wide (narrower than 1,600px) and may look blurry. Export from Figma at 2× for sharp results.
                             </p>
                           )}
                         </div>
@@ -956,17 +987,38 @@ export const AdminProjectsTab = () => {
 
             {formData.coverImg && (
               <div className="w-full overflow-hidden rounded-2xl border border-line bg-sheet my-6">
-                <img src={formData.coverImg} alt="Cover preview" className="w-full h-auto object-contain block" />
+                <img
+                  src={formData.coverImg}
+                  alt="Cover preview"
+                  className="w-full h-auto block m-0 p-0"
+                  style={{ width: '100%', height: 'auto', display: 'block' }}
+                />
               </div>
             )}
 
             {formData.images.length > 0 && (
-              <div className="space-y-4 my-8">
-                {formData.images.map((img, i) => (
-                  <div key={i} className="w-full overflow-hidden rounded-2xl border border-line bg-sheet">
-                    <img src={img.url} alt={img.alt} className="w-full h-auto object-contain block" />
-                  </div>
-                ))}
+              <div className="space-y-6 my-8">
+                {formData.images.map((img, i) => {
+                  const slices = Array.isArray(img.slices) && img.slices.length > 0
+                    ? img.slices
+                    : [{ url: img.url, width: img.width, height: img.height, index: 0 }];
+
+                  return (
+                    <div key={i} className="w-full overflow-hidden rounded-2xl border border-line bg-sheet" style={{ lineHeight: 0 }}>
+                      <div className="w-full flex flex-col m-0 p-0" style={{ lineHeight: 0 }}>
+                        {slices.map((slice, sIdx) => (
+                          <img
+                            key={slice.url || sIdx}
+                            src={slice.url}
+                            alt={img.alt || `Preview visual slice ${sIdx + 1}`}
+                            className="w-full h-auto block m-0 p-0 border-0"
+                            style={{ width: '100%', height: 'auto', display: 'block', verticalAlign: 'middle', margin: 0, padding: 0 }}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>

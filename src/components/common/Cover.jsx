@@ -9,7 +9,8 @@ export const Cover = ({ type, title = '', coverImg = null, className = '' }) => 
           src={coverImg}
           alt={title}
           loading="lazy"
-          className="w-full h-auto object-contain max-h-[560px] mx-auto block"
+          className="w-full h-auto block mx-auto"
+          style={{ width: '100%', height: 'auto', display: 'block' }}
         />
       </div>
     );
