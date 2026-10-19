@@ -92,6 +92,10 @@ export const PortfolioProvider = ({ children }) => {
     try {
       const saved = getStoredItemSync('surya_portfolio_profile');
       if (saved) {
+        const isOldSpec = !saved.specialization || saved.specialization.includes('Mobile Apps') || saved.specialization.includes('Ecommerce');
+        const isOldToolkit = !saved.coreToolkit || saved.coreToolkit.includes('HTML5, CSS Grid');
+        const isOldLocation = !saved.location || saved.location.includes('Open to Remote & Relocation');
+
         return {
           ...DEFAULT_PROFILE,
           ...saved,
@@ -100,9 +104,9 @@ export const PortfolioProvider = ({ children }) => {
           roleLine2: saved.roleLine2 && saved.roleLine2 !== 'Designer' ? saved.roleLine2 : DEFAULT_PROFILE.roleLine2,
           name: saved.name && saved.name !== 'Surya' ? saved.name : DEFAULT_PROFILE.name,
           badge: saved.badge && !saved.badge.includes('Product Roles') ? saved.badge : DEFAULT_PROFILE.badge,
-          specialization: (saved.specialization ? saved.specialization.replace(/E-Commerce/g, 'Ecommerce') : DEFAULT_PROFILE.specialization),
-          coreToolkit: saved.coreToolkit || DEFAULT_PROFILE.coreToolkit,
-          location: saved.location || DEFAULT_PROFILE.location,
+          specialization: isOldSpec ? DEFAULT_PROFILE.specialization : saved.specialization,
+          coreToolkit: isOldToolkit ? DEFAULT_PROFILE.coreToolkit : saved.coreToolkit,
+          location: isOldLocation ? DEFAULT_PROFILE.location : saved.location,
           lead: saved.lead || DEFAULT_PROFILE.lead,
           highlightedPhrase: saved.highlightedPhrase || DEFAULT_PROFILE.highlightedPhrase,
         };
@@ -170,6 +174,15 @@ export const PortfolioProvider = ({ children }) => {
           if (merged.roleLine1 === 'PRODUCT') merged.roleLine1 = 'USER EXPERIENCE';
           if (merged.badge && merged.badge.includes('Product Roles')) {
             merged.badge = merged.badge.replace('Product Roles', 'User Experience Roles');
+          }
+          if (!merged.specialization || merged.specialization.includes('Mobile Apps') || merged.specialization.includes('Ecommerce')) {
+            merged.specialization = DEFAULT_PROFILE.specialization;
+          }
+          if (!merged.coreToolkit || merged.coreToolkit.includes('HTML5, CSS Grid')) {
+            merged.coreToolkit = DEFAULT_PROFILE.coreToolkit;
+          }
+          if (!merged.location || merged.location.includes('Open to Remote & Relocation')) {
+            merged.location = DEFAULT_PROFILE.location;
           }
           setProfile((prev) => ({ ...prev, ...merged }));
         }

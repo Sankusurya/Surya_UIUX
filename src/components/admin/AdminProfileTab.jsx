@@ -10,9 +10,9 @@ export const AdminProfileTab = () => {
     badge: profile.badge || profile.status || 'Available for Junior User Experience & UI Roles',
     lead: profile.lead || 'I turn messy product problems into intuitive, battle-tested interfaces that users understand on first tap — and I know how to build them in code.',
     highlightedPhrase: profile.highlightedPhrase || 'intuitive, battle-tested interfaces',
-    specialization: (profile.specialization || profile.focus || 'UX Research, Mobile Apps, Design Systems, Ecommerce').replace(/E-Commerce/g, 'Ecommerce'),
-    coreToolkit: profile.coreToolkit || profile.strengths || 'Figma, FigJam, HTML5, CSS Grid, JavaScript',
-    location: profile.location || profile.basedIn || 'Andhra Pradesh, India · Open to Remote & Relocation',
+    specialization: (profile.specialization || profile.focus || 'Product Design, UX Research, UI Design, Interaction Design, AI-Powered Products').replace(/E-Commerce/g, 'Ecommerce'),
+    coreToolkit: profile.coreToolkit || profile.strengths || 'Figma, FigJam, Prototyping, Design Systems, AI-Assisted Design Workflows',
+    location: profile.location || profile.basedIn || 'Andhra Pradesh, India · Open to Remote Opportunities & Relocation',
     email: profile.email || 'suryasanku800@gmail.com',
     socials: profile.socials || [
       { label: 'LinkedIn', note: 'view profile', href: 'https://linkedin.com' },
