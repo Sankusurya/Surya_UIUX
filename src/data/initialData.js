@@ -411,29 +411,29 @@ export const DEFAULT_PROFILE = {
 
 export const DEFAULT_STEPS = [
   {
-    n: 1,
+    n: "01",
     title: "Understand",
-    desc: "Talk to users and stakeholders, read the data, and write the problem in one sentence before opening Figma."
+    desc: "Explore user needs, business goals, and existing pain points to understand the problem worth solving."
   },
   {
-    n: 2,
+    n: "02",
     title: "Define",
-    desc: "Turn findings into a few design principles and a measurable goal, so every later decision has a test."
+    desc: "Synthesize insights, identify the core problem, and establish clear design priorities."
   },
   {
-    n: 3,
+    n: "03",
     title: "Explore",
-    desc: "Sketch several directions quickly, then narrow down with the principles instead of taste."
+    desc: "Explore multiple solutions through user flows, wireframes, and visual directions before committing to one."
   },
   {
-    n: 4,
-    title: "Prototype and test",
-    desc: "Put a clickable prototype in front of real people, watch where they hesitate, and fix that first."
+    n: "04",
+    title: "Prototype & test",
+    desc: "Build interactive prototypes, observe user behavior, and identify usability issues early."
   },
   {
-    n: 5,
-    title: "Build and measure",
-    desc: "Ship it, often in code myself, then check the goal from step two and iterate."
+    n: "05",
+    title: "Refine & deliver",
+    desc: "Improve the experience using feedback, document design decisions, and prepare clear developer handoff."
   }
 ];
 

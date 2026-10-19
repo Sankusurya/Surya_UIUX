@@ -163,7 +163,7 @@ export const HomeView = () => {
         <div className="sh">
           <h2 id="hw">How I work</h2>
           <a className="textlink" href="#thinking">
-            My design thinking →
+            My design process →
           </a>
         </div>
         <StepsGrid />

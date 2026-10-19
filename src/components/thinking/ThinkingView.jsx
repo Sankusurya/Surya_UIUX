@@ -17,9 +17,9 @@ export const ThinkingView = () => {
           className="read"
           style={{ fontSize: '20px', lineHeight: 1.45, marginBottom: '40px' }}
         >
-          My process is simple to say and hard to skip: understand the problem,
-          agree how we will measure success, try several ideas, test with real
-          people, and ship something I can measure.
+          My process is simple to say and hard to skip: understand user needs,
+          define the core problem, explore multiple directions, prototype and test early,
+          and refine for clear developer handoff.
         </p>
         <StepsGrid />
       </section>

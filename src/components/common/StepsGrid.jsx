@@ -6,13 +6,16 @@ export const StepsGrid = () => {
 
   return (
     <div className="steps">
-      {steps.map((x, i) => (
-        <div key={i} className="step">
-          <span className="n">{x.n || i + 1}</span>
-          <h3>{x.title || x[0]}</h3>
-          <p>{x.desc || x[1]}</p>
-        </div>
-      ))}
+      {steps.map((x, i) => {
+        const num = String(x.n !== undefined ? x.n : i + 1).padStart(2, '0');
+        return (
+          <div key={i} className="step">
+            <span className="n">{num}</span>
+            <h3>{x.title || x[0]}</h3>
+            <p>{x.desc || x[1]}</p>
+          </div>
+        );
+      })}
     </div>
   );
 };

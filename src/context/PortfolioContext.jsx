@@ -120,7 +120,19 @@ export const PortfolioProvider = ({ children }) => {
   const [steps, setSteps] = useState(() => {
     try {
       const saved = getStoredItemSync('surya_portfolio_steps');
-      return saved || DEFAULT_STEPS;
+      if (saved && Array.isArray(saved) && saved.length > 0) {
+        const isOldSteps = saved.some(
+          (s) =>
+            s.title === 'Build and measure' ||
+            s.title === 'Prototype and test' ||
+            (s.desc && s.desc.includes('opening Figma'))
+        );
+        if (isOldSteps) {
+          return DEFAULT_STEPS;
+        }
+        return saved;
+      }
+      return DEFAULT_STEPS;
     } catch {
       return DEFAULT_STEPS;
     }
@@ -200,7 +212,19 @@ export const PortfolioProvider = ({ children }) => {
         }
 
         const idbSteps = await getStoredItemAsync('surya_portfolio_steps');
-        if (idbSteps && isMounted) setSteps(idbSteps);
+        if (idbSteps && isMounted) {
+          const isOldSteps = Array.isArray(idbSteps) && idbSteps.some(
+            (s) =>
+              s.title === 'Build and measure' ||
+              s.title === 'Prototype and test' ||
+              (s.desc && s.desc.includes('opening Figma'))
+          );
+          if (isOldSteps) {
+            setSteps(DEFAULT_STEPS);
+          } else {
+            setSteps(idbSteps);
+          }
+        }
 
         const idbPrinciples = await getStoredItemAsync('surya_portfolio_principles');
         if (idbPrinciples && isMounted) setPrinciples(idbPrinciples);
