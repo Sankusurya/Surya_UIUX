@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { usePortfolio } from '../../context/PortfolioContext';
 import { Tags } from '../common/Tags';
 import { TodoText } from '../common/TodoText';
-import { CaseStudyFullScreenViewer } from './CaseStudyFullScreenViewer';
 import { normalizeProject } from '../../data/initialData';
 
 export const CaseStudyView = () => {
@@ -11,11 +10,6 @@ export const CaseStudyView = () => {
   const slug = currentRoute.replace('case-', '');
   const rawProject = projects.find((p) => p.slug === slug) || projects[0];
   const project = normalizeProject(rawProject);
-
-  // Full-Screen Continuous Case Study Reader State
-  const [fullScreenViewerOpen, setFullScreenViewerOpen] = useState(false);
-  const [activeSlices, setActiveSlices] = useState([]);
-  const [viewerTitle, setViewerTitle] = useState('');
 
   if (!project) {
     return (
@@ -32,23 +26,6 @@ export const CaseStudyView = () => {
       </div>
     );
   }
-
-  const openViewerForCover = () => {
-    if (!project.coverImg) return;
-    setActiveSlices([{ url: project.coverImg, width: 0, height: 0, index: 0 }]);
-    setViewerTitle(`${project.title} · Cover Artwork`);
-    setFullScreenViewerOpen(true);
-  };
-
-  const openViewerForCaseStudy = (img) => {
-    const slices = Array.isArray(img.slices) && img.slices.length > 0
-      ? img.slices
-      : [{ url: img.url, width: img.width || 0, height: img.height || 0, index: 0 }];
-
-    setActiveSlices(slices);
-    setViewerTitle(project.title);
-    setFullScreenViewerOpen(true);
-  };
 
   // Other projects for "More projects" section (exclude current project)
   const otherProjects = projects
@@ -74,7 +51,7 @@ export const CaseStudyView = () => {
   const embedUrl = getEmbedUrl(project.prototypeUrl);
 
   return (
-    <div className="animate-in pt-4 pb-20 max-w-5xl mx-auto px-4 sm:px-6">
+    <div className="animate-in pt-4 pb-20 w-full">
       {/* 1. "All work" Back Link */}
       <nav className="mb-6">
         <a
@@ -97,9 +74,9 @@ export const CaseStudyView = () => {
         </div>
       )}
 
-      {/* 4. Short Project Description */}
+      {/* 4. Short Project Description (Aligned to left, spanning ~8 columns for readability) */}
       {project.summary && (
-        <p className="text-lg sm:text-xl text-ink-2 max-w-3xl leading-relaxed mb-6 font-normal">
+        <p className="cs-read-text text-lg sm:text-xl text-ink-2 leading-relaxed mb-6 font-normal">
           <TodoText text={project.summary} />
         </p>
       )}
@@ -172,42 +149,18 @@ export const CaseStudyView = () => {
         </div>
       )}
 
-      {/* 7. The Main Cover Image (Full width, Uncropped, Crisp) */}
-      {project.coverImg && (
-        <figure className="mb-10 w-full group">
-          <div
-            onClick={openViewerForCover}
-            title="Click to view full screen"
-            className="w-full overflow-hidden rounded-2xl border border-line bg-sheet shadow-sm cursor-zoom-in transition-all duration-200 hover:border-signal/50 relative"
-          >
-            <img
-              src={project.coverImg}
-              alt={`${project.title} Cover`}
-              loading="eager"
-              className="w-full h-auto block m-0 p-0"
-              style={{ width: '100%', height: 'auto', display: 'block' }}
-            />
-            <div className="absolute bottom-3 right-3 px-3 py-1.5 rounded-full bg-black/75 text-white text-[11px] font-mono opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none backdrop-blur-xs flex items-center gap-1.5 border border-white/10 shadow-md">
-              <span>🔍 Full Screen</span>
-            </div>
-          </div>
-        </figure>
-      )}
-
-      {/* 8. The Case Study: All Images Stacked Continuously at Full Width */}
+      {/* Case Study Deliverables: All Images Stacked Continuously at Full Width */}
       {Array.isArray(project.images) && project.images.length > 0 && (
-        <section aria-label="Case Study Deliverables" className="w-full space-y-10 my-10">
+        <section aria-label="Case Study Deliverables" className="w-full space-y-10 mb-10">
           {project.images.map((img, idx) => {
             const imgSlices = Array.isArray(img.slices) && img.slices.length > 0
               ? img.slices
               : [{ url: img.url, width: img.width || 0, height: img.height || 0, index: 0 }];
 
             return (
-              <figure key={img.id || idx} className="w-full group">
+              <figure key={img.id || idx} className="w-full">
                 <div
-                  onClick={() => openViewerForCaseStudy(img)}
-                  title="Click anywhere to view full-screen case study reader"
-                  className="w-full rounded-2xl border border-line bg-sheet overflow-hidden shadow-sm cursor-zoom-in transition-all duration-200 hover:border-signal/50 relative"
+                  className="w-full rounded-2xl border border-line bg-sheet overflow-hidden shadow-sm relative"
                   style={{ lineHeight: 0 }}
                 >
                   {/* Seamless vertical stack of slices with zero gap */}
@@ -241,10 +194,6 @@ export const CaseStudyView = () => {
                         </div>
                       );
                     })}
-                  </div>
-
-                  <div className="absolute bottom-4 right-4 px-3.5 py-1.5 rounded-full bg-black/80 text-white text-xs font-mono opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none backdrop-blur-sm flex items-center gap-2 border border-white/10 shadow-lg">
-                    <span>🔍 Click to expand full-screen</span>
                   </div>
                 </div>
 
@@ -374,14 +323,6 @@ export const CaseStudyView = () => {
           </div>
         </section>
       )}
-
-      {/* Full-Screen Continuous Case Study Reader */}
-      <CaseStudyFullScreenViewer
-        isOpen={fullScreenViewerOpen}
-        onClose={() => setFullScreenViewerOpen(false)}
-        slices={activeSlices}
-        title={viewerTitle || project.title}
-      />
     </div>
   );
 };

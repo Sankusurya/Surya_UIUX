@@ -22,8 +22,9 @@ export const normalizeProject = (p) => {
     prototypeUrl = '';
   }
 
-  // Cover image: remove SVG placeholder or legacy keys
-  let coverImg = p.coverImg || '';
+  // Cover image: robustly extract and remove SVG placeholder or legacy keys
+  let rawCover = p.coverImg || p.coverImage || p.cover_img || '';
+  let coverImg = typeof rawCover === 'object' && rawCover !== null ? (rawCover.url || '') : String(rawCover || '');
   if (typeof coverImg === 'string' && coverImg.startsWith('data:image/svg+xml')) {
     coverImg = '';
   }

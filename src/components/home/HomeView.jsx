@@ -118,7 +118,7 @@ export const HomeView = () => {
             const p = normalizeProject(rawP);
             return (
               <a key={p.slug} className="card group" href={`#case-${p.slug}`}>
-                <Cover title={p.title} coverImg={p.coverImg} />
+                <Cover title={p.title} coverImg={p.coverImg} aspectRatio="16/10" />
                 <div className="meta">
                   <Tags types={p.type} year={p.year} />
                   <h3 className="group-hover:text-signal transition-colors">{p.title}</h3>

@@ -31,11 +31,13 @@ export const Navbar = () => {
     }
   };
 
-  const handleWorkClick = (e) => {
+  const handleWorkClick = () => {
+    setIsWorkDropdownOpen(false);
+  };
+
+  const handleDropdownToggle = (e) => {
     e.preventDefault();
-    if (currentRoute !== 'work') {
-      window.location.hash = 'work';
-    }
+    e.stopPropagation();
     setIsWorkDropdownOpen((prev) => !prev);
   };
 
@@ -53,33 +55,44 @@ export const Navbar = () => {
         </a>
 
         {/* Work Pill Button with Dropdown Chevron */}
-        <div className="relative">
-          <button
-            type="button"
-            onClick={handleWorkClick}
-            className={`nav-work-pill cursor-pointer ${
+        <div className="relative inline-flex items-center">
+          <div
+            className={`nav-work-pill ${
               isWorkActive ? 'nav-work-active' : ''
             }`}
-            aria-expanded={isWorkDropdownOpen}
-            aria-haspopup="true"
           >
-            <span>Work</span>
-            <svg
-              width="12"
-              height="12"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className={`transition-transform duration-200 ${
-                isWorkDropdownOpen ? 'rotate-180' : ''
-              }`}
+            <a
+              href="#work"
+              onClick={handleWorkClick}
+              className="nav-work-link"
             >
-              <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
-          </button>
+              Work
+            </a>
+            <button
+              type="button"
+              onClick={handleDropdownToggle}
+              className="nav-work-arrow-btn"
+              aria-expanded={isWorkDropdownOpen}
+              aria-haspopup="true"
+              aria-label="Toggle Admin Menu"
+            >
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className={`transition-transform duration-200 ${
+                  isWorkDropdownOpen ? 'rotate-180' : ''
+                }`}
+              >
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+          </div>
 
           {/* Work Dropdown Menu - shows only Admin Panel */}
           {isWorkDropdownOpen && (

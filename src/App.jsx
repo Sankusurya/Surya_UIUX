@@ -11,6 +11,7 @@ import { ContactSection } from './components/home/ContactSection';
 import { AdminPanel } from './components/admin/AdminPanel';
 import { ResumeModal } from './components/common/ResumeModal';
 import { Toast } from './components/common/Toast';
+import { GridOverlay } from './components/common/GridOverlay';
 
 export const App = () => {
   const { currentRoute } = usePortfolio();
@@ -56,6 +57,7 @@ export const App = () => {
       {/* Global Modals & Notifications */}
       <ResumeModal />
       <Toast />
+      <GridOverlay />
     </>
   );
 };

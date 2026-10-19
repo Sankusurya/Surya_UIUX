@@ -272,8 +272,8 @@ export const AdminProjectsTab = () => {
     setDraggedIndex(null);
   };
 
-  // Save Project Handler
-  const handleSubmit = (e) => {
+  // Save Project Handler (Instant Real-Time Persistence)
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!formData.title.trim()) {
@@ -282,8 +282,16 @@ export const AdminProjectsTab = () => {
     }
 
     const slug = formData.slug.trim() || generateSlug(formData.title);
+    const existing = (isEditing && editingSlug)
+      ? (projects.find((p) => p.slug === editingSlug) || {})
+      : {};
+
+    const cleanCover = typeof formData.coverImg === 'string'
+      ? formData.coverImg.trim()
+      : (formData.coverImg?.url || '');
 
     const newProject = {
+      ...existing,
       slug,
       title: formData.title.trim(),
       year: formData.year.trim() || '2026',
@@ -294,8 +302,8 @@ export const AdminProjectsTab = () => {
       tools: formData.tools.trim(),
       prototypeUrl: sanitizeUrl(formData.prototypeUrl),
       caseStudyUrl: sanitizeUrl(formData.caseStudyUrl),
-      coverImg: formData.coverImg.trim(),
-      images: formData.images || [],
+      coverImg: cleanCover,
+      images: Array.isArray(formData.images) ? formData.images : [],
     };
 
     let updatedProjects;
@@ -305,7 +313,7 @@ export const AdminProjectsTab = () => {
       updatedProjects = [newProject, ...projects];
     }
 
-    saveProjects(updatedProjects);
+    await saveProjects(updatedProjects);
     setIsEditing(false);
     setEditingSlug(null);
     setFormData(emptyProject);
