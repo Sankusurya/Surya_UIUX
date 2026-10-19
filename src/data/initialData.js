@@ -512,3 +512,119 @@ export const DEFAULT_ABOUT = {
   ],
   interests: "Outside client work I'm usually exploring motion with LottieFiles or turning Figma screens into working prototypes with AI coding tools — building things is how I learn them. PERSONAL_HOBBY_HERE"
 };
+
+export const THINKING_STORY = {
+  header: {
+    title: "Design thinking",
+    label: "How I actually think",
+    intro: "Every designer has the same five steps on their website. The steps aren't what make the work good — the habits inside them are. So here's my process the way it really feels: six small moments, what I do in each, and the question I keep asking myself."
+  },
+  chapters: [
+    {
+      id: "story-ch-1",
+      number: "01",
+      tag: "01 · Listen",
+      fullTag: "CHAPTER 01 — LISTEN",
+      title: "People tell you symptoms, not causes",
+      scene: "Someone says, 'This app is slow.' Most of the time it isn't slow. They just can't tell whether it's working.",
+      whatIDo: [
+        "Ask about the last time it happened, not what they think in general.",
+        "Ask 'what happened just before that?' until I reach the real moment.",
+        "Talk to every side — the people who use it and the people who serve them."
+      ],
+      question: "What were they actually trying to do when it went wrong?",
+      lesson: "The real problem is usually one question deeper than the first answer."
+    },
+    {
+      id: "story-ch-2",
+      number: "02",
+      tag: "02 · Frame",
+      fullTag: "CHAPTER 02 — FRAME",
+      title: "One sentence before any screen",
+      scene: "Before I open Figma, I write the problem as one sentence: who, at what moment, and what goes wrong. If it doesn't fit in one sentence, I don't understand it yet.",
+      whatIDo: [
+        "Name the exact moment the problem happens, not just the feature.",
+        "Use that sentence to test every later decision: does this make that moment better?"
+      ],
+      question: "If I solved only this, would it matter to them?",
+      lesson: "A clear problem saves more time than a fast design."
+    },
+    {
+      id: "story-ch-3",
+      number: "03",
+      tag: "03 · Explore",
+      fullTag: "CHAPTER 03 — EXPLORE",
+      title: "The first idea is just the obvious one",
+      scene: "My first idea always feels right. That's exactly why I don't trust it yet.",
+      whatIDo: [
+        "Put two or three real options side by side.",
+        "Write the trade-off of each in plain words — what it gains, what it costs.",
+        "Choose, and write down what I gave up, so the decision can be explained later."
+      ],
+      question: "What am I giving up by choosing this?",
+      lesson: "A decision without a trade-off is usually a decision I haven't thought through."
+    },
+    {
+      id: "story-ch-4",
+      number: "04",
+      tag: "04 · Check",
+      fullTag: "CHAPTER 04 — CHECK",
+      title: "The most useful thing in a test is a pause",
+      scene: "A finger hovers between two buttons for a second too long. Nobody says anything — but that pause tells me more than any compliment.",
+      whatIDo: [
+        "Show work early, while it's still cheap to change.",
+        "Stay quiet and watch, instead of explaining my design.",
+        "Label honestly how sure I am: tested, informal feedback, or not tested yet — and how I'd test it next."
+      ],
+      question: "Where did they hesitate, and why?",
+      lesson: "If I have to explain it, the design isn't finished."
+    },
+    {
+      id: "story-ch-5",
+      number: "05",
+      tag: "05 · Rethink",
+      fullTag: "CHAPTER 05 — RETHINK",
+      title: "There's always someone I forgot",
+      scene: "It's easy to design only for the person tapping the screen. But behind most products is someone else — the person delivering, approving, supporting or managing it.",
+      whatIDo: [
+        "Map everyone the product touches, not just the main user.",
+        "Ask what each of them needs to keep using it.",
+        "Throw away what doesn't work, and keep a record of why."
+      ],
+      question: "Who else has to say yes for this to work?",
+      lesson: "A product only works if every side keeps using it."
+    },
+    {
+      id: "story-ch-6",
+      number: "06",
+      tag: "06 · Hand off",
+      fullTag: "CHAPTER 06 — HAND OFF",
+      title: "Done is when it ships right, not when it looks right",
+      scene: "A design that looks perfect in Figma can still break on a small phone, an empty list, or a slow connection.",
+      whatIDo: [
+        "Design the hard states too: empty, error, loading, no network.",
+        "Build with reusable components so every screen behaves the same.",
+        "Give developers clear specs, and turn screens into working prototypes so we test real flows early."
+      ],
+      question: "What will a developer have to guess?",
+      lesson: "Design what can be built — and leave nothing to guess."
+    }
+  ],
+  ai: {
+    title: "How I use AI",
+    label: "Faster making, not deciding",
+    text: "I use AI tools to move faster — turning designs into working prototypes and trying more options in less time. But AI doesn't decide what to build. The insights that change a product still come from watching and talking to real people."
+  },
+  rules: {
+    title: "The rules I keep",
+    label: "One per chapter",
+    items: [
+      { chapterId: "story-ch-1", chapterNumber: "01", text: "The real problem is one question deeper." },
+      { chapterId: "story-ch-2", chapterNumber: "02", text: "One clear sentence before any screen." },
+      { chapterId: "story-ch-3", chapterNumber: "03", text: "Every decision has a trade-off — write it down." },
+      { chapterId: "story-ch-4", chapterNumber: "04", text: "If I have to explain it, it isn't finished." },
+      { chapterId: "story-ch-5", chapterNumber: "05", text: "Design for everyone the product touches." },
+      { chapterId: "story-ch-6", chapterNumber: "06", text: "Leave nothing for developers to guess." }
+    ]
+  }
+};
