@@ -96,10 +96,10 @@ export const PortfolioProvider = ({ children }) => {
           ...DEFAULT_PROFILE,
           ...saved,
           email: (saved.email && saved.email !== 'sankusurya@gmail.com') ? saved.email : DEFAULT_PROFILE.email,
-          roleLine1: saved.roleLine1 && saved.roleLine1 !== 'UX/UI' ? saved.roleLine1 : DEFAULT_PROFILE.roleLine1,
+          roleLine1: saved.roleLine1 && saved.roleLine1 !== 'UX/UI' && saved.roleLine1 !== 'PRODUCT' ? saved.roleLine1 : DEFAULT_PROFILE.roleLine1,
           roleLine2: saved.roleLine2 && saved.roleLine2 !== 'Designer' ? saved.roleLine2 : DEFAULT_PROFILE.roleLine2,
           name: saved.name && saved.name !== 'Surya' ? saved.name : DEFAULT_PROFILE.name,
-          badge: saved.badge || DEFAULT_PROFILE.badge,
+          badge: saved.badge && !saved.badge.includes('Product Roles') ? saved.badge : DEFAULT_PROFILE.badge,
           specialization: saved.specialization || DEFAULT_PROFILE.specialization,
           coreToolkit: saved.coreToolkit || DEFAULT_PROFILE.coreToolkit,
           location: saved.location || DEFAULT_PROFILE.location,
@@ -165,7 +165,14 @@ export const PortfolioProvider = ({ children }) => {
         }
 
         const idbProfile = await getStoredItemAsync('surya_portfolio_profile');
-        if (idbProfile && isMounted) setProfile((prev) => ({ ...prev, ...idbProfile }));
+        if (idbProfile && isMounted) {
+          const merged = { ...idbProfile };
+          if (merged.roleLine1 === 'PRODUCT') merged.roleLine1 = 'USER EXPERIENCE';
+          if (merged.badge && merged.badge.includes('Product Roles')) {
+            merged.badge = merged.badge.replace('Product Roles', 'User Experience Roles');
+          }
+          setProfile((prev) => ({ ...prev, ...merged }));
+        }
 
         const idbSteps = await getStoredItemAsync('surya_portfolio_steps');
         if (idbSteps && isMounted) setSteps(idbSteps);

@@ -74,7 +74,7 @@ export const ContactSection = () => {
               something together?
             </h2>
             <p className="text-base text-ink-2 max-w-lg leading-relaxed">
-              Open to Junior UX/UI and Product Design roles, contract assignments, and collaborative projects. I respond within 24 hours.
+              Open to Junior User Experience and UI Design roles, contract assignments, and collaborative projects. I respond within 24 hours.
             </p>
 
             {/* Email pill */}
@@ -193,7 +193,7 @@ export const ContactSection = () => {
                     onChange={(e) => setTopic(e.target.value)}
                     className="w-full px-3.5 py-2.5 rounded-xl border border-line bg-sheet text-ink text-sm focus:outline-none focus:border-signal disabled:opacity-60"
                   >
-                    <option value="Full-time Junior UX/UI Role">Full-time Junior UX/UI & Product Role</option>
+                    <option value="Full-time Junior UX/UI Role">Full-time Junior UX/UI & User Experience Role</option>
                     <option value="Contract / Freelance Project">Contract / Freelance Project</option>
                     <option value="Design System Consulting">Design System Consulting</option>
                     <option value="Quick Coffee Chat / Portfolio Review">Quick Coffee Chat / Portfolio Review</option>

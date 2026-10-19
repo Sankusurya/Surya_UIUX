@@ -59,7 +59,7 @@ export const ResumeModal = () => {
                 {profile.name || 'Surya Teja'}
               </h1>
               <p className="text-signal font-medium text-base mt-0.5">
-                Junior UX/UI & Product Designer
+                Junior User Experience & UI Designer
               </p>
               <p className="text-xs text-ink-3 mt-1">
                 {profile.location || 'Andhra Pradesh, India · Open to Remote & Relocation'}
@@ -91,7 +91,7 @@ export const ResumeModal = () => {
               Summary
             </h2>
             <p className="text-sm text-ink-2 leading-relaxed">
-              Product-minded UX/UI Designer with front-end engineering proficiency. Passionate about transforming messy, high-friction product problems into intuitive, battle-tested interfaces users grasp on first tap. Experienced in conducting user research, prototyping in Figma, building comprehensive design systems, and shipping production-ready web interfaces.
+              User Experience (UX/UI) Designer with front-end engineering proficiency. Passionate about transforming messy, high-friction product problems into intuitive, battle-tested interfaces users grasp on first tap. Experienced in conducting user research, prototyping in Figma, building comprehensive design systems, and shipping production-ready web interfaces.
             </p>
           </div>
 
@@ -183,7 +183,7 @@ export const ResumeModal = () => {
             Close
           </button>
           <a
-            href={`mailto:${profile.email || 'suryasanku800@gmail.com'}?subject=Discussion%20regarding%20Product%20Design%20Role`}
+            href={`mailto:${profile.email || 'suryasanku800@gmail.com'}?subject=Discussion%20regarding%20User%20Experience%20Design%20Role`}
             className="px-5 py-2 rounded-full bg-signal text-white text-xs font-semibold hover:opacity-90 transition-opacity cursor-pointer"
           >
             Contact Surya →

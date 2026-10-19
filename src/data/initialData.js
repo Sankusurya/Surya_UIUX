@@ -313,15 +313,15 @@ export const DEFAULT_PROJECTS = [
 export const DEFAULT_PROFILE = {
   name: "Surya Teja",
   surname: "",
-  roleLine1: "PRODUCT",
+  roleLine1: "USER EXPERIENCE",
   roleLine2: "DESIGNER",
-  badge: "Available for Junior UX/UI & Product Roles",
+  badge: "Available for Junior User Experience & UI Roles",
   lead: "I turn messy product problems into intuitive, battle-tested interfaces that users understand on first tap — and I know how to build them in code.",
   highlightedPhrase: "intuitive, battle-tested interfaces",
   specialization: "UX Research, Mobile Apps, Design Systems, E-Commerce",
   coreToolkit: "Figma, FigJam, HTML5, CSS Grid, JavaScript",
   location: "Andhra Pradesh, India · Open to Remote & Relocation",
-  status: "Available for Junior UX/UI & Product Roles",
+  status: "Available for Junior User Experience & UI Roles",
   email: "suryasanku800@gmail.com",
   resumeUrl: "#resume",
   socials: [

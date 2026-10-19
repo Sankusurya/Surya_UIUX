@@ -28,14 +28,14 @@ export const HomeView = () => {
           <div className="hero-status-pill motion-badge">
             <span className="hero-green-dot" aria-hidden="true"></span>
             <span className="hero-status-text">
-              {profile.badge || profile.status || 'Available for Junior UX/UI & Product Roles'}
+              {profile.badge || profile.status || 'Available for Junior User Experience & UI Roles'}
             </span>
           </div>
 
           {/* Huge Typographic Title with Motion */}
           <h1 className="hero-title-lockup">
             <span className="hero-name motion-title-1">{profile.name || 'Surya Teja'}</span>
-            <span className="hero-role-1 motion-title-2">{profile.roleLine1 || 'PRODUCT'}</span>
+            <span className="hero-role-1 motion-title-2">{profile.roleLine1 || 'USER EXPERIENCE'}</span>
             <span className="hero-role-2 motion-title-3">{profile.roleLine2 || 'DESIGNER'}</span>
           </h1>
         </div>

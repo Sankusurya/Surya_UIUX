@@ -8,8 +8,8 @@ export const AdminInquiriesTab = () => {
     addMessage({
       name: 'Sarah Jenkins',
       email: 's.jenkins@designcorp.io',
-      topic: 'Full-time Junior UX/UI & Product Role',
-      message: 'Hi Surya, I came across your portfolio and love your focus on battle-tested interfaces and UX research. We have an opening for a Junior Product Designer on our mobile team. Would love to schedule a quick 15-minute chat this week!'
+      topic: 'Full-time Junior UX/UI & User Experience Role',
+      message: 'Hi Surya, I came across your portfolio and love your focus on battle-tested interfaces and UX research. We have an opening for a Junior User Experience Designer on our mobile team. Would love to schedule a quick 15-minute chat this week!'
     });
   };
 

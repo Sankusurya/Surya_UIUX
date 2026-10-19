@@ -5,9 +5,9 @@ export const AdminProfileTab = () => {
   const { profile, saveProfile } = usePortfolio();
   const [formData, setFormData] = useState({
     name: profile.name || 'Surya Teja',
-    roleLine1: profile.roleLine1 || 'PRODUCT',
+    roleLine1: profile.roleLine1 || 'USER EXPERIENCE',
     roleLine2: profile.roleLine2 || 'DESIGNER',
-    badge: profile.badge || profile.status || 'Available for Junior UX/UI & Product Roles',
+    badge: profile.badge || profile.status || 'Available for Junior User Experience & UI Roles',
     lead: profile.lead || 'I turn messy product problems into intuitive, battle-tested interfaces that users understand on first tap — and I know how to build them in code.',
     highlightedPhrase: profile.highlightedPhrase || 'intuitive, battle-tested interfaces',
     specialization: profile.specialization || profile.focus || 'UX Research, Mobile Apps, Design Systems, E-Commerce',
@@ -81,7 +81,7 @@ export const AdminProfileTab = () => {
             type="text"
             value={formData.badge}
             onChange={(e) => handleChange('badge', e.target.value)}
-            placeholder="Available for Junior UX/UI & Product Roles"
+            placeholder="Available for Junior User Experience & UI Roles"
             className="w-full px-3.5 py-2 rounded-xl border border-line bg-paper text-ink text-sm focus:outline-none focus:border-signal"
           />
         </div>
@@ -108,7 +108,7 @@ export const AdminProfileTab = () => {
               type="text"
               value={formData.roleLine1}
               onChange={(e) => handleChange('roleLine1', e.target.value)}
-              placeholder="PRODUCT"
+              placeholder="USER EXPERIENCE"
               className="w-full px-3.5 py-2 rounded-xl border border-line bg-paper text-ink text-sm focus:outline-none focus:border-signal font-bold uppercase"
             />
           </div>

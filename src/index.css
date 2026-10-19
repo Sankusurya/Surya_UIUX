@@ -720,13 +720,14 @@ section {
 
 .hero-role-1 {
   font-family: var(--f-display);
-  font-size: clamp(64px, 11.5vw, 160px);
+  font-size: clamp(34px, 5.8vw, 84px);
   text-transform: uppercase;
   color: #EDE8DE;
   display: block;
-  line-height: 0.88;
+  line-height: 0.95;
   font-weight: 800;
   letter-spacing: 0.04em;
+  white-space: nowrap;
 }
 
 :root[data-theme="light"] .hero-role-1 {
