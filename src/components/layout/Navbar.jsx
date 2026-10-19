@@ -2,13 +2,15 @@ import React, { useState, useEffect, useRef } from 'react';
 import { usePortfolio } from '../../context/PortfolioContext';
 
 export const Navbar = () => {
-  const { currentRoute, theme, toggleTheme, openResume } = usePortfolio();
+  const { currentRoute, theme, toggleTheme, openResume, isResumeOpen } = usePortfolio();
   const [isWorkDropdownOpen, setIsWorkDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
+  const isHomeActive = currentRoute === 'home' || !currentRoute;
   const isWorkActive = currentRoute === 'work' || currentRoute.startsWith('case-');
   const isThinkingActive = currentRoute === 'thinking';
   const isAboutActive = currentRoute === 'about';
+  const isResumeActive = Boolean(isResumeOpen);
 
   // Close dropdown on click outside
   useEffect(() => {
@@ -47,9 +49,10 @@ export const Navbar = () => {
         {/* Orange Circular Avatar with Italic 'S' */}
         <a
           href="#home"
-          className="nav-avatar"
+          className={`nav-avatar ${isHomeActive ? 'nav-avatar-active' : ''}`}
           aria-label="Surya Teja Homepage"
-          title="Surya Teja"
+          title="Surya Teja Homepage"
+          aria-current={isHomeActive ? 'page' : undefined}
         >
           S
         </a>
@@ -120,6 +123,7 @@ export const Navbar = () => {
         <a
           href="#thinking"
           className={`nav-link ${isThinkingActive ? 'nav-link-active' : ''}`}
+          aria-current={isThinkingActive ? 'page' : undefined}
         >
           Thinking
         </a>
@@ -128,6 +132,7 @@ export const Navbar = () => {
         <a
           href="#about"
           className={`nav-link ${isAboutActive ? 'nav-link-active' : ''}`}
+          aria-current={isAboutActive ? 'page' : undefined}
         >
           About
         </a>
@@ -136,7 +141,8 @@ export const Navbar = () => {
         <button
           type="button"
           onClick={openResume}
-          className="nav-link cursor-pointer"
+          className={`nav-link cursor-pointer ${isResumeActive ? 'nav-link-active' : ''}`}
+          aria-current={isResumeActive ? 'true' : undefined}
         >
           Resume
         </button>

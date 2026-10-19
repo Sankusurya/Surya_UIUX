@@ -265,6 +265,16 @@ p {
   filter: brightness(1.05);
 }
 
+.nav-avatar-active {
+  box-shadow: 0 0 0 2px rgba(22, 22, 22, 0.95), 0 0 0 4.5px var(--signal), 0 2px 12px rgba(255, 122, 69, 0.45);
+  transform: scale(1.03);
+}
+
+:root[data-theme="light"] .nav-avatar-active {
+  box-shadow: 0 0 0 2px #FFFFFF, 0 0 0 4.5px #C2410C, 0 2px 10px rgba(194, 65, 12, 0.35);
+  transform: scale(1.03);
+}
+
 /* Work pill with separate Work link and dropdown chevron */
 .nav-work-pill {
   display: inline-flex;
@@ -276,7 +286,7 @@ p {
   padding: 3px 5px 3px 12px;
   border-radius: 9999px;
   border: none;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
 }
 
 :root[data-theme="light"] .nav-work-pill {
@@ -285,19 +295,31 @@ p {
 }
 
 .nav-work-pill:hover,
-.nav-work-pill.nav-work-open,
-.nav-work-active {
-  background: #2A2A2A;
+.nav-work-pill.nav-work-open {
+  background: rgba(255, 255, 255, 0.08);
   color: #FFFFFF;
-  font-weight: 600;
 }
 
 :root[data-theme="light"] .nav-work-pill:hover,
-:root[data-theme="light"] .nav-work-pill.nav-work-open,
+:root[data-theme="light"] .nav-work-pill.nav-work-open {
+  background: rgba(0, 0, 0, 0.05);
+  color: #141414;
+}
+
+.nav-work-pill.nav-work-active,
+.nav-work-active {
+  background: #2A2A2A;
+  color: #FFFFFF !important;
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+:root[data-theme="light"] .nav-work-pill.nav-work-active,
 :root[data-theme="light"] .nav-work-active {
   background: #E8E5DF;
-  color: #141414;
+  color: #141414 !important;
   font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
 .nav-work-link {
@@ -413,14 +435,14 @@ p {
   text-decoration: none;
   font-size: 13.5px;
   font-weight: 500;
-  padding: 6px 12px;
+  padding: 6px 14px;
   border-radius: 9999px;
   color: #D4D0C7;
   background: transparent;
   border: none;
   cursor: pointer;
   font-family: inherit;
-  transition: color 0.15s ease, background 0.15s ease;
+  transition: color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
   white-space: nowrap;
 }
 
@@ -428,14 +450,30 @@ p {
   color: #55514E;
 }
 
-.nav-link:hover,
-.nav-link-active {
+.nav-link:hover {
+  background: rgba(255, 255, 255, 0.08);
   color: #FFFFFF;
 }
 
-:root[data-theme="light"] .nav-link:hover,
-:root[data-theme="light"] .nav-link-active {
+:root[data-theme="light"] .nav-link:hover {
+  background: rgba(0, 0, 0, 0.05);
   color: #141414;
+}
+
+.nav-link.nav-link-active,
+.nav-link-active {
+  background: #2A2A2A;
+  color: #FFFFFF !important;
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+:root[data-theme="light"] .nav-link.nav-link-active,
+:root[data-theme="light"] .nav-link-active {
+  background: #E8E5DF;
+  color: #141414 !important;
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
 /* Contact white pill button */
