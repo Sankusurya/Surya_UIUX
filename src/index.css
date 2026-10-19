@@ -2481,3 +2481,158 @@ a:focus-visible {
   background: var(--sheet);
 }
 
+/* ========================================================
+   Homepage: "How I Work" Process Grid & List
+   ======================================================== */
+.home-process-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  background: var(--sheet);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.home-process-item {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: relative;
+  background: var(--sheet);
+}
+
+.home-process-item:last-child {
+  border-bottom: none;
+}
+
+.home-process-item .item-tag {
+  font-family: var(--f-mono);
+  color: var(--signal);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.home-process-item .item-line {
+  font-family: var(--f-body);
+  font-size: 17px;
+  line-height: 1.45;
+  color: var(--ink);
+  font-weight: 500;
+  margin: 0;
+}
+
+.home-process-connector {
+  display: none;
+}
+
+.home-process-note {
+  font-family: var(--f-mono);
+  margin-top: 14px;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--ink-3);
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+}
+
+/* Tablet (640px – 1023px): 2 columns × 3 rows */
+@media (min-width: 640px) {
+  .home-process-list {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    overflow: visible;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+  }
+
+  .home-process-item {
+    background: var(--sheet);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 24px;
+    gap: 12px;
+    transition: border-color 150ms ease, transform 150ms ease, box-shadow 150ms ease;
+  }
+
+  .home-process-item:last-child {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .home-process-item .item-tag {
+    font-size: 12px;
+  }
+
+  .home-process-item .item-line {
+    font-size: 19px;
+    line-height: 1.35;
+  }
+
+  .home-process-note {
+    justify-content: flex-end;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .home-process-item:hover {
+      border-color: var(--signal);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+    }
+  }
+}
+
+/* Desktop (≥ 1024px): 3 columns × 2 rows */
+@media (min-width: 1024px) {
+  .home-process-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+  }
+
+  .home-process-item {
+    padding: 28px;
+    gap: 14px;
+  }
+
+  .home-process-item .item-line {
+    font-size: 20px;
+    line-height: 1.35;
+  }
+
+  .home-process-connector {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    right: -17px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 14px;
+    height: 14px;
+    color: var(--ink-3);
+    font-size: 13px;
+    pointer-events: none;
+    z-index: 5;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-process-item {
+    transition: none !important;
+    transform: none !important;
+  }
+  .home-process-item:hover {
+    transform: none !important;
+  }
+}
+
+

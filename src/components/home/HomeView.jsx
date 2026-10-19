@@ -3,8 +3,7 @@ import { usePortfolio } from '../../context/PortfolioContext';
 import { Cover } from '../common/Cover';
 import { Tags } from '../common/Tags';
 import { TodoText } from '../common/TodoText';
-import { StepsGrid } from '../common/StepsGrid';
-import { normalizeProject } from '../../data/initialData';
+import { normalizeProject, HOME_PROCESS } from '../../data/initialData';
 
 export const HomeView = () => {
   const { projects, profile, openResume } = usePortfolio();
@@ -160,13 +159,46 @@ export const HomeView = () => {
       </section>
 
       <section aria-labelledby="hw">
-        <div className="sh">
+        <div className="sh" style={{ marginBottom: '16px' }}>
           <h2 id="hw">How I work</h2>
           <a className="textlink" href="#thinking">
-            My design process →
+            Read how I think →
           </a>
         </div>
-        <StepsGrid />
+        <p
+          style={{
+            fontSize: '17px',
+            lineHeight: 1.5,
+            color: 'var(--ink-2)',
+            maxWidth: '560px',
+            marginBottom: '32px',
+          }}
+        >
+          Six habits I bring to every project — the full story is on my Thinking page.
+        </p>
+
+        <ol className="home-process-list">
+          {HOME_PROCESS.map((item, idx) => {
+            const hasConnector = idx === 0 || idx === 1 || idx === 3 || idx === 4;
+            return (
+              <li key={item.n} className="home-process-item">
+                <span className="item-tag">
+                  {item.n} · {item.title.toUpperCase()}
+                </span>
+                <p className="item-line">{item.line}</p>
+                {hasConnector && (
+                  <span className="home-process-connector" aria-hidden="true">
+                    →
+                  </span>
+                )}
+              </li>
+            );
+          })}
+        </ol>
+
+        <div className="home-process-note">
+          <span>↺ and back again when something doesn't work</span>
+        </div>
       </section>
     </>
   );

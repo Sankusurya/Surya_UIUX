@@ -437,6 +437,15 @@ export const DEFAULT_STEPS = [
   }
 ];
 
+export const HOME_PROCESS = [
+  { n: "01", title: "Listen",   line: "The real problem is usually one question deeper than the first answer." },
+  { n: "02", title: "Frame",    line: "One clear sentence about the problem before any screen." },
+  { n: "03", title: "Explore",  line: "Two or three real options, each with its trade-off written down." },
+  { n: "04", title: "Check",    line: "Show work early, watch where people pause, and say how sure I am." },
+  { n: "05", title: "Rethink",  line: "Design for everyone the product touches, not just the main user." },
+  { n: "06", title: "Hand off", line: "Hard states, reusable components, and nothing left to guess." }
+];
+
 export const DEFAULT_PRINCIPLES = [
   {
     title: "Clarity beats cleverness",
