@@ -92,9 +92,9 @@ export const PortfolioProvider = ({ children }) => {
     try {
       const saved = getStoredItemSync('surya_portfolio_profile');
       if (saved) {
-        const isOldSpec = !saved.specialization || saved.specialization.includes('Mobile Apps') || saved.specialization.includes('Ecommerce');
-        const isOldToolkit = !saved.coreToolkit || saved.coreToolkit.includes('HTML5, CSS Grid');
-        const isOldLocation = !saved.location || saved.location.includes('Open to Remote & Relocation');
+        const isOldSpec = !saved.specialization || saved.specialization.includes('Mobile Apps') || saved.specialization.includes('Ecommerce') || saved.specialization.includes('AI-Powered Products');
+        const isOldToolkit = !saved.coreToolkit || saved.coreToolkit.includes('HTML5, CSS Grid') || saved.coreToolkit.includes('JavaScript') || saved.coreToolkit.includes('AI-Assisted Design Workflows');
+        const isOldLocation = !saved.location || saved.location.includes('Open to Remote & Relocation') || saved.location.includes('Andhra Pradesh, India');
 
         return {
           ...DEFAULT_PROFILE,
@@ -138,7 +138,19 @@ export const PortfolioProvider = ({ children }) => {
   const [about, setAbout] = useState(() => {
     try {
       const saved = getStoredItemSync('surya_portfolio_about');
-      return saved || DEFAULT_ABOUT;
+      if (saved) {
+        const hasBracket = JSON.stringify(saved).includes('[');
+        const hasOldTools = Array.isArray(saved.tools) && (saved.tools.includes('JavaScript') || saved.tools.includes('WordPress'));
+        if (hasBracket || hasOldTools) {
+          return DEFAULT_ABOUT;
+        }
+        return {
+          ...DEFAULT_ABOUT,
+          ...saved,
+          photo: saved.photo || DEFAULT_ABOUT.photo,
+        };
+      }
+      return DEFAULT_ABOUT;
     } catch {
       return DEFAULT_ABOUT;
     }
@@ -175,13 +187,13 @@ export const PortfolioProvider = ({ children }) => {
           if (merged.badge && merged.badge.includes('Product Roles')) {
             merged.badge = merged.badge.replace('Product Roles', 'User Experience Roles');
           }
-          if (!merged.specialization || merged.specialization.includes('Mobile Apps') || merged.specialization.includes('Ecommerce')) {
+          if (!merged.specialization || merged.specialization.includes('Mobile Apps') || merged.specialization.includes('Ecommerce') || merged.specialization.includes('AI-Powered Products')) {
             merged.specialization = DEFAULT_PROFILE.specialization;
           }
-          if (!merged.coreToolkit || merged.coreToolkit.includes('HTML5, CSS Grid')) {
+          if (!merged.coreToolkit || merged.coreToolkit.includes('HTML5, CSS Grid') || merged.coreToolkit.includes('JavaScript') || merged.coreToolkit.includes('AI-Assisted Design Workflows')) {
             merged.coreToolkit = DEFAULT_PROFILE.coreToolkit;
           }
-          if (!merged.location || merged.location.includes('Open to Remote & Relocation')) {
+          if (!merged.location || merged.location.includes('Open to Remote & Relocation') || merged.location.includes('Andhra Pradesh, India')) {
             merged.location = DEFAULT_PROFILE.location;
           }
           setProfile((prev) => ({ ...prev, ...merged }));
@@ -194,7 +206,15 @@ export const PortfolioProvider = ({ children }) => {
         if (idbPrinciples && isMounted) setPrinciples(idbPrinciples);
 
         const idbAbout = await getStoredItemAsync('surya_portfolio_about');
-        if (idbAbout && isMounted) setAbout(idbAbout);
+        if (idbAbout && isMounted) {
+          const hasBracket = JSON.stringify(idbAbout).includes('[');
+          const hasOldTools = Array.isArray(idbAbout.tools) && (idbAbout.tools.includes('JavaScript') || idbAbout.tools.includes('WordPress'));
+          if (hasBracket || hasOldTools) {
+            setAbout(DEFAULT_ABOUT);
+          } else {
+            setAbout({ ...DEFAULT_ABOUT, ...idbAbout, photo: idbAbout.photo || DEFAULT_ABOUT.photo });
+          }
+        }
 
         const idbMessages = await getStoredItemAsync('surya_portfolio_messages');
         if (idbMessages && isMounted) setMessages(idbMessages);

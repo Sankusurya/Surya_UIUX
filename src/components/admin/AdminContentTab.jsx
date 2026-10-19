@@ -47,7 +47,7 @@ export const AdminContentTab = () => {
       ...prev,
       experience: [
         ...prev.experience,
-        { role: '[Role] · [Company]', period: '[Year – Year]', desc: '[Description of impact]' },
+        { role: 'Role · Company', period: 'Year – Year', desc: 'Description of impact' },
       ],
     }));
   };

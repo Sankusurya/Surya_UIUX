@@ -396,9 +396,9 @@ export const DEFAULT_PROFILE = {
   badge: "Available for Junior User Experience & UI Roles",
   lead: "I turn messy product problems into intuitive, battle-tested interfaces that users understand on first tap — and I know how to build them in code.",
   highlightedPhrase: "intuitive, battle-tested interfaces",
-  specialization: "Product Design, UX Research, UI Design, Interaction Design, AI-Powered Products",
-  coreToolkit: "Figma, FigJam, Prototyping, Design Systems, AI-Assisted Design Workflows",
-  location: "Andhra Pradesh, India · Open to Remote Opportunities & Relocation",
+  specialization: "Mobile & web product UX · AI-powered products · Design systems",
+  coreToolkit: "Figma, Design Systems, Prototyping, AI-assisted design-to-code",
+  location: "Visakhapatnam, India · Open to remote & relocation",
   status: "Available for Junior User Experience & UI Roles",
   email: "suryasanku800@gmail.com",
   resumeUrl: "#resume",
@@ -467,26 +467,44 @@ export const DEFAULT_PRINCIPLES = [
 
 export const DEFAULT_ABOUT = {
   headline: "Hi, I'm Surya Teja",
-  bio: "A UX/UI designer who also writes code. I care about interfaces that feel obvious, and about the small details that make them feel finished.",
+  bio: "A UI/UX designer who works end to end — from research and user flows to developer-ready screens — and uses AI-assisted coding to turn designs into working prototypes.",
+  photo: "assets/surya-teja.jpg",
   background: [
-    "[Your education and how you got into design, two or three sentences.]",
-    "[Current role or what you are doing now.]"
+    "I studied Mathematics, Electronics and Computer Science at Andhra University (2020–2023). My first job was at Cyient, turning scanned telecom network records into precise digital drawings across 12+ projects. Strict standards for every layer, symbol and label — and checking each drawing before delivery — taught me that a design is only good if someone else can read and use it without errors.",
+    "I wanted to design for people instead of networks, so in 2025 I trained in UI/UX at Tech Mahindra SMART Academy and cleared the NSDC User Experience Designer assessment with Grade A.",
+    "Today I'm a UI/UX Designer at Dilshaj Infotech, designing EduProva — an AI-powered learning and career super-app — from product requirements to developer-ready screens."
   ],
-  philosophy: "I simplify, then I humanize. First I remove anything that makes people think harder than they need to. Then I add the small touches, like clear feedback and gentle motion, that make a product feel considerate.",
+  philosophy: "I start with the problem, not the screen. Before opening Figma I talk to the people involved and write the problem in one sentence — for Fuel N Fix, conversations with riders and mechanics showed the real pain wasn't finding help, it was not knowing the price until it was too late. Then I simplify: remove anything that makes people think harder than they need to, and keep the important thing first. Finally I design for what can actually be built — reusable components, clear specs, and working prototypes — so developers get fewer surprises and users get a product that feels obvious.",
   experience: [
     {
-      role: "[Role] · [Company]",
-      period: "[2025 – now]",
-      desc: "[One line on what you owned and a result.]"
+      role: "UI/UX Designer · Dilshaj Infotech",
+      period: "Nov 2025 – Present",
+      desc: "Designing EduProva end to end — 6 product areas (learning, AI tools, jobs, freelancing, community and supporting flows) in one visual language, backed by a reusable Figma component library and Dev Mode handoff. Improved the AI job board and auto-apply flows from usability feedback."
     },
     {
-      role: "[Role] · [Company]",
-      period: "[2024 – 2025]",
-      desc: "[One line on what you owned and a result.]"
+      role: "UI/UX Development Certification · Tech Mahindra SMART Academy",
+      period: "Apr – Aug 2025",
+      desc: "Trained in research, information architecture, wireframing, prototyping and usability testing. Cleared the NSDC User Experience Designer assessment with Grade A."
+    },
+    {
+      role: "Design Specialist, Telecom Network Engineering · Cyient",
+      period: "Oct 2023 – Apr 2025",
+      desc: "Led 12+ digitization projects turning scanned fiber and coax records into accurate network designs. Recognized by my project manager for consistently high-quality delivery."
     }
   ],
   tools: [
-    "Figma", "FigJam", "Prototyping", "Usability testing", "HTML", "CSS", "JavaScript", "WordPress", "AI-assisted research"
+    "Figma",
+    "Auto Layout & Variants",
+    "Design Systems",
+    "Interactive Prototyping",
+    "Dev Mode Handoff",
+    "Figma MCP Server",
+    "AI-assisted prototyping (vibe coding)",
+    "Usability Testing",
+    "Photoshop",
+    "Illustrator",
+    "LottieFiles",
+    "HTML & CSS"
   ],
-  interests: "[What you do outside design. Recruiters remember this part.]"
+  interests: "Outside client work I'm usually exploring motion with LottieFiles or turning Figma screens into working prototypes with AI coding tools — building things is how I learn them."
 };

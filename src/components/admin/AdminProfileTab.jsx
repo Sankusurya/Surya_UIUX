@@ -10,9 +10,9 @@ export const AdminProfileTab = () => {
     badge: profile.badge || profile.status || 'Available for Junior User Experience & UI Roles',
     lead: profile.lead || 'I turn messy product problems into intuitive, battle-tested interfaces that users understand on first tap — and I know how to build them in code.',
     highlightedPhrase: profile.highlightedPhrase || 'intuitive, battle-tested interfaces',
-    specialization: (profile.specialization || profile.focus || 'Product Design, UX Research, UI Design, Interaction Design, AI-Powered Products').replace(/E-Commerce/g, 'Ecommerce'),
-    coreToolkit: profile.coreToolkit || profile.strengths || 'Figma, FigJam, Prototyping, Design Systems, AI-Assisted Design Workflows',
-    location: profile.location || profile.basedIn || 'Andhra Pradesh, India · Open to Remote Opportunities & Relocation',
+    specialization: (profile.specialization || profile.focus || 'Mobile & web product UX · AI-powered products · Design systems').replace(/E-Commerce/g, 'Ecommerce'),
+    coreToolkit: profile.coreToolkit || profile.strengths || 'Figma, Design Systems, Prototyping, AI-assisted design-to-code',
+    location: profile.location || profile.basedIn || 'Visakhapatnam, India · Open to remote & relocation',
     email: profile.email || 'suryasanku800@gmail.com',
     socials: profile.socials || [
       { label: 'LinkedIn', note: 'view profile', href: 'https://linkedin.com' },
@@ -168,7 +168,7 @@ export const AdminProfileTab = () => {
               type="text"
               value={formData.specialization}
               onChange={(e) => handleChange('specialization', e.target.value)}
-              placeholder="UX Research, Mobile Apps, Design Systems, Ecommerce"
+              placeholder="Mobile & web product UX · AI-powered products · Design systems"
               className="w-full px-3.5 py-2 rounded-xl border border-line bg-paper text-ink text-sm focus:outline-none focus:border-signal"
             />
           </div>
@@ -181,7 +181,7 @@ export const AdminProfileTab = () => {
               type="text"
               value={formData.coreToolkit}
               onChange={(e) => handleChange('coreToolkit', e.target.value)}
-              placeholder="Figma, FigJam, HTML5, CSS Grid, JavaScript"
+              placeholder="Figma, Design Systems, Prototyping, AI-assisted design-to-code"
               className="w-full px-3.5 py-2 rounded-xl border border-line bg-paper text-ink text-sm focus:outline-none focus:border-signal"
             />
           </div>
@@ -194,7 +194,7 @@ export const AdminProfileTab = () => {
               type="text"
               value={formData.location}
               onChange={(e) => handleChange('location', e.target.value)}
-              placeholder="Andhra Pradesh, India · Open to Remote & Relocation"
+              placeholder="Visakhapatnam, India · Open to remote & relocation"
               className="w-full px-3.5 py-2 rounded-xl border border-line bg-paper text-ink text-sm focus:outline-none focus:border-signal"
             />
           </div>

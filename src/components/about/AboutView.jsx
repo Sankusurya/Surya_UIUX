@@ -1,6 +1,7 @@
 import React from 'react';
 import { usePortfolio } from '../../context/PortfolioContext';
 import { TodoText } from '../common/TodoText';
+import { resolveAssetUrl } from '../../data/initialData';
 
 export const AboutView = () => {
   const { about, profile } = usePortfolio();
@@ -26,15 +27,17 @@ export const AboutView = () => {
             <TodoText
               text={
                 about.bio ||
-                'A UX/UI designer who also writes code. I care about interfaces that feel obvious, and about the small details that make them feel finished.'
+                'A UI/UX designer who works end to end — from research and user flows to developer-ready screens — and uses AI-assisted coding to turn designs into working prototypes.'
               }
             />
           </p>
         </div>
         <div className="portrait">
-          Add your photo here
-          <br />
-          (portrait, 4:5)
+          <img
+            src={resolveAssetUrl(about.photo || 'assets/surya-teja.jpg')}
+            alt={profile.name || 'Surya Teja'}
+            className="about-portrait-img"
+          />
         </div>
       </header>
 

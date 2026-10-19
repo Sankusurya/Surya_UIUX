@@ -57,7 +57,7 @@ export const HomeView = () => {
               <dd>
                 {(profile.specialization ||
                   profile.focus ||
-                  'Product Design, UX Research, UI Design, Interaction Design, AI-Powered Products').replace(/E-Commerce/g, 'Ecommerce')}
+                  'Mobile & web product UX · AI-powered products · Design systems').replace(/E-Commerce/g, 'Ecommerce')}
               </dd>
             </div>
             <div className="hero-meta-row">
@@ -65,7 +65,7 @@ export const HomeView = () => {
               <dd>
                 {profile.coreToolkit ||
                   profile.strengths ||
-                  'Figma, FigJam, Prototyping, Design Systems, AI-Assisted Design Workflows'}
+                  'Figma, Design Systems, Prototyping, AI-assisted design-to-code'}
               </dd>
             </div>
             <div className="hero-meta-row">
@@ -73,7 +73,7 @@ export const HomeView = () => {
               <dd>
                 {profile.location ||
                   profile.basedIn ||
-                  'Andhra Pradesh, India · Open to Remote Opportunities & Relocation'}
+                  'Visakhapatnam, India · Open to remote & relocation'}
               </dd>
             </div>
           </dl>
