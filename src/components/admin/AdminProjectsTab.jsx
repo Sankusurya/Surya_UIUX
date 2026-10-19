@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { usePortfolio } from '../../context/PortfolioContext';
 import { uploadImageToStorage, formatBytes, processCaseStudyImage } from '../../utils/imageStorage';
-import { normalizeProject } from '../../data/initialData';
+import { normalizeProject, resolveAssetUrl } from '../../data/initialData';
 import { Tags } from '../common/Tags';
 import { ImageViewer } from '../common/ImageViewer';
 
@@ -356,7 +356,7 @@ export const AdminProjectsTab = () => {
                 <div className="flex items-center gap-3 min-w-0">
                   <div className="w-14 h-10 rounded-lg overflow-hidden border border-line bg-sheet shrink-0 flex items-center justify-center">
                     {p.coverImg ? (
-                      <img src={p.coverImg} alt={p.title} className="w-full h-full object-cover" />
+                      <img src={resolveAssetUrl(p.coverImg)} alt={p.title} className="w-full h-full object-cover" />
                     ) : (
                       <span className="text-[10px] font-mono text-signal uppercase">No cover</span>
                     )}
@@ -691,7 +691,7 @@ export const AdminProjectsTab = () => {
                 </span>
                 <div className="w-full rounded-lg border border-line bg-sheet overflow-hidden">
                   <img
-                    src={formData.coverImg}
+                    src={resolveAssetUrl(formData.coverImg)}
                     alt="Cover Preview"
                     className="w-full h-auto block mx-auto"
                     style={{ width: '100%', height: 'auto', display: 'block' }}
@@ -795,7 +795,7 @@ export const AdminProjectsTab = () => {
 
                     {/* Thumbnail */}
                     <div className="w-16 h-12 rounded-lg overflow-hidden border border-line bg-sheet shrink-0 flex items-center justify-center">
-                      <img src={img.url} alt={img.alt} className="w-full h-full object-cover" />
+                      <img src={resolveAssetUrl(img.url)} alt={img.alt} className="w-full h-full object-cover" />
                     </div>
 
                     {/* Alt description input + dim info */}
@@ -996,7 +996,7 @@ export const AdminProjectsTab = () => {
             {formData.coverImg && (
               <div className="w-full overflow-hidden rounded-2xl border border-line bg-sheet my-6">
                 <img
-                  src={formData.coverImg}
+                  src={resolveAssetUrl(formData.coverImg)}
                   alt="Cover preview"
                   className="w-full h-auto block m-0 p-0"
                   style={{ width: '100%', height: 'auto', display: 'block' }}
@@ -1017,7 +1017,7 @@ export const AdminProjectsTab = () => {
                         {slices.map((slice, sIdx) => (
                           <img
                             key={slice.url || sIdx}
-                            src={slice.url}
+                            src={resolveAssetUrl(slice.url)}
                             alt={img.alt || `Preview visual slice ${sIdx + 1}`}
                             className="w-full h-auto block m-0 p-0 border-0"
                             style={{ width: '100%', height: 'auto', display: 'block', verticalAlign: 'middle', margin: 0, padding: 0 }}

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { usePortfolio } from '../../context/PortfolioContext';
 import { Tags } from '../common/Tags';
 import { TodoText } from '../common/TodoText';
-import { normalizeProject } from '../../data/initialData';
+import { normalizeProject, resolveAssetUrl } from '../../data/initialData';
 
 export const CaseStudyView = () => {
   const { currentRoute, projects } = usePortfolio();
@@ -177,7 +177,7 @@ export const CaseStudyView = () => {
                           }}
                         >
                           <img
-                            src={slice.url}
+                            src={resolveAssetUrl(slice.url)}
                             alt={img.alt || `${project.title} Case Study Visual - Part ${sIdx + 1}`}
                             loading={sIdx === 0 ? "eager" : "lazy"}
                             decoding="async"
@@ -289,7 +289,7 @@ export const CaseStudyView = () => {
                   <div className="w-full overflow-hidden rounded-xl border border-line bg-paper aspect-[16/10] flex items-center justify-center">
                     {norm.coverImg ? (
                       <img
-                        src={norm.coverImg}
+                        src={resolveAssetUrl(norm.coverImg)}
                         alt={norm.title}
                         loading="lazy"
                         className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"

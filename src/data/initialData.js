@@ -1,4 +1,49 @@
 /**
+ * Safely resolves an asset URL so it works seamlessly on GitHub Pages subpaths,
+ * custom domains, and local preview.
+ */
+export const resolveAssetUrl = (url) => {
+  if (!url || typeof url !== 'string') return url || '';
+  const trimmed = url.trim();
+
+  // Keep data URLs, blob URLs, and full HTTP/HTTPS URLs untouched
+  if (
+    trimmed.startsWith('data:') ||
+    trimmed.startsWith('blob:') ||
+    trimmed.startsWith('http://') ||
+    trimmed.startsWith('https://')
+  ) {
+    return trimmed;
+  }
+
+  // Detect GitHub Pages repo subpath from window.location (e.g. "Surya_UIUX")
+  let repoSubpath = '';
+  if (typeof window !== 'undefined' && window.location.hostname.endsWith('github.io')) {
+    const pathParts = window.location.pathname.split('/').filter(Boolean);
+    if (pathParts.length > 0 && !pathParts[0].includes('.')) {
+      repoSubpath = pathParts[0];
+    }
+  }
+
+  // Strip leading slashes, dots, or backslashes
+  let cleanPath = trimmed.replace(/^(\.\/|\/|\\)+/, '');
+
+  // If already prefixed with repoSubpath, strip it to prevent duplicate /Surya_UIUX/Surya_UIUX/...
+  if (repoSubpath && cleanPath.startsWith(`${repoSubpath}/`)) {
+    cleanPath = cleanPath.slice(repoSubpath.length + 1);
+  }
+
+  if (repoSubpath) {
+    return `/${repoSubpath}/${cleanPath}`;
+  }
+
+  // In localhost or root domain preview
+  const base = import.meta.env?.BASE_URL || './';
+  const cleanBase = base.endsWith('/') ? base : `${base}/`;
+  return `${cleanBase}${cleanPath}`;
+};
+
+/**
  * Normalizes any project (legacy or new) to the clean, streamlined case study structure:
  * - images: array of uncompressed full-fidelity case study images [{ id, url, alt }]
  * - prototypeUrl: link to Figma/Framer/Live prototype
@@ -28,20 +73,28 @@ export const normalizeProject = (p) => {
   if (typeof coverImg === 'string' && coverImg.startsWith('data:image/svg+xml')) {
     coverImg = '';
   }
+  coverImg = resolveAssetUrl(coverImg);
 
-  // Ensure slices exist on each image
-  const normalizedImages = images.map((img, idx) => ({
-    id: img.id || `img-${idx}`,
-    url: img.url,
-    originalUrl: img.originalUrl || img.url,
-    alt: img.alt || `${p.title || 'Project'} Case Study Deliverable`,
-    width: img.width || 0,
-    height: img.height || 0,
-    fileSize: img.fileSize || 0,
-    slices: Array.isArray(img.slices) && img.slices.length > 0
+  // Ensure slices exist on each image and asset URLs are properly resolved
+  const normalizedImages = images.map((img, idx) => {
+    const rawSlices = Array.isArray(img.slices) && img.slices.length > 0
       ? img.slices
-      : [{ url: img.url, width: img.width || 0, height: img.height || 0, index: 0 }],
-  }));
+      : [{ url: img.url, width: img.width || 0, height: img.height || 0, index: 0 }];
+
+    return {
+      id: img.id || `img-${idx}`,
+      url: resolveAssetUrl(img.url),
+      originalUrl: resolveAssetUrl(img.originalUrl || img.url),
+      alt: img.alt || `${p.title || 'Project'} Case Study Deliverable`,
+      width: img.width || 0,
+      height: img.height || 0,
+      fileSize: img.fileSize || 0,
+      slices: rawSlices.map((slice, sIdx) => ({
+        ...slice,
+        url: resolveAssetUrl(slice.url),
+      })),
+    };
+  });
 
   return {
     ...p,
@@ -66,36 +119,36 @@ export const DEFAULT_PROJECTS = [
     tools: "Figma, Design Systems, Mobile UX",
     prototypeUrl: "",
     caseStudyUrl: "",
-    coverImg: "/assets/fuel-n-fix.png",
+    coverImg: "assets/fuel-n-fix.png",
     summary: "Bringing fuel and local repair help to your location. An on-demand roadside assistance experience designed for stranded motorists.",
     outcome: "Streamlined emergency dispatch flow; readable in under 5 seconds with zero cognitive friction.",
     images: [
       {
         id: "fuel-n-fix-case-study",
-        url: "/assets/fuel-n-fix.png",
-        originalUrl: "/Fuel N Fix.png",
+        url: "assets/fuel-n-fix.png",
+        originalUrl: "Fuel N Fix.png",
         alt: "Fuel N Fix UI/UX Case Study Visuals",
         width: 1850,
         height: 32768,
         fileSize: 8852063,
         isSliced: true,
         slices: [
-          { index: 0, url: "/assets/fuel-n-fix/slice_0.png", width: 1850, height: 2048 },
-          { index: 1, url: "/assets/fuel-n-fix/slice_1.png", width: 1850, height: 2048 },
-          { index: 2, url: "/assets/fuel-n-fix/slice_2.png", width: 1850, height: 2048 },
-          { index: 3, url: "/assets/fuel-n-fix/slice_3.png", width: 1850, height: 2048 },
-          { index: 4, url: "/assets/fuel-n-fix/slice_4.png", width: 1850, height: 2048 },
-          { index: 5, url: "/assets/fuel-n-fix/slice_5.png", width: 1850, height: 2048 },
-          { index: 6, url: "/assets/fuel-n-fix/slice_6.png", width: 1850, height: 2048 },
-          { index: 7, url: "/assets/fuel-n-fix/slice_7.png", width: 1850, height: 2048 },
-          { index: 8, url: "/assets/fuel-n-fix/slice_8.png", width: 1850, height: 2048 },
-          { index: 9, url: "/assets/fuel-n-fix/slice_9.png", width: 1850, height: 2048 },
-          { index: 10, url: "/assets/fuel-n-fix/slice_10.png", width: 1850, height: 2048 },
-          { index: 11, url: "/assets/fuel-n-fix/slice_11.png", width: 1850, height: 2048 },
-          { index: 12, url: "/assets/fuel-n-fix/slice_12.png", width: 1850, height: 2048 },
-          { index: 13, url: "/assets/fuel-n-fix/slice_13.png", width: 1850, height: 2048 },
-          { index: 14, url: "/assets/fuel-n-fix/slice_14.png", width: 1850, height: 2048 },
-          { index: 15, url: "/assets/fuel-n-fix/slice_15.png", width: 1850, height: 2048 },
+          { index: 0, url: "assets/fuel-n-fix/slice_0.png", width: 1850, height: 2048 },
+          { index: 1, url: "assets/fuel-n-fix/slice_1.png", width: 1850, height: 2048 },
+          { index: 2, url: "assets/fuel-n-fix/slice_2.png", width: 1850, height: 2048 },
+          { index: 3, url: "assets/fuel-n-fix/slice_3.png", width: 1850, height: 2048 },
+          { index: 4, url: "assets/fuel-n-fix/slice_4.png", width: 1850, height: 2048 },
+          { index: 5, url: "assets/fuel-n-fix/slice_5.png", width: 1850, height: 2048 },
+          { index: 6, url: "assets/fuel-n-fix/slice_6.png", width: 1850, height: 2048 },
+          { index: 7, url: "assets/fuel-n-fix/slice_7.png", width: 1850, height: 2048 },
+          { index: 8, url: "assets/fuel-n-fix/slice_8.png", width: 1850, height: 2048 },
+          { index: 9, url: "assets/fuel-n-fix/slice_9.png", width: 1850, height: 2048 },
+          { index: 10, url: "assets/fuel-n-fix/slice_10.png", width: 1850, height: 2048 },
+          { index: 11, url: "assets/fuel-n-fix/slice_11.png", width: 1850, height: 2048 },
+          { index: 12, url: "assets/fuel-n-fix/slice_12.png", width: 1850, height: 2048 },
+          { index: 13, url: "assets/fuel-n-fix/slice_13.png", width: 1850, height: 2048 },
+          { index: 14, url: "assets/fuel-n-fix/slice_14.png", width: 1850, height: 2048 },
+          { index: 15, url: "assets/fuel-n-fix/slice_15.png", width: 1850, height: 2048 },
         ]
       }
     ],

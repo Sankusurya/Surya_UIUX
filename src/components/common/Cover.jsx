@@ -1,4 +1,5 @@
 import React from 'react';
+import { resolveAssetUrl } from '../../data/initialData';
 
 export const Cover = ({
   type,
@@ -21,7 +22,7 @@ export const Cover = ({
         aria-hidden="true"
       >
         <img
-          src={cleanCover}
+          src={resolveAssetUrl(cleanCover)}
           alt={title}
           loading="lazy"
           className="w-full h-full object-cover object-center block transition-transform duration-300"

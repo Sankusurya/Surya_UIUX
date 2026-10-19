@@ -1,6 +1,6 @@
 import React from 'react';
 import { usePortfolio } from '../../context/PortfolioContext';
-import { normalizeProject } from '../../data/initialData';
+import { normalizeProject, resolveAssetUrl } from '../../data/initialData';
 
 const CATEGORIES = ["All", "UX case study", "UI", "Web dev"];
 
@@ -80,7 +80,7 @@ export const WorkView = () => {
               <div className="work-card-media">
                 {hasCover ? (
                   <img
-                    src={cleanCover}
+                    src={resolveAssetUrl(cleanCover)}
                     alt={p.title}
                     loading="lazy"
                     className="work-card-img"

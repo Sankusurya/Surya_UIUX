@@ -1,6 +1,7 @@
 import React from 'react';
 import { TodoText } from '../common/TodoText';
 import { isTrustedEmbedUrl, getSafeEmbedUrl, getDomainFromUrl } from '../../utils/embedSecurity';
+import { resolveAssetUrl } from '../../data/initialData';
 
 /**
  * Slugifies text for section heading anchor IDs.
@@ -63,7 +64,7 @@ export const CaseStudyBlockRenderer = ({ block, index }) => {
         <figure className="cs-block-image w-full max-w-4xl mx-auto my-6">
           <div className="rounded-2xl overflow-hidden border border-line bg-sheet shadow-sm">
             <img
-              src={block.url}
+              src={resolveAssetUrl(block.url)}
               alt={block.alt || block.caption || 'Case study illustration'}
               loading="lazy"
               className="w-full h-auto object-cover max-h-[640px]"
@@ -97,7 +98,7 @@ export const CaseStudyBlockRenderer = ({ block, index }) => {
               <figure key={imgIdx} className="space-y-1.5 flex flex-col">
                 <div className="rounded-xl overflow-hidden border border-line bg-sheet shadow-sm flex-1">
                   <img
-                    src={img.url}
+                    src={resolveAssetUrl(img.url)}
                     alt={img.alt || img.caption || `Gallery image ${imgIdx + 1}`}
                     loading="lazy"
                     className="w-full h-full object-cover min-h-[180px] max-h-[360px]"

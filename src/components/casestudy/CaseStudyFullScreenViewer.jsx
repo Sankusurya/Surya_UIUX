@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { resolveAssetUrl } from '../../data/initialData';
 
 /**
  * Full-Screen Case Study Continuous Reader
@@ -183,7 +184,7 @@ export const CaseStudyFullScreenViewer = ({
             {slices.map((slice, idx) => (
               <img
                 key={slice.url || idx}
-                src={slice.url}
+                src={resolveAssetUrl(slice.url)}
                 alt={`${title} - Slice ${idx + 1}`}
                 loading={idx === 0 ? 'eager' : 'lazy'}
                 decoding="async"

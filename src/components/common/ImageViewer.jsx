@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { resolveAssetUrl } from '../../data/initialData';
 
 /**
  * Full-screen Lightbox & Zoom Viewer for Case Study Images
@@ -192,7 +193,8 @@ export const ImageViewer = ({
 
   if (!isOpen || !currentImage) return null;
 
-  const imageUrl = typeof currentImage === 'string' ? currentImage : currentImage.url;
+  const rawUrl = typeof currentImage === 'string' ? currentImage : currentImage.url;
+  const imageUrl = resolveAssetUrl(rawUrl);
   const imageAlt = typeof currentImage === 'object' ? (currentImage.alt || currentImage.caption) : '';
 
   return (
