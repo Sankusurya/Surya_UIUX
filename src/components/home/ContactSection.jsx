@@ -4,89 +4,150 @@ import { usePortfolio } from '../../context/PortfolioContext';
 export const ContactSection = () => {
   const { profile, addMessage, openResume } = usePortfolio();
   const [copyText, setCopyText] = useState('Copy email');
+  const [isCopied, setIsCopied] = useState(false);
 
-  // Contact form state
+  // Form state
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [topic, setTopic] = useState('Full-time Junior UX/UI Role');
+  const [topic, setTopic] = useState('Job Opportunity');
   const [message, setMessage] = useState('');
+
+  // Submission & validation state
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-  const [submitFeedback, setSubmitFeedback] = useState(null);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [errors, setErrors] = useState({});
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   const handleCopyEmail = async () => {
+    const targetEmail = profile.email || 'suryasanku800@gmail.com';
     try {
-      await navigator.clipboard.writeText(profile.email || 'suryasanku800@gmail.com');
+      if (navigator?.clipboard?.writeText) {
+        await navigator.clipboard.writeText(targetEmail);
+      } else {
+        const textarea = document.createElement('textarea');
+        textarea.value = targetEmail;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+      }
       setCopyText('Copied ✓');
+      setIsCopied(true);
     } catch {
-      setCopyText('Selected, press Ctrl+C');
+      setCopyText('Copied ✓');
+      setIsCopied(true);
     }
+
     setTimeout(() => {
       setCopyText('Copy email');
-    }, 2000);
+      setIsCopied(false);
+    }, 2500);
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+    if (!name.trim()) {
+      newErrors.name = 'Please enter your name.';
+    }
+    if (!email.trim()) {
+      newErrors.email = 'Please enter your email address.';
+    } else if (!emailRegex.test(email.trim())) {
+      newErrors.email = 'Please enter a valid email address (e.g. you@company.com).';
+    }
+    if (!message.trim()) {
+      newErrors.message = 'Please enter your message.';
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!name.trim() || !email.trim() || !message.trim()) return;
+    setErrorMessage('');
+
+    if (!validateForm()) {
+      return;
+    }
 
     setIsSubmitting(true);
     try {
-      const result = await addMessage({
-        name,
-        email,
-        topic,
-        message,
+      await addMessage({
+        name: name.trim(),
+        email: email.trim(),
+        topic: topic || 'Job Opportunity',
+        message: message.trim(),
       });
 
-      setSubmitted(true);
-      setSubmitFeedback({
-        isEmailed: Boolean(result?.emailResult?.success),
-        notice: result?.emailResult?.needsKey
-          ? 'Saved directly to the portfolio online database and Admin inbox.'
-          : 'Delivered directly to suryasanku800@gmail.com & saved to the Admin inbox.'
-      });
-
+      setIsSuccess(true);
       setName('');
       setEmail('');
+      setTopic('Job Opportunity');
       setMessage('');
+      setErrors({});
     } catch (err) {
-      alert(`Could not send message: ${err.message || 'Please check your connection and try again.'}`);
+      setErrorMessage(
+        err.message || 'Unable to send message right now. Please try again or email directly.'
+      );
     } finally {
       setIsSubmitting(false);
     }
-
-    setTimeout(() => {
-      setSubmitted(false);
-      setSubmitFeedback(null);
-    }, 7000);
   };
+
+  const handleResetForm = () => {
+    setIsSuccess(false);
+    setErrorMessage('');
+    setErrors({});
+  };
+
+  const linkedInUrl =
+    profile.socials?.find((s) => s.label?.toLowerCase() === 'linkedin')?.href ||
+    'https://www.linkedin.com';
+  const gitHubUrl =
+    profile.socials?.find((s) => s.label?.toLowerCase() === 'github')?.href ||
+    'https://github.com/Sankusurya';
+  const displayEmail = profile.email || 'suryasanku800@gmail.com';
 
   return (
     <div className="wrap">
       <section className="contact" id="contact" aria-labelledby="contact-h">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-          {/* Left Column: Heading, Pitch, Quick Mail */}
+          {/* Left Column: Heading, Supporting Description, Email, Socials */}
           <div className="lg:col-span-6 space-y-6">
-            <h2 id="contact-h" className="text-3xl sm:text-5xl font-extrabold font-display uppercase tracking-wider text-ink leading-tight">
-              Feel like <span className="text-signal">building</span>
-              <br />
-              something together?
+            <h2
+              id="contact-h"
+              className="text-3xl sm:text-5xl font-extrabold font-display uppercase tracking-wider text-ink leading-tight"
+            >
+              LET'S BUILD SOMETHING <span className="text-signal italic">MEANINGFUL.</span>
             </h2>
+
             <p className="text-base text-ink-2 max-w-lg leading-relaxed">
-              Open to Junior User Experience and UI Design roles, contract assignments, and collaborative projects. I respond within 24 hours.
+              I'm open to UI/UX Designer, Product Designer, and collaborative design opportunities.
+              Have a role or project in mind? Let's connect.
             </p>
 
-            {/* Email pill */}
-            <div className="mailrow inline-flex items-center gap-2 p-1.5 rounded-full border border-line bg-paper shadow-xs max-w-md">
-              <span className="mail font-mono text-xs sm:text-sm px-3 text-ink select-all" id="mail">
-                {profile.email || 'suryasanku800@gmail.com'}
-              </span>
+            {/* Email pill component */}
+            <div className="mailrow inline-flex items-center gap-2 p-1.5 rounded-full border border-line bg-paper shadow-xs max-w-full">
+              <a
+                href={`mailto:${displayEmail}`}
+                className="mail font-mono text-xs sm:text-sm px-3 text-ink hover:text-signal transition-colors select-all truncate"
+                title="Send email directly"
+              >
+                {displayEmail}
+              </a>
               <button
                 type="button"
                 id="copy"
                 onClick={handleCopyEmail}
-                className="px-4 py-1.5 rounded-full bg-pill text-pill-ink font-semibold text-xs hover:opacity-90 transition-opacity cursor-pointer shrink-0"
+                className={`px-4 py-1.5 rounded-full font-semibold text-xs transition-all cursor-pointer shrink-0 ${
+                  isCopied
+                    ? 'bg-emerald-600 text-white'
+                    : 'bg-pill text-pill-ink hover:opacity-90'
+                }`}
+                aria-label="Copy email address"
               >
                 {copyText}
               </button>
@@ -95,7 +156,7 @@ export const ContactSection = () => {
             {/* Social Links */}
             <div className="socials flex items-center flex-wrap gap-4 pt-2 text-sm text-ink-2">
               <a
-                href="https://linkedin.com"
+                href={linkedInUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-signal transition-colors underline font-medium"
@@ -104,7 +165,7 @@ export const ContactSection = () => {
               </a>
               <span className="text-ink-3">·</span>
               <a
-                href="https://github.com/Sankusurya"
+                href={gitHubUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-signal transition-colors underline font-medium"
@@ -122,113 +183,198 @@ export const ContactSection = () => {
             </div>
           </div>
 
-          {/* Right Column: Direct Interactive Inquiry Form */}
+          {/* Right Column: Refined Contact Form */}
           <div className="lg:col-span-6 bg-paper border border-line rounded-2xl p-6 sm:p-8 shadow-sm">
-            <div className="mb-4">
+            <div className="mb-5">
               <span className="font-mono text-xs uppercase tracking-wider text-signal font-semibold">
-                Direct Inquiry
+                GET IN TOUCH
               </span>
-              <h3 className="text-xl font-bold font-display uppercase text-ink mt-0.5">
-                Send a Message
+              <h3 className="text-2xl font-bold font-display uppercase tracking-wide text-ink mt-1">
+                Let's Connect
               </h3>
-              <p className="text-xs text-ink-3">
-                Drop your details below and I'll receive it instantly.
+              <p className="text-xs sm:text-sm text-ink-3 mt-1">
+                Have an opportunity or a project in mind? I'd love to hear about it.
               </p>
             </div>
 
-            {submitted ? (
-              <div className="p-6 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 space-y-2.5 text-center animate-in">
-                <span className="text-3xl block">✓</span>
-                <p className="font-bold text-base">Message Sent Successfully!</p>
-                <p className="text-xs opacity-90 max-w-sm mx-auto">
-                  {submitFeedback?.notice || 'Thank you for reaching out. Surya will review your note and respond shortly.'}
+            {isSuccess ? (
+              <div
+                className="p-6 sm:p-8 rounded-2xl bg-emerald-500/10 border border-emerald-500/25 text-center space-y-3 animate-fade-in"
+                role="status"
+                aria-live="polite"
+              >
+                <div className="w-12 h-12 mx-auto rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-2xl font-bold">
+                  ✓
+                </div>
+                <p className="font-semibold text-base sm:text-lg text-ink max-w-md mx-auto leading-relaxed">
+                  Message sent successfully. Thanks for reaching out! I'll get back to you as soon as possible.
                 </p>
                 <div className="pt-2">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] bg-emerald-500/20 font-mono">
-                    ✓ Logged in Studio CMS Inbox
-                  </span>
+                  <button
+                    type="button"
+                    onClick={handleResetForm}
+                    className="px-5 py-2 rounded-full border border-line bg-sheet text-ink hover:border-signal hover:text-signal font-semibold text-xs tracking-wider uppercase transition-colors cursor-pointer"
+                  >
+                    Send another message
+                  </button>
                 </div>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <form onSubmit={handleSubmit} noValidate className="space-y-4">
+                {errorMessage && (
+                  <div
+                    className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/25 text-red-600 dark:text-red-400 text-xs sm:text-sm flex items-center justify-between gap-2"
+                    role="alert"
+                  >
+                    <span>{errorMessage}</span>
+                    <button
+                      type="button"
+                      onClick={() => setErrorMessage('')}
+                      className="font-bold hover:opacity-80 px-1"
+                      aria-label="Dismiss error"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                )}
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                  {/* Your Name */}
                   <div>
-                    <label className="block text-xs font-mono uppercase tracking-wider text-ink-3 mb-1">
-                      Your Name
+                    <label
+                      htmlFor="contact-name"
+                      className="block text-xs font-mono uppercase tracking-wider text-ink-3 mb-1.5"
+                    >
+                      Your Name <span className="text-signal">*</span>
                     </label>
                     <input
+                      id="contact-name"
                       type="text"
                       required
                       disabled={isSubmitting}
                       value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      placeholder="e.g. Alex Miller"
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-line bg-sheet text-ink text-sm focus:outline-none focus:border-signal disabled:opacity-60"
+                      onChange={(e) => {
+                        setName(e.target.value);
+                        if (errors.name) setErrors((prev) => ({ ...prev, name: '' }));
+                      }}
+                      placeholder="Your full name"
+                      className={`w-full px-3.5 py-2.5 rounded-xl border bg-sheet text-ink text-sm transition-colors focus:outline-none focus:border-signal focus:ring-1 focus:ring-signal/30 disabled:opacity-60 ${
+                        errors.name ? 'border-red-500/60 focus:border-red-500' : 'border-line'
+                      }`}
+                      aria-invalid={Boolean(errors.name)}
+                      aria-describedby={errors.name ? 'name-error' : undefined}
                     />
+                    {errors.name && (
+                      <p id="name-error" className="text-xs text-red-500 mt-1">
+                        {errors.name}
+                      </p>
+                    )}
                   </div>
 
+                  {/* Email Address */}
                   <div>
-                    <label className="block text-xs font-mono uppercase tracking-wider text-ink-3 mb-1">
-                      Email Address
+                    <label
+                      htmlFor="contact-email"
+                      className="block text-xs font-mono uppercase tracking-wider text-ink-3 mb-1.5"
+                    >
+                      Email Address <span className="text-signal">*</span>
                     </label>
                     <input
+                      id="contact-email"
                       type="email"
                       required
                       disabled={isSubmitting}
                       value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="alex@company.com"
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-line bg-sheet text-ink text-sm focus:outline-none focus:border-signal disabled:opacity-60"
+                      onChange={(e) => {
+                        setEmail(e.target.value);
+                        if (errors.email) setErrors((prev) => ({ ...prev, email: '' }));
+                      }}
+                      placeholder="you@company.com"
+                      className={`w-full px-3.5 py-2.5 rounded-xl border bg-sheet text-ink text-sm transition-colors focus:outline-none focus:border-signal focus:ring-1 focus:ring-signal/30 disabled:opacity-60 ${
+                        errors.email ? 'border-red-500/60 focus:border-red-500' : 'border-line'
+                      }`}
+                      aria-invalid={Boolean(errors.email)}
+                      aria-describedby={errors.email ? 'email-error' : undefined}
                     />
+                    {errors.email && (
+                      <p id="email-error" className="text-xs text-red-500 mt-1">
+                        {errors.email}
+                      </p>
+                    )}
                   </div>
                 </div>
 
+                {/* I'm reaching out about (Optional) */}
                 <div>
-                  <label className="block text-xs font-mono uppercase tracking-wider text-ink-3 mb-1">
-                    Discussion Topic
-                  </label>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label
+                      htmlFor="contact-topic"
+                      className="block text-xs font-mono uppercase tracking-wider text-ink-3"
+                    >
+                      I'm reaching out about
+                    </label>
+                    <span className="text-[11px] font-mono text-ink-3 opacity-70">Optional</span>
+                  </div>
                   <select
+                    id="contact-topic"
                     value={topic}
                     disabled={isSubmitting}
                     onChange={(e) => setTopic(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-line bg-sheet text-ink text-sm focus:outline-none focus:border-signal disabled:opacity-60"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-line bg-sheet text-ink text-sm transition-colors focus:outline-none focus:border-signal focus:ring-1 focus:ring-signal/30 disabled:opacity-60 cursor-pointer"
                   >
-                    <option value="Full-time Junior UX/UI Role">Full-time Junior UX/UI & User Experience Role</option>
-                    <option value="Contract / Freelance Project">Contract / Freelance Project</option>
-                    <option value="Design System Consulting">Design System Consulting</option>
-                    <option value="Quick Coffee Chat / Portfolio Review">Quick Coffee Chat / Portfolio Review</option>
-                    <option value="General Inquiry">General Inquiry</option>
+                    <option value="Job Opportunity">Job Opportunity</option>
+                    <option value="Design Project">Design Project</option>
+                    <option value="Collaboration">Collaboration</option>
+                    <option value="Something Else">Something Else</option>
                   </select>
                 </div>
 
+                {/* Your Message */}
                 <div>
-                  <label className="block text-xs font-mono uppercase tracking-wider text-ink-3 mb-1">
-                    Your Message
+                  <label
+                    htmlFor="contact-message"
+                    className="block text-xs font-mono uppercase tracking-wider text-ink-3 mb-1.5"
+                  >
+                    Your Message <span className="text-signal">*</span>
                   </label>
                   <textarea
+                    id="contact-message"
                     required
-                    rows={3}
+                    rows={4}
                     disabled={isSubmitting}
                     value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    placeholder="Tell me about your team, problem, or role..."
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-line bg-sheet text-ink text-sm focus:outline-none focus:border-signal disabled:opacity-60"
+                    onChange={(e) => {
+                      setMessage(e.target.value);
+                      if (errors.message) setErrors((prev) => ({ ...prev, message: '' }));
+                    }}
+                    placeholder="Tell me a little about the opportunity..."
+                    className={`w-full px-3.5 py-2.5 rounded-xl border bg-sheet text-ink text-sm transition-colors focus:outline-none focus:border-signal focus:ring-1 focus:ring-signal/30 disabled:opacity-60 resize-y ${
+                      errors.message ? 'border-red-500/60 focus:border-red-500' : 'border-line'
+                    }`}
+                    aria-invalid={Boolean(errors.message)}
+                    aria-describedby={errors.message ? 'message-error' : undefined}
                   />
+                  {errors.message && (
+                    <p id="message-error" className="text-xs text-red-500 mt-1">
+                      {errors.message}
+                    </p>
+                  )}
                 </div>
 
+                {/* Primary CTA */}
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full py-2.5 rounded-full font-semibold text-xs sm:text-sm hover:opacity-95 active:scale-[0.99] transition-all cursor-pointer shadow-xs disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="w-full py-3 rounded-full font-semibold text-sm hover:opacity-95 active:scale-[0.99] transition-all cursor-pointer shadow-xs disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   style={{ backgroundColor: 'var(--signal)', color: 'var(--signal-ink, #ffffff)' }}
                 >
                   {isSubmitting ? (
                     <>
-                      <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-                      <span>Sending to Surya...</span>
+                      <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <span>Sending Message...</span>
                     </>
                   ) : (
-                    <span>Send Inquiry Message →</span>
+                    <span>Send Message →</span>
                   )}
                 </button>
               </form>
