@@ -150,7 +150,7 @@ export const ResumeModal = () => {
                   <h3 className="font-bold text-sm text-ink">Gentleman Boutique Menswear Store</h3>
                   <span className="text-ink-3 font-mono">2025</span>
                 </div>
-                <p className="text-signal font-medium">UX Research, E-Commerce UI & Build</p>
+                <p className="text-signal font-medium">UX Research, Ecommerce UI & Build</p>
                 <p className="text-ink-2">
                   Redesigned the entire purchase funnel and mobile checkout experience for a menswear boutique, focusing on reducing cart abandonment through clear visual hierarchy.
                 </p>

@@ -10,7 +10,7 @@ export const AdminProfileTab = () => {
     badge: profile.badge || profile.status || 'Available for Junior User Experience & UI Roles',
     lead: profile.lead || 'I turn messy product problems into intuitive, battle-tested interfaces that users understand on first tap — and I know how to build them in code.',
     highlightedPhrase: profile.highlightedPhrase || 'intuitive, battle-tested interfaces',
-    specialization: profile.specialization || profile.focus || 'UX Research, Mobile Apps, Design Systems, E-Commerce',
+    specialization: (profile.specialization || profile.focus || 'UX Research, Mobile Apps, Design Systems, Ecommerce').replace(/E-Commerce/g, 'Ecommerce'),
     coreToolkit: profile.coreToolkit || profile.strengths || 'Figma, FigJam, HTML5, CSS Grid, JavaScript',
     location: profile.location || profile.basedIn || 'Andhra Pradesh, India · Open to Remote & Relocation',
     email: profile.email || 'suryasanku800@gmail.com',
@@ -168,7 +168,7 @@ export const AdminProfileTab = () => {
               type="text"
               value={formData.specialization}
               onChange={(e) => handleChange('specialization', e.target.value)}
-              placeholder="UX Research, Mobile Apps, Design Systems, E-Commerce"
+              placeholder="UX Research, Mobile Apps, Design Systems, Ecommerce"
               className="w-full px-3.5 py-2 rounded-xl border border-line bg-paper text-ink text-sm focus:outline-none focus:border-signal"
             />
           </div>

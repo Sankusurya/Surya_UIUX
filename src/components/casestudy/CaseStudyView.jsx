@@ -50,103 +50,106 @@ export const CaseStudyView = () => {
 
   const embedUrl = getEmbedUrl(project.prototypeUrl);
 
+  const hasVisualDeliverables = Array.isArray(project.images) && project.images.length > 0;
+
   return (
     <div className="animate-in pt-4 pb-20 w-full">
-      {/* 1. "All work" Back Link */}
-      <nav className="mb-6">
+      {/* 1. Top Navigation Bar: Back Link & Action Buttons */}
+      <nav className="flex flex-wrap items-center justify-between gap-4 mb-6">
         <a
           href="#work"
           className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-ink-3 hover:text-signal transition-colors cursor-pointer py-1"
         >
           <span>←</span> All work
         </a>
+
+        {(project.prototypeUrl || project.caseStudyUrl) && (
+          <div className="flex flex-wrap items-center gap-2.5">
+            {project.prototypeUrl && (
+              <a
+                href={project.prototypeUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full font-semibold text-xs shadow-sm transition-all hover:opacity-95 active:scale-[0.99] cursor-pointer"
+                style={{ backgroundColor: 'var(--signal)', color: 'var(--signal-ink, #ffffff)' }}
+              >
+                <span>View Prototype</span>
+                <span className="text-sm leading-none">↗</span>
+              </a>
+            )}
+
+            {project.caseStudyUrl && (
+              <a
+                href={project.caseStudyUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-line bg-sheet text-ink hover:text-signal hover:border-signal/50 font-semibold text-xs shadow-xs transition-all active:scale-[0.99] cursor-pointer"
+              >
+                <span>View on Behance</span>
+                <span className="text-sm leading-none">↗</span>
+              </a>
+            )}
+          </div>
+        )}
       </nav>
 
-      {/* 2. Project Title */}
-      <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold font-display uppercase tracking-wider text-ink leading-[0.95] mb-4">
+      {/* Accessible Title */}
+      <h1 className={hasVisualDeliverables ? 'sr-only' : 'text-4xl sm:text-6xl lg:text-7xl font-extrabold font-display uppercase tracking-wider text-ink leading-[0.95] mb-4'}>
         {project.title}
       </h1>
 
-      {/* 3. Category Tags */}
-      {project.type && (
-        <div className="mb-6">
-          <Tags types={project.type} year={project.year} />
-        </div>
-      )}
-
-      {/* 4. Short Project Description (Aligned to left, spanning ~8 columns for readability) */}
-      {project.summary && (
-        <p className="cs-read-text text-lg sm:text-xl text-ink-2 leading-relaxed mb-6 font-normal">
-          <TodoText text={project.summary} />
-        </p>
-      )}
-
-      {/* 5. Small Row of Facts: My Role, Timeline, Tools (Show only filled ones) */}
-      {(project.role || project.timeline || project.tools) && (
-        <div className="flex flex-wrap items-center gap-6 sm:gap-10 py-4 border-y border-line mb-8 text-sm">
-          {project.role && (
-            <div>
-              <span className="block text-[11px] font-mono uppercase tracking-wider text-signal font-semibold">
-                My Role
-              </span>
-              <span className="font-semibold text-ink leading-snug">
-                <TodoText text={project.role} />
-              </span>
+      {/* When NO visual deliverables exist: Show full text header (Tags, Summary, Role facts) */}
+      {!hasVisualDeliverables && (
+        <>
+          {project.type && (
+            <div className="mb-6">
+              <Tags types={project.type} year={project.year} />
             </div>
           )}
 
-          {project.timeline && (
-            <div>
-              <span className="block text-[11px] font-mono uppercase tracking-wider text-signal font-semibold">
-                Timeline
-              </span>
-              <span className="font-semibold text-ink leading-snug">
-                <TodoText text={project.timeline} />
-              </span>
+          {project.summary && (
+            <p className="cs-read-text text-lg sm:text-xl text-ink-2 leading-relaxed mb-6 font-normal">
+              <TodoText text={project.summary} />
+            </p>
+          )}
+
+          {(project.role || project.timeline || project.tools) && (
+            <div className="flex flex-wrap items-center gap-6 sm:gap-10 py-4 border-y border-line mb-8 text-sm">
+              {project.role && (
+                <div>
+                  <span className="block text-[11px] font-mono uppercase tracking-wider text-signal font-semibold">
+                    My Role
+                  </span>
+                  <span className="font-semibold text-ink leading-snug">
+                    <TodoText text={project.role} />
+                  </span>
+                </div>
+              )}
+
+              {project.timeline && (
+                <div>
+                  <span className="block text-[11px] font-mono uppercase tracking-wider text-signal font-semibold">
+                    Timeline
+                  </span>
+                  <span className="font-semibold text-ink leading-snug">
+                    <TodoText text={project.timeline} />
+                  </span>
+                </div>
+              )}
+
+              {project.tools && (
+                <div>
+                  <span className="block text-[11px] font-mono uppercase tracking-wider text-signal font-semibold">
+                    Tools
+                  </span>
+                  <span className="font-semibold text-ink leading-snug">
+                    <TodoText text={project.tools} />
+                  </span>
+                </div>
+              )}
             </div>
           )}
-
-          {project.tools && (
-            <div>
-              <span className="block text-[11px] font-mono uppercase tracking-wider text-signal font-semibold">
-                Tools
-              </span>
-              <span className="font-semibold text-ink leading-snug">
-                <TodoText text={project.tools} />
-              </span>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* 6. Prominent Action Buttons (View prototype & View on Behance) */}
-      {(project.prototypeUrl || project.caseStudyUrl) && (
-        <div className="flex flex-wrap items-center gap-3 mb-10">
-          {project.prototypeUrl && (
-            <a
-              href={project.prototypeUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-xs sm:text-sm shadow-sm transition-all hover:opacity-95 active:scale-[0.99] cursor-pointer"
-              style={{ backgroundColor: 'var(--signal)', color: 'var(--signal-ink, #ffffff)' }}
-            >
-              <span>View Prototype</span>
-              <span className="text-base leading-none">↗</span>
-            </a>
-          )}
-
-          {project.caseStudyUrl && (
-            <a
-              href={project.caseStudyUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-line bg-sheet text-ink hover:text-signal hover:border-signal/50 font-semibold text-xs sm:text-sm shadow-xs transition-all active:scale-[0.99] cursor-pointer"
-            >
-              <span>View on Behance</span>
-              <span className="text-base leading-none">↗</span>
-            </a>
-          )}
-        </div>
+        </>
       )}
 
       {/* Case Study Deliverables: All Images Stacked Continuously at Full Width */}

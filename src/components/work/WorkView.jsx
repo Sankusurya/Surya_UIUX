@@ -2,7 +2,7 @@ import React from 'react';
 import { usePortfolio } from '../../context/PortfolioContext';
 import { normalizeProject, resolveAssetUrl } from '../../data/initialData';
 
-const CATEGORIES = ["All", "UX case study", "UI", "Web dev"];
+const CATEGORIES = ["All", "UX Case Study", "UI Design", "Web Dev"];
 
 const formatCategoryYear = (p) => {
   let category = '';
@@ -15,10 +15,10 @@ const formatCategoryYear = (p) => {
   }
 
   // Normalize common categories to clean Title Case
-  if (category.toLowerCase() === 'ux case study') {
+  if (category.toLowerCase() === 'ux case study' || category.toLowerCase() === 'design case study') {
     category = 'UX Case Study';
-  } else if (category.toLowerCase() === 'ui') {
-    category = 'UI';
+  } else if (category.toLowerCase() === 'ui' || category.toLowerCase() === 'ui design') {
+    category = 'UI Design';
   } else if (category.toLowerCase() === 'web dev') {
     category = 'Web Dev';
   }
@@ -34,9 +34,19 @@ const formatCategoryYear = (p) => {
 export const WorkView = () => {
   const { projects, activeFilter, setActiveFilter } = usePortfolio();
 
-  const filteredProjects = projects.filter(
-    (p) => activeFilter === "All" || (p.type && p.type.includes(activeFilter))
-  );
+  const filteredProjects = projects.filter((rawP) => {
+    if (activeFilter === "All") return true;
+    const p = normalizeProject(rawP);
+    const types = Array.isArray(p.type) ? p.type : [p.type];
+    const target = activeFilter.toLowerCase();
+    return types.some((t) => {
+      const s = String(t || '').toLowerCase();
+      if (target === 'ui design' && (s === 'ui' || s === 'ui design')) return true;
+      if (target === 'ux case study' && (s === 'ux case study' || s === 'design case study')) return true;
+      if (target === 'web dev' && (s === 'web dev' || s === 'web development')) return true;
+      return s === target;
+    });
+  });
 
   return (
     <section style={{ paddingTop: '24px' }}>

@@ -269,29 +269,35 @@ p {
 .nav-work-pill {
   display: inline-flex;
   align-items: center;
-  background: #2A2A2A;
-  color: #FFFFFF;
+  background: transparent;
+  color: #D4D0C7;
   font-size: 13.5px;
-  font-weight: 600;
-  padding: 3px 5px 3px 14px;
+  font-weight: 500;
+  padding: 3px 5px 3px 12px;
   border-radius: 9999px;
   border: none;
-  transition: background 0.15s ease, transform 0.1s;
+  transition: background 0.15s ease, color 0.15s ease;
 }
 
 :root[data-theme="light"] .nav-work-pill {
-  background: #E8E5DF;
-  color: #1A1A1A;
+  background: transparent;
+  color: #55514E;
 }
 
 .nav-work-pill:hover,
+.nav-work-pill.nav-work-open,
 .nav-work-active {
-  background: #383838;
+  background: #2A2A2A;
+  color: #FFFFFF;
+  font-weight: 600;
 }
 
 :root[data-theme="light"] .nav-work-pill:hover,
+:root[data-theme="light"] .nav-work-pill.nav-work-open,
 :root[data-theme="light"] .nav-work-active {
-  background: #DBD7CE;
+  background: #E8E5DF;
+  color: #141414;
+  font-weight: 600;
 }
 
 .nav-work-link {
@@ -738,7 +744,7 @@ section {
   font-family: var(--f-display);
   font-size: clamp(64px, 11.5vw, 160px);
   text-transform: uppercase;
-  color: #FF7A45;
+  color: var(--signal);
   display: block;
   line-height: 0.88;
   font-weight: 800;
@@ -769,7 +775,7 @@ section {
 }
 
 .hero-accent {
-  color: #FF7A45;
+  color: var(--signal);
   font-weight: 600;
 }
 
@@ -883,7 +889,7 @@ section {
 }
 
 .hero-bg-link {
-  color: #FF7A45;
+  color: var(--signal);
   font-size: 14px;
   font-weight: 500;
   text-decoration: underline;

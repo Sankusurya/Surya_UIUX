@@ -59,7 +59,7 @@ export const Navbar = () => {
           <div
             className={`nav-work-pill ${
               isWorkActive ? 'nav-work-active' : ''
-            }`}
+            } ${isWorkDropdownOpen ? 'nav-work-open' : ''}`}
           >
             <a
               href="#work"

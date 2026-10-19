@@ -45,7 +45,7 @@ export const Cover = ({
       aria-hidden="true"
     >
       <div className="absolute top-4 right-4 text-[10px] font-mono uppercase tracking-widest text-signal px-2 py-0.5 rounded-full border border-signal/20 bg-signal/10">
-        Design Case Study
+        {type ? (Array.isArray(type) ? type[0] : type) : 'UX Case Study'}
       </div>
       <span className="font-display text-xl sm:text-2xl uppercase tracking-wider text-ink font-extrabold leading-tight">
         {title || 'Project'}

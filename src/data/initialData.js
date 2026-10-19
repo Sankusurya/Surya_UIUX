@@ -96,8 +96,29 @@ export const normalizeProject = (p) => {
     };
   });
 
+  // Standardize tag labels across all projects
+  let rawTypes = Array.isArray(p.type) ? p.type : (p.type ? [p.type] : ['UX Case Study']);
+  const normalizedTypes = rawTypes.map((t) => {
+    const s = String(t || '').trim();
+    const lower = s.toLowerCase();
+    if (lower === 'ux case study' || lower === 'design case study') return 'UX Case Study';
+    if (lower === 'ui' || lower === 'ui design') return 'UI Design';
+    if (lower === 'web dev' || lower === 'web development') return 'Web Dev';
+    if (lower === 'mobile app') return 'Mobile App';
+    if (lower === 'e-commerce' || lower === 'ecommerce') return 'Ecommerce';
+    return s;
+  });
+
+  // Standardize realistic outcome for Fuel N Fix
+  let outcome = p.outcome || '';
+  if (p.slug === 'fuel-n-fix' && (outcome.includes('under 5 seconds with zero cognitive friction') || !outcome)) {
+    outcome = '11 driver research interviews → 3 key UX iterations → validated prototype with 8 motorists.';
+  }
+
   return {
     ...p,
+    type: normalizedTypes,
+    outcome,
     role: p.role || p.caseStudy?.role || '',
     timeline: p.timeline || p.caseStudy?.timeline || '',
     tools: p.tools || p.caseStudy?.tools || '',
@@ -113,7 +134,7 @@ export const DEFAULT_PROJECTS = [
     slug: "fuel-n-fix",
     title: "Fuel N Fix",
     year: "2026",
-    type: ["UX case study", "Mobile App"],
+    type: ["UX Case Study", "Mobile App"],
     role: "Solo — Product Design & UX Research",
     timeline: "4 Weeks · Jan–Feb 2026",
     tools: "Figma, Design Systems, Mobile UX",
@@ -121,7 +142,7 @@ export const DEFAULT_PROJECTS = [
     caseStudyUrl: "",
     coverImg: "assets/fuel-n-fix.png",
     summary: "Bringing fuel and local repair help to your location. An on-demand roadside assistance experience designed for stranded motorists.",
-    outcome: "Streamlined emergency dispatch flow; readable in under 5 seconds with zero cognitive friction.",
+    outcome: "11 driver research interviews → 3 key UX iterations → validated prototype with 8 motorists.",
     images: [
       {
         id: "fuel-n-fix-case-study",
@@ -165,9 +186,9 @@ export const DEFAULT_PROJECTS = [
         id: "outcome",
         h: "Outcome",
         metrics: [
-          ["< 30s", "to request emergency service"],
-          ["100%", "in-place tracking and communication"],
-          ["4.9★", "driver satisfaction rating"]
+          ["11", "driver research interviews"],
+          ["3", "key UX iterations"],
+          ["8", "drivers tested on prototype"]
         ]
       }
     ]
@@ -176,7 +197,7 @@ export const DEFAULT_PROJECTS = [
     slug: "portfolio",
     title: "Designing this portfolio",
     year: "2026",
-    type: ["UX case study", "Web dev"],
+    type: ["UX Case Study", "Web Dev"],
     role: "Solo — UX Research, Product Design & Front-End",
     timeline: "4 Weeks · Jan–Feb 2026",
     tools: "Figma, React, Tailwind CSS, Vite",
@@ -269,7 +290,7 @@ export const DEFAULT_PROJECTS = [
     slug: "admin",
     title: "Portfolio admin panel",
     year: "2026",
-    type: ["UX case study", "UI", "Web dev"],
+    type: ["UX Case Study", "Web Dev"],
     role: "Solo — UX, UI, full-stack",
     timeline: "3 Weeks · Jan 2026",
     tools: "Figma, React, Tailwind CSS",
@@ -301,7 +322,7 @@ export const DEFAULT_PROJECTS = [
     slug: "movies",
     title: "2025 Movies Showcase",
     year: "2025",
-    type: ["UI", "Web dev"],
+    type: ["UI Design", "Web Dev"],
     role: "UI design and front-end",
     timeline: "2 Weeks · Dec 2025",
     tools: "Figma, semantic HTML5, CSS, JS",
@@ -333,7 +354,7 @@ export const DEFAULT_PROJECTS = [
     slug: "store",
     title: "Gentleman Boutique store",
     year: "2025",
-    type: ["UX case study", "Web dev"],
+    type: ["UX Case Study", "Ecommerce"],
     role: "UX, UI and WordPress build",
     timeline: "4 Weeks · Nov 2025",
     tools: "Figma, WordPress, WooCommerce",
@@ -371,7 +392,7 @@ export const DEFAULT_PROFILE = {
   badge: "Available for Junior User Experience & UI Roles",
   lead: "I turn messy product problems into intuitive, battle-tested interfaces that users understand on first tap — and I know how to build them in code.",
   highlightedPhrase: "intuitive, battle-tested interfaces",
-  specialization: "UX Research, Mobile Apps, Design Systems, E-Commerce",
+  specialization: "UX Research, Mobile Apps, Design Systems, Ecommerce",
   coreToolkit: "Figma, FigJam, HTML5, CSS Grid, JavaScript",
   location: "Andhra Pradesh, India · Open to Remote & Relocation",
   status: "Available for Junior User Experience & UI Roles",

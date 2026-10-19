@@ -117,7 +117,7 @@ export const ContactSection = () => {
                 onClick={openResume}
                 className="hover:text-signal transition-colors underline font-medium cursor-pointer bg-transparent border-0 p-0 text-inherit text-sm font-sans"
               >
-                View Resume 📄
+                View Resume ↗
               </button>
             </div>
           </div>
