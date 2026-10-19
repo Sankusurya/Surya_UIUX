@@ -467,14 +467,18 @@ export const DEFAULT_PRINCIPLES = [
 
 export const DEFAULT_ABOUT = {
   headline: "Hi, I'm Surya Teja",
-  bio: "A UI/UX designer who works end to end — from research and user flows to developer-ready screens — and uses AI-assisted coding to turn designs into working prototypes.",
+  bio: "A UI/UX designer who designs end to end — research, flows, high-fidelity UI and developer-ready handoff — and backs every decision with what users actually said or did.",
   photo: "assets/surya-teja.jpg",
   background: [
-    "I studied Mathematics, Electronics and Computer Science at Andhra University (2020–2023). My first job was at Cyient, turning scanned telecom network records into precise digital drawings across 12+ projects. Strict standards for every layer, symbol and label — and checking each drawing before delivery — taught me that a design is only good if someone else can read and use it without errors.",
-    "I wanted to design for people instead of networks, so in 2025 I trained in UI/UX at Tech Mahindra SMART Academy and cleared the NSDC User Experience Designer assessment with Grade A.",
-    "Today I'm a UI/UX Designer at Dilshaj Infotech, designing EduProva — an AI-powered learning and career super-app — from product requirements to developer-ready screens."
+    "I'm a UI/UX Designer at Dilshaj Infotech, designing EduProva — an AI-powered learning and career super-app — across six product areas, with one shared component library so every module looks and works the same.",
+    "I didn't start in UX. After a B.Sc. in Mathematics, Electronics and Computer Science at Andhra University, I spent 1.5 years at Cyient turning scanned telecom records into precise network drawings. Every layer, symbol and label followed a standard, and every drawing was checked before anyone used it. That's where I learned the rule I still design by: if someone can't use it without asking me, it isn't finished.",
+    "I wanted that same care to reach people instead of cables. In 2025 I trained in UI/UX at Tech Mahindra SMART Academy, cleared the NSDC User Experience Designer assessment with Grade A, and moved into product design."
   ],
-  philosophy: "I start with the problem, not the screen. Before opening Figma I talk to the people involved and write the problem in one sentence — for Fuel N Fix, conversations with riders and mechanics showed the real pain wasn't finding help, it was not knowing the price until it was too late. Then I simplify: remove anything that makes people think harder than they need to, and keep the important thing first. Finally I design for what can actually be built — reusable components, clear specs, and working prototypes — so developers get fewer surprises and users get a product that feels obvious.",
+  philosophy: [
+    "Listen before I draw. I frame problems from real conversations, not assumptions. On Fuel N Fix, 11 interviews with riders and mechanics showed the real fear wasn't finding help — it was the price changing at the roadside. That one insight became the core feature: the price is locked before booking, and any change needs the rider's approval.",
+    "Every decision gets a reason I can show. In my case studies each decision comes with the moment that triggered it, the options I weighed, the trade-off I accepted, and an honest note on how far it has been validated. When riders couldn't tell my two home-screen boxes apart without reading, I switched to picture cards they understood at a glance. At EduProva, I reworked the AI auto-apply flow after usability feedback. When something isn't tested yet, I say so and write down how I'll test it.",
+    "Design for every user — and for the build. A mechanic told me, 'When we're busy, we don't take these jobs,' so I added an 'I'm busy' button: a two-sided product only works if both sides keep using it. And because I work closely with developers, I design with reusable components, clear Dev Mode specs and working prototypes built with AI-assisted coding, so what ships matches what was designed."
+  ],
   experience: [
     {
       role: "UI/UX Designer · Dilshaj Infotech",
@@ -506,5 +510,5 @@ export const DEFAULT_ABOUT = {
     "LottieFiles",
     "HTML & CSS"
   ],
-  interests: "Outside client work I'm usually exploring motion with LottieFiles or turning Figma screens into working prototypes with AI coding tools — building things is how I learn them."
+  interests: "Outside client work I'm usually exploring motion with LottieFiles or turning Figma screens into working prototypes with AI coding tools — building things is how I learn them. PERSONAL_HOBBY_HERE"
 };

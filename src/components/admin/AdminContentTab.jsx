@@ -6,7 +6,12 @@ export const AdminContentTab = () => {
 
   const [stepsData, setStepsData] = useState([...steps]);
   const [principlesData, setPrinciplesData] = useState([...principles]);
-  const [aboutData, setAboutData] = useState({ ...about });
+  const [aboutData, setAboutData] = useState(() => ({
+    ...about,
+    philosophy: Array.isArray(about?.philosophy)
+      ? about.philosophy.join('\n\n')
+      : (about?.philosophy || ''),
+  }));
   const [newTool, setNewTool] = useState('');
 
   const handleStepChange = (idx, field, val) => {
@@ -63,7 +68,24 @@ export const AdminContentTab = () => {
     e.preventDefault();
     saveSteps(stepsData);
     savePrinciples(principlesData);
-    saveAbout(aboutData);
+
+    let processedPhilosophy;
+    if (typeof aboutData.philosophy === 'string') {
+      const parts = aboutData.philosophy
+        .split(/\n\s*\n/)
+        .map((p) => p.trim())
+        .filter(Boolean);
+      processedPhilosophy = parts.length > 0 ? parts : [aboutData.philosophy.trim()];
+    } else if (Array.isArray(aboutData.philosophy)) {
+      processedPhilosophy = aboutData.philosophy;
+    } else {
+      processedPhilosophy = [];
+    }
+
+    saveAbout({
+      ...aboutData,
+      philosophy: processedPhilosophy,
+    });
   };
 
   return (
@@ -175,12 +197,13 @@ export const AdminContentTab = () => {
 
         <div>
           <label className="block text-xs font-mono uppercase tracking-wider text-ink-3 mb-1">
-            Design Philosophy
+            Design Philosophy (Separate paragraphs with a blank line)
           </label>
           <textarea
-            rows={3}
+            rows={6}
             value={aboutData.philosophy || ''}
             onChange={(e) => setAboutData({ ...aboutData, philosophy: e.target.value })}
+            placeholder="First paragraph...&#10;&#10;Second paragraph...&#10;&#10;Third paragraph..."
             className="w-full px-3.5 py-2 rounded-xl border border-line bg-paper text-ink text-sm"
           />
         </div>

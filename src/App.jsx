@@ -57,7 +57,7 @@ export const App = () => {
       {/* Global Modals & Notifications */}
       <ResumeModal />
       <Toast />
-      <GridOverlay />
+      {import.meta.env.DEV && <GridOverlay />}
     </>
   );
 };

@@ -151,9 +151,12 @@ export const PortfolioProvider = ({ children }) => {
     try {
       const saved = getStoredItemSync('surya_portfolio_about');
       if (saved) {
-        const hasBracket = JSON.stringify(saved).includes('[');
-        const hasOldTools = Array.isArray(saved.tools) && (saved.tools.includes('JavaScript') || saved.tools.includes('WordPress'));
-        if (hasBracket || hasOldTools) {
+        const isOldPhilosophy = typeof saved.philosophy === 'string';
+        const isOldBio = saved.bio && (
+          saved.bio.includes('uses AI-assisted coding to turn designs into working prototypes') ||
+          !saved.bio.includes('backs every decision with what users actually said or did')
+        );
+        if (isOldPhilosophy || isOldBio) {
           return DEFAULT_ABOUT;
         }
         return {
@@ -231,9 +234,12 @@ export const PortfolioProvider = ({ children }) => {
 
         const idbAbout = await getStoredItemAsync('surya_portfolio_about');
         if (idbAbout && isMounted) {
-          const hasBracket = JSON.stringify(idbAbout).includes('[');
-          const hasOldTools = Array.isArray(idbAbout.tools) && (idbAbout.tools.includes('JavaScript') || idbAbout.tools.includes('WordPress'));
-          if (hasBracket || hasOldTools) {
+          const isOldPhilosophy = typeof idbAbout.philosophy === 'string';
+          const isOldBio = idbAbout.bio && (
+            idbAbout.bio.includes('uses AI-assisted coding to turn designs into working prototypes') ||
+            !idbAbout.bio.includes('backs every decision with what users actually said or did')
+          );
+          if (isOldPhilosophy || isOldBio) {
             setAbout(DEFAULT_ABOUT);
           } else {
             setAbout({ ...DEFAULT_ABOUT, ...idbAbout, photo: idbAbout.photo || DEFAULT_ABOUT.photo });

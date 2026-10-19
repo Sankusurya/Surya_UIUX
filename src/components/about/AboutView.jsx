@@ -27,7 +27,7 @@ export const AboutView = () => {
             <TodoText
               text={
                 about.bio ||
-                'A UI/UX designer who works end to end — from research and user flows to developer-ready screens — and uses AI-assisted coding to turn designs into working prototypes.'
+                'A UI/UX designer who designs end to end — research, flows, high-fidelity UI and developer-ready handoff — and backs every decision with what users actually said or did.'
               }
             />
           </p>
@@ -59,17 +59,20 @@ export const AboutView = () => {
           </div>
         </details>
 
-        <details>
+        <details open>
           <summary>Design philosophy</summary>
           <div className="in">
-            <p>
-              <TodoText
-                text={
-                  about.philosophy ||
-                  'I simplify, then I humanize. First I remove anything that makes people think harder than they need to. Then I add the small touches, like clear feedback and gentle motion, that make a product feel considerate.'
-                }
-              />
-            </p>
+            {about.philosophy && Array.isArray(about.philosophy) ? (
+              about.philosophy.map((p, i) => (
+                <p key={i}>
+                  <TodoText text={p} />
+                </p>
+              ))
+            ) : (
+              <p>
+                <TodoText text={about.philosophy} />
+              </p>
+            )}
             <a className="textlink" href="#thinking">
               Read my full design thinking →
             </a>

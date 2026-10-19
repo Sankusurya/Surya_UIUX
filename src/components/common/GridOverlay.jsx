@@ -5,6 +5,8 @@ import React, { useState, useEffect } from 'react';
  * Toggle with the "G" key or via the floating indicator.
  */
 export const GridOverlay = () => {
+  if (!import.meta.env.DEV) return null;
+
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
