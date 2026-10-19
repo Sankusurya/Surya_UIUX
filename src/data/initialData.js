@@ -73,6 +73,10 @@ export const normalizeProject = (p) => {
   if (typeof coverImg === 'string' && coverImg.startsWith('data:image/svg+xml')) {
     coverImg = '';
   }
+  // If fuel-n-fix still points to the 32k-pixel full case study graphic or is empty, use the dedicated cover artwork
+  if (p.slug === 'fuel-n-fix' && (!coverImg || coverImg.includes('fuel-n-fix.png'))) {
+    coverImg = 'assets/fuel-n-fix-cover.png';
+  }
   coverImg = resolveAssetUrl(coverImg);
 
   // Ensure slices exist on each image and asset URLs are properly resolved
@@ -140,7 +144,7 @@ export const DEFAULT_PROJECTS = [
     tools: "Figma, Design Systems, Mobile UX",
     prototypeUrl: "",
     caseStudyUrl: "",
-    coverImg: "assets/fuel-n-fix.png",
+    coverImg: "assets/fuel-n-fix-cover.png",
     summary: "Bringing fuel and local repair help to your location. An on-demand roadside assistance experience designed for stranded motorists.",
     outcome: "11 driver research interviews → 3 key UX iterations → validated prototype with 8 motorists.",
     images: [

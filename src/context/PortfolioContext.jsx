@@ -424,7 +424,7 @@ export const PortfolioProvider = ({ children }) => {
         showToast('warning', 'Saved Locally', result.error);
       }
     } else {
-      showToast('success', 'Changes Saved & Live ✓', 'Case study and cover image updated immediately.');
+      showToast('success', 'Changes Saved Locally in Browser ✓', 'To display on mobile/other devices, push repository to GitHub or configure Supabase in .env.');
     }
     return result;
   };
