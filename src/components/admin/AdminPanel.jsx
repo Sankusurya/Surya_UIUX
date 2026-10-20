@@ -27,7 +27,20 @@ export const AdminPanel = () => {
     showToast,
   } = usePortfolio();
 
-  const [activeTab, setActiveTab] = useState('projects');
+  const [activeTab, setActiveTab] = useState(() => {
+    try {
+      return sessionStorage.getItem('surya_admin_active_tab') || 'projects';
+    } catch {
+      return 'projects';
+    }
+  });
+
+  const handleSelectTab = (tabId) => {
+    setActiveTab(tabId);
+    try {
+      sessionStorage.setItem('surya_admin_active_tab', tabId);
+    } catch {}
+  };
   const [isSyncing, setIsSyncing] = useState(false);
 
   if (!isAdminAuth) {
@@ -191,7 +204,7 @@ export const AdminPanel = () => {
           <button
             key={tab.id}
             type="button"
-            onClick={() => setActiveTab(tab.id)}
+            onClick={() => handleSelectTab(tab.id)}
             className={`px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold transition-all whitespace-nowrap cursor-pointer ${
               activeTab === tab.id
                 ? 'bg-pill text-pill-ink shadow-sm'

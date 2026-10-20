@@ -1,22 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { usePortfolio } from '../../context/PortfolioContext';
 import { uploadImageToStorage, formatBytes, processCaseStudyImage } from '../../utils/imageStorage';
 import { normalizeProject, resolveAssetUrl } from '../../data/initialData';
 import { Tags } from '../common/Tags';
 import { ImageViewer } from '../common/ImageViewer';
+import {
+  saveProjectDraft,
+  getActiveProjectDraft,
+  getProjectDraft,
+  clearProjectDraft,
+  getDraftsList,
+  hasProjectContent,
+} from '../../utils/draftStorage';
 
 export const AdminProjectsTab = () => {
   const { projects, saveProjects, showToast } = usePortfolio();
-
-  const [isEditing, setIsEditing] = useState(false);
-  const [editingSlug, setEditingSlug] = useState(null);
-  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-
-  // Upload States
-  const [isUploadingCover, setIsUploadingCover] = useState(false);
-  const [isUploadingImages, setIsUploadingImages] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(null);
-  const [draggedIndex, setDraggedIndex] = useState(null);
 
   // Clean Project Form State matching public page fields in exact order
   const emptyProject = {
@@ -34,8 +32,70 @@ export const AdminProjectsTab = () => {
     images: [],
   };
 
-  const [formData, setFormData] = useState(emptyProject);
+  // Restore initial draft state if any was in progress
+  const initialDraft = getActiveProjectDraft();
+
+  const [isEditing, setIsEditing] = useState(() => {
+    return Boolean(initialDraft && (initialDraft.isEditorOpen || hasProjectContent(initialDraft.formData)));
+  });
+
+  const [editingSlug, setEditingSlug] = useState(() => {
+    return initialDraft ? initialDraft.editingSlug : null;
+  });
+
+  const [formData, setFormData] = useState(() => {
+    return initialDraft && initialDraft.formData ? initialDraft.formData : emptyProject;
+  });
+
+  const [draftStatus, setDraftStatus] = useState(() => {
+    if (initialDraft && initialDraft.updatedAt) {
+      return {
+        isRestored: true,
+        lastSaved: new Date(initialDraft.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      };
+    }
+    return null;
+  });
+
+  const [savedDrafts, setSavedDrafts] = useState(() => getDraftsList());
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+
+  // Upload States
+  const [isUploadingCover, setIsUploadingCover] = useState(false);
+  const [isUploadingImages, setIsUploadingImages] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(null);
+  const [draggedIndex, setDraggedIndex] = useState(null);
   const [tagInput, setTagInput] = useState('');
+
+  // Auto-save draft on every change
+  useEffect(() => {
+    if (!isEditing) return;
+
+    if (hasProjectContent(formData)) {
+      const draftKey = editingSlug || '__new__';
+      saveProjectDraft(draftKey, formData, true);
+      const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      setDraftStatus({
+        isRestored: false,
+        lastSaved: timeStr,
+      });
+      setSavedDrafts(getDraftsList());
+    }
+  }, [formData, isEditing, editingSlug]);
+
+  // Window beforeunload warning + immediate flush
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (isEditing && hasProjectContent(formData)) {
+        const draftKey = editingSlug || '__new__';
+        saveProjectDraft(draftKey, formData, true);
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [formData, isEditing, editingSlug]);
 
   // Sanitize URL helper
   const sanitizeUrl = (url) => {
@@ -56,40 +116,140 @@ export const AdminProjectsTab = () => {
 
   const handleEdit = (rawP) => {
     const p = normalizeProject(rawP);
-    setFormData({
-      title: p.title || '',
-      slug: p.slug || '',
-      year: p.year || '2026',
-      type: Array.isArray(p.type) ? p.type : ['UX case study'],
-      summary: p.summary || '',
-      role: p.role || '',
-      timeline: p.timeline || '',
-      tools: p.tools || '',
-      prototypeUrl: p.prototypeUrl || '',
-      caseStudyUrl: p.caseStudyUrl || '',
-      coverImg: p.coverImg || '',
-      images: Array.isArray(p.images) ? [...p.images] : [],
-    });
-    setEditingSlug(p.slug);
-    setIsEditing(true);
+    // Check if there is an existing draft for this project
+    const existingDraft = getProjectDraft(p.slug);
+    if (existingDraft && hasProjectContent(existingDraft.formData)) {
+      setFormData(existingDraft.formData);
+      setEditingSlug(p.slug);
+      setIsEditing(true);
+      setDraftStatus({
+        isRestored: true,
+        lastSaved: new Date(existingDraft.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      });
+      showToast('info', 'Draft Restored', `Loaded your in-progress draft for "${p.title}".`);
+    } else {
+      setFormData({
+        title: p.title || '',
+        slug: p.slug || '',
+        year: p.year || '2026',
+        type: Array.isArray(p.type) ? p.type : ['UX case study'],
+        summary: p.summary || '',
+        role: p.role || '',
+        timeline: p.timeline || '',
+        tools: p.tools || '',
+        prototypeUrl: p.prototypeUrl || '',
+        caseStudyUrl: p.caseStudyUrl || '',
+        coverImg: p.coverImg || '',
+        images: Array.isArray(p.images) ? [...p.images] : [],
+      });
+      setEditingSlug(p.slug);
+      setIsEditing(true);
+      setDraftStatus(null);
+    }
     window.scrollTo({ top: 300, behavior: 'smooth' });
   };
 
   const handleCreateNew = () => {
-    setFormData(emptyProject);
-    setEditingSlug(null);
-    setIsEditing(true);
+    // If there is an existing draft for a new project, load it!
+    const newDraft = getProjectDraft('__new__');
+    if (newDraft && hasProjectContent(newDraft.formData)) {
+      setFormData(newDraft.formData);
+      setEditingSlug(null);
+      setIsEditing(true);
+      setDraftStatus({
+        isRestored: true,
+        lastSaved: new Date(newDraft.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      });
+      showToast('info', 'Draft Restored', 'Resumed your in-progress new project draft.');
+    } else {
+      setFormData(emptyProject);
+      setEditingSlug(null);
+      setIsEditing(true);
+      setDraftStatus(null);
+    }
     window.scrollTo({ top: 300, behavior: 'smooth' });
+  };
+
+  const handleResumeDraft = (draft) => {
+    if (!draft || !draft.formData) return;
+    setFormData(draft.formData);
+    setEditingSlug(draft.editingSlug || null);
+    setIsEditing(true);
+    setDraftStatus({
+      isRestored: true,
+      lastSaved: new Date(draft.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    });
+    showToast('success', 'Draft Loaded', `Resumed editing "${draft.title || 'Untitled Project'}".`);
+    window.scrollTo({ top: 300, behavior: 'smooth' });
+  };
+
+  const handleDiscardCurrentDraft = (confirmWithUser = true) => {
+    if (confirmWithUser && !window.confirm('Discard all unsaved changes for this project? This cannot be undone.')) {
+      return;
+    }
+    const draftKey = editingSlug || '__new__';
+    clearProjectDraft(draftKey);
+    setFormData(emptyProject);
+    setIsEditing(false);
+    setEditingSlug(null);
+    setDraftStatus(null);
+    setSavedDrafts(getDraftsList());
+    showToast('info', 'Draft Discarded', 'Your in-progress draft was cleared.');
+  };
+
+  const handleCloseAndKeepDraft = () => {
+    if (hasProjectContent(formData)) {
+      const draftKey = editingSlug || '__new__';
+      saveProjectDraft(draftKey, formData, false);
+      showToast('success', 'Draft Saved ✓', 'Your work is safely stored in drafts. Resume anytime!');
+    }
+    setIsEditing(false);
+    setEditingSlug(null);
+    setFormData(emptyProject);
+    setSavedDrafts(getDraftsList());
+  };
+
+  const handleCancelClick = () => {
+    if (hasProjectContent(formData)) {
+      const shouldKeep = window.confirm(
+        'You have unsaved changes in this project.\n\nClick "OK" to SAVE AS DRAFT (you can resume anytime).\nClick "Cancel" to DISCARD your changes.'
+      );
+      if (shouldKeep) {
+        handleCloseAndKeepDraft();
+      } else {
+        handleDiscardCurrentDraft(false);
+      }
+    } else {
+      setIsEditing(false);
+      setEditingSlug(null);
+      setFormData(emptyProject);
+    }
+  };
+
+  const handleDiscardDraftByKey = (key, title) => {
+    if (window.confirm(`Discard draft for "${title || 'Untitled Project'}"? This cannot be undone.`)) {
+      clearProjectDraft(key);
+      setSavedDrafts(getDraftsList());
+      if (editingSlug === key || (key === '__new__' && !editingSlug)) {
+        setIsEditing(false);
+        setFormData(emptyProject);
+        setDraftStatus(null);
+      }
+      showToast('info', 'Draft Discarded', 'The draft was removed.');
+    }
   };
 
   const handleDelete = (slug, title) => {
     if (window.confirm(`Are you sure you want to delete "${title}"?`)) {
       const updated = projects.filter((p) => p.slug !== slug);
       saveProjects(updated);
+      clearProjectDraft(slug);
+      setSavedDrafts(getDraftsList());
       showToast('info', 'Project Deleted', `"${title}" was removed.`);
       if (editingSlug === slug) {
         setIsEditing(false);
         setFormData(emptyProject);
+        setDraftStatus(null);
       }
     }
   };
@@ -314,13 +474,109 @@ export const AdminProjectsTab = () => {
     }
 
     await saveProjects(updatedProjects);
+    // Project is published/saved live, clear its draft
+    clearProjectDraft(editingSlug || '__new__');
+    setDraftStatus(null);
+    setSavedDrafts(getDraftsList());
     setIsEditing(false);
     setEditingSlug(null);
     setFormData(emptyProject);
+    showToast('success', editingSlug ? 'Changes Saved ✓' : 'Project Published ✓', `"${newProject.title}" is now live!`);
   };
 
   return (
     <div className="space-y-10">
+      {/* Drafts Notification Banner */}
+      {savedDrafts.length > 0 && (
+        <div className="p-5 sm:p-6 rounded-2xl border-2 border-amber-500/40 bg-amber-500/5 dark:bg-amber-500/10 space-y-4 shadow-sm animate-in">
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <div className="flex items-center gap-2.5">
+              <span className="text-xl">📝</span>
+              <div>
+                <h4 className="text-sm font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 font-display">
+                  Unsaved Project Drafts ({savedDrafts.length})
+                </h4>
+                <p className="text-xs text-ink-3 mt-0.5">
+                  Saved automatically · Pick up right where you left off
+                </p>
+              </div>
+            </div>
+            <span className="text-xs font-mono text-ink-3">
+              Protected against browser refreshes & page navigation
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+            {savedDrafts.map((draft) => {
+              const draftTitle = draft.title || 'Untitled Project';
+              const isCurrentEditor = isEditing && (editingSlug === draft.editingSlug || (!editingSlug && draft.editingSlug === '__new__'));
+              const formattedTime = new Date(draft.updatedAt).toLocaleString(undefined, {
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+              });
+
+              return (
+                <div
+                  key={draft.key}
+                  className={`p-3.5 rounded-xl border flex items-center justify-between gap-3 bg-paper/90 transition-all ${
+                    isCurrentEditor ? 'border-amber-500 ring-2 ring-amber-500/20' : 'border-line hover:border-amber-500/50'
+                  }`}
+                >
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold text-sm text-ink truncate">
+                        {draftTitle}
+                      </span>
+                      {draft.isNew ? (
+                        <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-signal/15 text-signal font-semibold">
+                          NEW
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-paper border border-line text-ink-3 font-semibold">
+                          EDIT
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2 mt-1 text-xs text-ink-3">
+                      <span>Saved {formattedTime}</span>
+                      <span>·</span>
+                      <span>{draft.hasCover ? '1 cover' : 'no cover'}</span>
+                      <span>·</span>
+                      <span>{draft.imageCount} visuals</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => handleResumeDraft(draft)}
+                      disabled={isCurrentEditor}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide uppercase transition-all cursor-pointer ${
+                        isCurrentEditor
+                          ? 'bg-amber-500/20 text-amber-600 dark:text-amber-400 cursor-default font-mono'
+                          : 'bg-amber-500 text-white hover:bg-amber-600 shadow-xs'
+                      }`}
+                    >
+                      {isCurrentEditor ? 'Editing Now' : 'Resume →'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDiscardDraftByKey(draft.key, draftTitle)}
+                      title="Discard this draft"
+                      className="p-1.5 rounded-lg border border-line text-ink-3 hover:text-red-500 hover:border-red-500/30 text-xs transition-colors cursor-pointer"
+                    >
+                      🗑️
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* 1. Existing Projects List */}
       <div className="bg-sheet border border-line rounded-2xl p-6 shadow-sm">
         <div className="flex items-center justify-between mb-4 pb-3 border-b border-line flex-wrap gap-3">
@@ -347,6 +603,7 @@ export const AdminProjectsTab = () => {
         <div className="space-y-3">
           {projects.map((rawP, index) => {
             const p = normalizeProject(rawP);
+            const projectDraft = savedDrafts.find((d) => d.editingSlug === p.slug);
             return (
               <div
                 key={p.slug}
@@ -362,7 +619,14 @@ export const AdminProjectsTab = () => {
                     )}
                   </div>
                   <div className="min-w-0">
-                    <h4 className="font-bold text-sm text-ink truncate">{p.title}</h4>
+                    <div className="flex items-center gap-2">
+                      <h4 className="font-bold text-sm text-ink truncate">{p.title}</h4>
+                      {projectDraft && (
+                        <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/15 text-amber-600 dark:text-amber-400 font-semibold border border-amber-500/30 shrink-0">
+                          Draft edits
+                        </span>
+                      )}
+                    </div>
                     <div className="flex items-center gap-2 text-xs text-ink-3">
                       <span>{p.year}</span>
                       <span>·</span>
@@ -401,10 +665,14 @@ export const AdminProjectsTab = () => {
 
                   <button
                     type="button"
-                    onClick={() => handleEdit(p)}
-                    className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-signal/10 text-signal border border-signal/30 hover:bg-signal/20 transition-colors cursor-pointer"
+                    onClick={() => (projectDraft ? handleResumeDraft(projectDraft) : handleEdit(p))}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors cursor-pointer ${
+                      projectDraft
+                        ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/30 hover:bg-amber-500/25'
+                        : 'bg-signal/10 text-signal border-signal/30 hover:bg-signal/20'
+                    }`}
                   >
-                    Edit
+                    {projectDraft ? 'Resume Draft' : 'Edit'}
                   </button>
 
                   <button
@@ -445,6 +713,15 @@ export const AdminProjectsTab = () => {
             <div className="flex items-center gap-2">
               <button
                 type="button"
+                onClick={handleCloseAndKeepDraft}
+                className="px-3.5 py-2 rounded-full border border-line bg-paper text-ink hover:text-signal text-xs font-medium transition-colors cursor-pointer flex items-center gap-1.5"
+                title="Save progress and close without publishing yet"
+              >
+                <span>💾</span>
+                <span>Save as Draft</span>
+              </button>
+              <button
+                type="button"
                 onClick={() => setIsPreviewOpen(true)}
                 className="px-4 py-2 rounded-full border border-line bg-paper text-ink hover:text-signal text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1.5"
               >
@@ -453,10 +730,40 @@ export const AdminProjectsTab = () => {
               </button>
               <button
                 type="button"
-                onClick={() => setIsEditing(false)}
+                onClick={handleCancelClick}
                 className="px-3.5 py-2 rounded-full border border-line text-xs font-medium text-ink-3 hover:text-ink cursor-pointer"
               >
                 Cancel
+              </button>
+            </div>
+          </div>
+
+          {/* Auto-Save & Draft Status Bar */}
+          <div className="p-3.5 rounded-xl border border-line/70 bg-paper/70 flex items-center justify-between flex-wrap gap-2 text-xs">
+            <div className="flex items-center gap-2.5 flex-wrap">
+              <span className="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span className="font-semibold text-ink">
+                {draftStatus?.lastSaved
+                  ? `Auto-saved to drafts · Last saved at ${draftStatus.lastSaved}`
+                  : 'Auto-saving enabled · Your progress is saved as you type'}
+              </span>
+              {draftStatus?.isRestored && (
+                <span className="px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 font-mono text-[10px] font-semibold border border-amber-500/30">
+                  Restored from draft
+                </span>
+              )}
+            </div>
+
+            <div className="flex items-center gap-3 text-ink-3">
+              <span className="hidden sm:inline text-[11px]">
+                Safe to leave, refresh, or switch pages anytime
+              </span>
+              <button
+                type="button"
+                onClick={() => handleDiscardCurrentDraft(true)}
+                className="text-red-500 hover:text-red-600 text-xs font-medium cursor-pointer underline underline-offset-2"
+              >
+                Discard Draft
               </button>
             </div>
           </div>
@@ -887,19 +1194,29 @@ export const AdminProjectsTab = () => {
 
           {/* Form Action Buttons */}
           <div className="pt-6 border-t border-line flex items-center justify-between flex-wrap gap-4">
-            <button
-              type="button"
-              onClick={() => setIsPreviewOpen(true)}
-              className="px-5 py-2.5 rounded-full border border-line bg-paper text-ink hover:text-signal text-xs font-semibold transition-colors cursor-pointer flex items-center gap-2"
-            >
-              <span>👁</span>
-              <span>Preview Live Page</span>
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setIsPreviewOpen(true)}
+                className="px-5 py-2.5 rounded-full border border-line bg-paper text-ink hover:text-signal text-xs font-semibold transition-colors cursor-pointer flex items-center gap-2"
+              >
+                <span>👁</span>
+                <span>Preview Live Page</span>
+              </button>
+              <button
+                type="button"
+                onClick={handleCloseAndKeepDraft}
+                className="px-4 py-2.5 rounded-full border border-line bg-paper text-ink hover:text-signal text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1.5"
+              >
+                <span>💾</span>
+                <span>Save as Draft</span>
+              </button>
+            </div>
 
             <div className="flex items-center gap-3">
               <button
                 type="button"
-                onClick={() => setIsEditing(false)}
+                onClick={handleCancelClick}
                 className="px-5 py-2.5 rounded-full border border-line text-xs font-medium text-ink-3 hover:text-ink cursor-pointer"
               >
                 Cancel
