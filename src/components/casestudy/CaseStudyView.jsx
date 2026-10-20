@@ -60,7 +60,7 @@ export const CaseStudyView = () => {
           href="#work"
           className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-ink-3 hover:text-signal transition-colors cursor-pointer py-1"
         >
-          <span>←</span> All work
+          <span>←</span> Back to all projects
         </a>
 
         {(project.prototypeUrl || project.caseStudyUrl) && (
@@ -93,63 +93,61 @@ export const CaseStudyView = () => {
         )}
       </nav>
 
-      {/* Accessible Title */}
-      <h1 className={hasVisualDeliverables ? 'sr-only' : 'text-4xl sm:text-6xl lg:text-7xl font-extrabold font-display uppercase tracking-wider text-ink leading-[0.95] mb-4'}>
+      {/* 2. Category Tags */}
+      {project.type && (
+        <div className="mb-4">
+          <Tags types={project.type} year={project.year} />
+        </div>
+      )}
+
+      {/* 3. Project Title */}
+      <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold font-display uppercase tracking-wider text-ink leading-[0.95] mb-4">
         {project.title}
       </h1>
 
-      {/* When NO visual deliverables exist: Show full text header (Tags, Summary, Role facts) */}
-      {!hasVisualDeliverables && (
-        <>
-          {project.type && (
-            <div className="mb-6">
-              <Tags types={project.type} year={project.year} />
+      {/* 4. Project Description */}
+      {project.summary && (
+        <p className="cs-read-text text-lg sm:text-xl text-ink-2 leading-relaxed mb-8 font-normal">
+          <TodoText text={project.summary} />
+        </p>
+      )}
+
+      {/* 5. Facts (Role, Timeline, Tools) shown when no visual deliverables */}
+      {!hasVisualDeliverables && (project.role || project.timeline || project.tools) && (
+        <div className="flex flex-wrap items-center gap-6 sm:gap-10 py-4 border-y border-line mb-8 text-sm">
+          {project.role && (
+            <div>
+              <span className="block text-[11px] font-mono uppercase tracking-wider text-signal font-semibold">
+                My Role
+              </span>
+              <span className="font-semibold text-ink leading-snug">
+                <TodoText text={project.role} />
+              </span>
             </div>
           )}
 
-          {project.summary && (
-            <p className="cs-read-text text-lg sm:text-xl text-ink-2 leading-relaxed mb-6 font-normal">
-              <TodoText text={project.summary} />
-            </p>
-          )}
-
-          {(project.role || project.timeline || project.tools) && (
-            <div className="flex flex-wrap items-center gap-6 sm:gap-10 py-4 border-y border-line mb-8 text-sm">
-              {project.role && (
-                <div>
-                  <span className="block text-[11px] font-mono uppercase tracking-wider text-signal font-semibold">
-                    My Role
-                  </span>
-                  <span className="font-semibold text-ink leading-snug">
-                    <TodoText text={project.role} />
-                  </span>
-                </div>
-              )}
-
-              {project.timeline && (
-                <div>
-                  <span className="block text-[11px] font-mono uppercase tracking-wider text-signal font-semibold">
-                    Timeline
-                  </span>
-                  <span className="font-semibold text-ink leading-snug">
-                    <TodoText text={project.timeline} />
-                  </span>
-                </div>
-              )}
-
-              {project.tools && (
-                <div>
-                  <span className="block text-[11px] font-mono uppercase tracking-wider text-signal font-semibold">
-                    Tools
-                  </span>
-                  <span className="font-semibold text-ink leading-snug">
-                    <TodoText text={project.tools} />
-                  </span>
-                </div>
-              )}
+          {project.timeline && (
+            <div>
+              <span className="block text-[11px] font-mono uppercase tracking-wider text-signal font-semibold">
+                Timeline
+              </span>
+              <span className="font-semibold text-ink leading-snug">
+                <TodoText text={project.timeline} />
+              </span>
             </div>
           )}
-        </>
+
+          {project.tools && (
+            <div>
+              <span className="block text-[11px] font-mono uppercase tracking-wider text-signal font-semibold">
+                Tools
+              </span>
+              <span className="font-semibold text-ink leading-snug">
+                <TodoText text={project.tools} />
+              </span>
+            </div>
+          )}
+        </div>
       )}
 
       {/* Case Study Deliverables: All Images Stacked Continuously at Full Width */}

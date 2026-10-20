@@ -113,6 +113,20 @@ export const normalizeProject = (p) => {
     return s;
   });
 
+  // Standardize Fuel N Fix title, summary, outcome & types
+  let title = p.title || '';
+  if (p.slug === 'fuel-n-fix' && (title === 'Fuel N Fix' || !title)) {
+    title = 'Fuel N Fix — Roadside Fuel & Mechanic Assistance';
+  }
+  let summary = p.summary || '';
+  if (p.slug === 'fuel-n-fix' && (summary.startsWith('Bringing fuel') || !summary)) {
+    summary = "Finding a petrol station on Google Maps doesn't help when your fuel tank is already dry. I designed Fuel N Fix from scratch: an emergency on-demand roadside delivery and bike repair app that brings help directly to stranded riders.";
+  }
+  let types = normalizedTypes;
+  if (p.slug === 'fuel-n-fix' && !types.includes('Product Design')) {
+    types = ['UX Case Study', 'Product Design', 'Mobile App'];
+  }
+
   // Standardize realistic outcome for Fuel N Fix
   let outcome = p.outcome || '';
   if (p.slug === 'fuel-n-fix' && (outcome.includes('under 5 seconds with zero cognitive friction') || !outcome)) {
@@ -121,7 +135,9 @@ export const normalizeProject = (p) => {
 
   return {
     ...p,
-    type: normalizedTypes,
+    title,
+    summary,
+    type: types,
     outcome,
     role: p.role || p.caseStudy?.role || '',
     timeline: p.timeline || p.caseStudy?.timeline || '',
@@ -136,16 +152,16 @@ export const normalizeProject = (p) => {
 export const DEFAULT_PROJECTS = [
   {
     slug: "fuel-n-fix",
-    title: "Fuel N Fix",
+    title: "Fuel N Fix — Roadside Fuel & Mechanic Assistance",
     year: "2026",
-    type: ["UX Case Study", "Mobile App"],
+    type: ["UX Case Study", "Product Design", "Mobile App"],
     role: "Solo — Product Design & UX Research",
     timeline: "4 Weeks · Jan–Feb 2026",
     tools: "Figma, Design Systems, Mobile UX",
     prototypeUrl: "",
     caseStudyUrl: "",
     coverImg: "assets/fuel-n-fix-cover.png",
-    summary: "Bringing fuel and local repair help to your location. An on-demand roadside assistance experience designed for stranded motorists.",
+    summary: "Finding a petrol station on Google Maps doesn't help when your fuel tank is already dry. I designed Fuel N Fix from scratch: an emergency on-demand roadside delivery and bike repair app that brings help directly to stranded riders.",
     outcome: "11 driver research interviews → 3 key UX iterations → validated prototype with 8 motorists.",
     images: [
       {
