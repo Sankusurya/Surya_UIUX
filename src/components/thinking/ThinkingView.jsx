@@ -81,7 +81,60 @@ export const ThinkingView = () => {
       {/* Chapters */}
       <div className="story-chapters-list">
         {chapters.map((ch, idx) => {
-          const isEven = idx % 2 === 1;
+          /* Accent SVGs rotate through 3 decorative marks for visual rhythm */
+          const accentSvgs = [
+            /* Figma cursor spark */
+            <svg key="cursor" width="52" height="52" viewBox="0 0 52 52" fill="none" aria-hidden="true" style={{ opacity: 0.55 }}>
+              <path d="M10 6L10 38L19 29L25 45L30 43L24 27L36 27L10 6Z" fill="var(--signal)" stroke="var(--signal)" strokeWidth="1.5" strokeLinejoin="round"/>
+              <circle cx="40" cy="10" r="3" fill="var(--signal)" opacity="0.6"/>
+              <circle cx="46" cy="18" r="1.5" fill="var(--signal)" opacity="0.4"/>
+              <circle cx="44" cy="4" r="1.5" fill="var(--signal)" opacity="0.4"/>
+            </svg>,
+            /* Wireframe phone */
+            <svg key="phone" width="44" height="60" viewBox="0 0 44 60" fill="none" aria-hidden="true" style={{ opacity: 0.5 }}>
+              <rect x="3" y="3" width="38" height="54" rx="7" stroke="var(--signal)" strokeWidth="1.8"/>
+              <rect x="10" y="12" width="24" height="4" rx="2" fill="var(--signal)" opacity="0.5"/>
+              <rect x="10" y="20" width="24" height="8" rx="2" stroke="var(--signal)" strokeWidth="1.2" opacity="0.6"/>
+              <rect x="10" y="32" width="10" height="3" rx="1.5" fill="var(--signal)" opacity="0.4"/>
+              <rect x="10" y="37" width="24" height="3" rx="1.5" fill="var(--signal)" opacity="0.3"/>
+              <rect x="10" y="42" width="16" height="3" rx="1.5" fill="var(--signal)" opacity="0.3"/>
+              <circle cx="22" cy="7" r="2" fill="var(--signal)" opacity="0.4"/>
+            </svg>,
+            /* Sticky note + pencil */
+            <svg key="note" width="52" height="52" viewBox="0 0 52 52" fill="none" aria-hidden="true" style={{ opacity: 0.5 }}>
+              <rect x="4" y="8" width="36" height="36" rx="4" fill="var(--sheet)" stroke="var(--signal)" strokeWidth="1.8"/>
+              <rect x="10" y="18" width="24" height="2.5" rx="1.25" fill="var(--signal)" opacity="0.5"/>
+              <rect x="10" y="24" width="20" height="2.5" rx="1.25" fill="var(--signal)" opacity="0.4"/>
+              <rect x="10" y="30" width="16" height="2.5" rx="1.25" fill="var(--signal)" opacity="0.3"/>
+              <path d="M36 38L46 28L49 31L39 41Z" fill="var(--signal)" opacity="0.7"/>
+              <path d="M46 25L51 30L49 31L46 28Z" fill="var(--signal)"/>
+              <path d="M36 38L38 44L40 39Z" fill="var(--signal)" opacity="0.5"/>
+            </svg>,
+            /* Speech bubble */
+            <svg key="bubble" width="56" height="48" viewBox="0 0 56 48" fill="none" aria-hidden="true" style={{ opacity: 0.5 }}>
+              <rect x="2" y="2" width="46" height="34" rx="10" fill="var(--sheet)" stroke="var(--signal)" strokeWidth="1.8"/>
+              <path d="M14 36L8 46L22 38" fill="var(--sheet)" stroke="var(--signal)" strokeWidth="1.8" strokeLinejoin="round"/>
+              <path d="M10 14 Q12 11 15 14 Q18 17 21 14 Q24 11 27 14 Q30 17 33 14" stroke="var(--signal)" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.7"/>
+              <path d="M10 23 Q13 20 17 23 Q21 26 25 23" stroke="var(--signal)" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.5"/>
+            </svg>,
+            /* Loupe / search */
+            <svg key="loupe" width="50" height="50" viewBox="0 0 50 50" fill="none" aria-hidden="true" style={{ opacity: 0.5 }}>
+              <circle cx="20" cy="20" r="14" stroke="var(--signal)" strokeWidth="2"/>
+              <circle cx="20" cy="20" r="8" stroke="var(--signal)" strokeWidth="1.2" opacity="0.4"/>
+              <line x1="30" y1="30" x2="46" y2="46" stroke="var(--signal)" strokeWidth="2.5" strokeLinecap="round"/>
+              <circle cx="20" cy="14" r="2.5" fill="var(--signal)" opacity="0.35"/>
+            </svg>,
+            /* Component / grid */
+            <svg key="grid" width="50" height="50" viewBox="0 0 50 50" fill="none" aria-hidden="true" style={{ opacity: 0.5 }}>
+              <rect x="4" y="4" width="18" height="18" rx="4" stroke="var(--signal)" strokeWidth="1.8"/>
+              <rect x="28" y="4" width="18" height="18" rx="4" fill="var(--signal)" opacity="0.25" stroke="var(--signal)" strokeWidth="1.8"/>
+              <rect x="4" y="28" width="18" height="18" rx="4" fill="var(--signal)" opacity="0.25" stroke="var(--signal)" strokeWidth="1.8"/>
+              <rect x="28" y="28" width="18" height="18" rx="4" stroke="var(--signal)" strokeWidth="1.8"/>
+              <circle cx="13" cy="13" r="3" fill="var(--signal)" opacity="0.5"/>
+              <circle cx="37" cy="37" r="3" fill="var(--signal)" opacity="0.5"/>
+            </svg>,
+          ];
+          const accentSvg = accentSvgs[idx % accentSvgs.length];
 
           return (
             <section
@@ -89,18 +142,17 @@ export const ThinkingView = () => {
               id={ch.id}
               style={{
                 scrollMarginTop: '110px',
-                paddingTop: idx === 0 ? '36px' : 'clamp(64px, 8vw, 96px)',
-                marginTop: idx === 0 ? '0' : 'clamp(48px, 6vw, 64px)',
-                borderTop: idx === 0 ? '1px solid var(--line)' : '1px solid var(--line)',
+                paddingTop: idx === 0 ? '36px' : 'clamp(56px, 7vw, 80px)',
+                marginTop: idx === 0 ? '0' : 'clamp(40px, 5vw, 56px)',
+                borderTop: '1px solid var(--line)',
+                display: 'grid',
+                gridTemplateColumns: '1fr auto',
+                gap: '24px',
+                alignItems: 'start',
               }}
             >
-              <div
-                style={{
-                  maxWidth: '640px',
-                  marginLeft: isEven ? 'auto' : '0',
-                  marginRight: isEven ? '0' : 'auto',
-                }}
-              >
+              {/* Main chapter content */}
+              <div style={{ maxWidth: '640px', minWidth: 0 }}>
                 {/* Chapter Tag */}
                 <div
                   className="mono"
@@ -143,7 +195,7 @@ export const ThinkingView = () => {
                     borderLeft: '2px solid var(--line)',
                   }}
                 >
-                  “{ch.scene}”
+                  "{ch.scene}"
                 </blockquote>
 
                 {/* What I Do Block */}
@@ -228,7 +280,7 @@ export const ThinkingView = () => {
                       fontWeight: '500',
                     }}
                   >
-                    “{ch.question}”
+                    "{ch.question}"
                   </p>
                 </div>
 
@@ -256,6 +308,22 @@ export const ThinkingView = () => {
                     {ch.lesson}
                   </p>
                 </div>
+              </div>
+
+              {/* Right gutter accent — decorative SVG sticker, hidden on mobile */}
+              <div
+                className="thinking-chapter-accent"
+                aria-hidden="true"
+                style={{
+                  paddingTop: '16px',
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  justifyContent: 'center',
+                  width: '72px',
+                  flexShrink: 0,
+                }}
+              >
+                {accentSvg}
               </div>
             </section>
           );

@@ -2481,6 +2481,16 @@ a:focus-visible {
   background: var(--sheet);
 }
 
+/* Thinking page: right-gutter SVG accents — hide on narrow screens */
+.thinking-chapter-accent {
+  display: flex;
+}
+@media (max-width: 640px) {
+  .thinking-chapter-accent {
+    display: none;
+  }
+}
+
 /* ========================================================
    Homepage: "How I Work" Process Grid & List
    ======================================================== */

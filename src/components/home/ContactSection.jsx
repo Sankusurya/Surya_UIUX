@@ -207,6 +207,101 @@ export const ContactSection = () => {
                 View Resume ↗
               </button>
             </div>
+
+            {/* Decorative availability card — fills left-column whitespace */}
+            <div
+              style={{
+                marginTop: '28px',
+                padding: '20px 24px',
+                background: 'var(--sheet)',
+                border: '1px solid var(--line)',
+                borderRadius: '20px',
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: '16px',
+                maxWidth: '420px',
+              }}
+            >
+              {/* Sticker illustration */}
+              <div style={{ flexShrink: 0, paddingTop: '2px' }} aria-hidden="true">
+                <svg width="56" height="56" viewBox="0 0 60 60" fill="none">
+                  <circle cx="30" cy="30" r="28" fill="var(--signal)" opacity="0.08" stroke="var(--signal)" strokeWidth="1.5"/>
+                  {/* Person at desk */}
+                  <circle cx="30" cy="18" r="7" fill="var(--signal)" opacity="0.7"/>
+                  <path d="M16 42 Q16 30 30 30 Q44 30 44 42" fill="var(--signal)" opacity="0.45"/>
+                  {/* Laptop screen */}
+                  <rect x="19" y="43" width="22" height="12" rx="2" fill="var(--sheet)" stroke="var(--signal)" strokeWidth="1.4" opacity="0.8"/>
+                  <rect x="22" y="46" width="8" height="1.5" rx="0.75" fill="var(--signal)" opacity="0.5"/>
+                  <rect x="22" y="49" width="12" height="1.5" rx="0.75" fill="var(--signal)" opacity="0.4"/>
+                  <rect x="22" y="52" width="6" height="1.5" rx="0.75" fill="var(--signal)" opacity="0.3"/>
+                  {/* Cursor blink */}
+                  <path d="M34 46L34 52L37 49L34 46Z" fill="var(--signal)" opacity="0.6"/>
+                </svg>
+              </div>
+              <div>
+                <div
+                  style={{
+                    fontFamily: 'var(--f-mono, monospace)',
+                    fontSize: '10px',
+                    letterSpacing: '0.08em',
+                    textTransform: 'uppercase',
+                    color: 'var(--signal)',
+                    fontWeight: '700',
+                    marginBottom: '4px',
+                  }}
+                >
+                  Currently available
+                </div>
+                <p
+                  style={{
+                    fontSize: '14px',
+                    lineHeight: 1.55,
+                    color: 'var(--ink-2)',
+                    margin: 0,
+                  }}
+                >
+                  Open to full-time UI/UX and Product Designer roles. I respond within 24 hours.
+                </p>
+              </div>
+            </div>
+
+            {/* Second decorative card — design process accent */}
+            <div
+              style={{
+                marginTop: '16px',
+                padding: '16px 20px',
+                border: '1px dashed var(--line)',
+                borderRadius: '16px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '14px',
+                maxWidth: '420px',
+                opacity: 0.7,
+              }}
+            >
+              {/* Mini wireframe sticker */}
+              <div style={{ flexShrink: 0 }} aria-hidden="true">
+                <svg width="40" height="40" viewBox="0 0 44 60" fill="none">
+                  <rect x="3" y="3" width="38" height="54" rx="7" stroke="var(--signal)" strokeWidth="1.8"/>
+                  <rect x="10" y="12" width="24" height="4" rx="2" fill="var(--signal)" opacity="0.5"/>
+                  <rect x="10" y="20" width="24" height="8" rx="2" stroke="var(--signal)" strokeWidth="1.2" opacity="0.6"/>
+                  <rect x="10" y="32" width="10" height="3" rx="1.5" fill="var(--signal)" opacity="0.4"/>
+                  <rect x="10" y="37" width="24" height="3" rx="1.5" fill="var(--signal)" opacity="0.3"/>
+                  <circle cx="22" cy="7" r="2" fill="var(--signal)" opacity="0.4"/>
+                </svg>
+              </div>
+              <p
+                style={{
+                  fontSize: '13px',
+                  lineHeight: 1.5,
+                  color: 'var(--ink-3)',
+                  margin: 0,
+                  fontFamily: 'var(--f-mono, monospace)',
+                }}
+              >
+                Figma · Research · Handoff → shipped
+              </p>
+            </div>
           </div>
 
           {/* Right Column: Refined Contact Form */}
