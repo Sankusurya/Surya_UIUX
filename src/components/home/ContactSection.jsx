@@ -15,8 +15,10 @@ export const ContactSection = () => {
   // Submission & validation state
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [needsActivation, setNeedsActivation] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [errors, setErrors] = useState({});
+  const [lastSubmitted, setLastSubmitted] = useState(null);
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -48,6 +50,16 @@ export const ContactSection = () => {
     }, 2500);
   };
 
+  const getMailtoUrl = (customData) => {
+    const d = customData || lastSubmitted || { name, email, topic, message };
+    const targetEmail = profile.email || 'suryasanku800@gmail.com';
+    const subject = encodeURIComponent(`Portfolio Inquiry: [${d.topic || 'General'}] from ${d.name || 'Visitor'}`);
+    const body = encodeURIComponent(
+      `Hi Surya,\n\nI am contacting you through your portfolio.\n\nName: ${d.name || ''}\nEmail: ${d.email || ''}\nTopic: ${d.topic || ''}\n\nMessage:\n${d.message || ''}\n`
+    );
+    return `mailto:${targetEmail}?subject=${subject}&body=${body}`;
+  };
+
   const validateForm = () => {
     const newErrors = {};
     if (!name.trim()) {
@@ -68,26 +80,39 @@ export const ContactSection = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMessage('');
+    setNeedsActivation(false);
 
     if (!validateForm()) {
       return;
     }
 
     setIsSubmitting(true);
-    try {
-      await addMessage({
-        name: name.trim(),
-        email: email.trim(),
-        topic: topic || 'Job Opportunity',
-        message: message.trim(),
-      });
+    const submissionData = {
+      name: name.trim(),
+      email: email.trim(),
+      topic: topic || 'Job Opportunity',
+      message: message.trim(),
+    };
+    setLastSubmitted(submissionData);
 
-      setIsSuccess(true);
-      setName('');
-      setEmail('');
-      setTopic('Job Opportunity');
-      setMessage('');
-      setErrors({});
+    try {
+      const result = await addMessage(submissionData);
+
+      if (result.success) {
+        setIsSuccess(true);
+        setName('');
+        setEmail('');
+        setTopic('Job Opportunity');
+        setMessage('');
+        setErrors({});
+      } else if (result.needsActivation) {
+        setNeedsActivation(true);
+      } else {
+        setErrorMessage(
+          result.emailResult?.error ||
+          'Automated email delivery could not be completed. Please send directly using the mail button below.'
+        );
+      }
     } catch (err) {
       setErrorMessage(
         err.message || 'Unable to send message right now. Please try again or email directly.'
@@ -99,6 +124,7 @@ export const ContactSection = () => {
 
   const handleResetForm = () => {
     setIsSuccess(false);
+    setNeedsActivation(false);
     setErrorMessage('');
     setErrors({});
   };
@@ -206,8 +232,11 @@ export const ContactSection = () => {
                 <div className="w-12 h-12 mx-auto rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-2xl font-bold">
                   ✓
                 </div>
-                <p className="font-semibold text-base sm:text-lg text-ink max-w-md mx-auto leading-relaxed">
-                  Message sent successfully. Thanks for reaching out! I'll get back to you as soon as possible.
+                <h4 className="font-bold text-base sm:text-lg text-ink">
+                  Message Sent to Surya's Inbox
+                </h4>
+                <p className="font-medium text-xs sm:text-sm text-ink-2 max-w-md mx-auto leading-relaxed">
+                  Delivered to <strong className="text-ink">{displayEmail}</strong>. Thanks for reaching out! I'll get back to you as soon as possible.
                 </p>
                 <div className="pt-2">
                   <button
@@ -219,22 +248,67 @@ export const ContactSection = () => {
                   </button>
                 </div>
               </div>
+            ) : needsActivation ? (
+              <div
+                className="p-6 sm:p-8 rounded-2xl bg-amber-500/10 border border-amber-500/25 text-center space-y-3 animate-fade-in"
+                role="status"
+                aria-live="polite"
+              >
+                <div className="w-12 h-12 mx-auto rounded-full bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center text-xl font-bold">
+                  ✉
+                </div>
+                <h4 className="font-bold text-base sm:text-lg text-ink">
+                  Inquiry Recorded & Activation Pending
+                </h4>
+                <p className="text-xs sm:text-sm text-ink-2 max-w-md mx-auto leading-relaxed">
+                  Your message was saved! A one-time activation email has been sent to <strong className="text-ink">{displayEmail}</strong>. Once activated, submissions flow directly into Surya's inbox automatically.
+                </p>
+                <p className="text-xs text-ink-3">
+                  Want to ensure instant delivery right now? You can also send directly from your email app:
+                </p>
+                <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-2">
+                  <a
+                    href={getMailtoUrl()}
+                    className="w-full sm:w-auto px-5 py-2.5 rounded-full font-semibold text-xs tracking-wider uppercase transition-all cursor-pointer text-center flex items-center justify-center gap-1.5"
+                    style={{ backgroundColor: 'var(--signal)', color: 'var(--signal-ink, #ffffff)' }}
+                  >
+                    <span>Open in Mail App (Direct Email) ↗</span>
+                  </a>
+                  <button
+                    type="button"
+                    onClick={handleResetForm}
+                    className="w-full sm:w-auto px-5 py-2 rounded-full border border-line bg-sheet text-ink hover:border-signal hover:text-signal font-semibold text-xs tracking-wider uppercase transition-colors cursor-pointer"
+                  >
+                    Back to form
+                  </button>
+                </div>
+              </div>
             ) : (
               <form onSubmit={handleSubmit} noValidate className="space-y-4">
                 {errorMessage && (
                   <div
-                    className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/25 text-red-600 dark:text-red-400 text-xs sm:text-sm flex items-center justify-between gap-2"
+                    className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/25 text-red-600 dark:text-red-400 text-xs sm:text-sm space-y-2"
                     role="alert"
                   >
-                    <span>{errorMessage}</span>
-                    <button
-                      type="button"
-                      onClick={() => setErrorMessage('')}
-                      className="font-bold hover:opacity-80 px-1"
-                      aria-label="Dismiss error"
-                    >
-                      ✕
-                    </button>
+                    <div className="flex items-center justify-between gap-2">
+                      <span>{errorMessage}</span>
+                      <button
+                        type="button"
+                        onClick={() => setErrorMessage('')}
+                        className="font-bold hover:opacity-80 px-1"
+                        aria-label="Dismiss error"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                    <div>
+                      <a
+                        href={getMailtoUrl()}
+                        className="inline-flex items-center gap-1 font-semibold underline text-signal hover:opacity-90"
+                      >
+                        Click here to send directly via your email app (mailto) ↗
+                      </a>
+                    </div>
                   </div>
                 )}
 

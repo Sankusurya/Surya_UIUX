@@ -614,15 +614,16 @@ export const PortfolioProvider = ({ children }) => {
     const emailResult = await sendContactEmail(msg);
 
     if (emailResult.success) {
-      showToast('success', 'Inquiry Emailed & Saved ✓', 'Your message was delivered to suryasanku800@gmail.com and saved to the inbox.');
-    } else if (emailResult.needsKey) {
-      showToast('info', 'Inquiry Saved to Online Inbox ✓', 'Message recorded in the portfolio database. (Direct email requires VITE_WEB3FORMS_ACCESS_KEY).');
+      showToast('success', 'Inquiry Emailed to Surya ✓', 'Your message was delivered directly to suryasanku800@gmail.com.');
+    } else if (emailResult.needsActivation) {
+      showToast('info', 'One-time Activation Needed', 'FormSubmit sent an activation email to suryasanku800@gmail.com.');
     } else {
-      showToast('warning', 'Message Saved (Email Delivery Notice)', emailResult.error);
+      showToast('warning', 'Email Delivery Notice', emailResult.error || 'Message saved in database; direct email delivery failed.');
     }
 
     return {
-      success: true,
+      success: Boolean(emailResult.success),
+      needsActivation: Boolean(emailResult.needsActivation),
       dbResult,
       emailResult,
       newMsg
