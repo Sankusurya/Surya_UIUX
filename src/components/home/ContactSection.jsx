@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { usePortfolio } from '../../context/PortfolioContext';
+// Helper for exact illustration and sticker URLs
+const ill = (name) => `${import.meta.env.BASE_URL}assets/illustrations/${encodeURIComponent(name)}`;
 
 export const ContactSection = () => {
   const { profile, addMessage, openResume } = usePortfolio();
@@ -149,10 +151,31 @@ export const ContactSection = () => {
       <section className="contact" id="contact" aria-labelledby="contact-h">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
           {/* Left Column: Heading, Supporting Description, Email, Socials */}
-          <div className="lg:col-span-6 space-y-6">
+          <div className="lg:col-span-6 space-y-6 relative">
+            {/* Orange Paper Plane Flight Path beside heading, angled toward contact form */}
+            <img
+              src={ill("Orange Paper Plane Flight Path.png")}
+              alt=""
+              aria-hidden="true"
+              loading="lazy"
+              width="170"
+              height="170"
+              className="contact-paper-plane"
+              style={{
+                position: 'absolute',
+                top: '-32px',
+                right: '12px',
+                width: '170px',
+                height: 'auto',
+                pointerEvents: 'none',
+                userSelect: 'none',
+                zIndex: 5,
+              }}
+            />
+
             <h2
               id="contact-h"
-              className="text-3xl sm:text-5xl font-extrabold font-display uppercase tracking-wider text-ink leading-tight"
+              className="text-3xl sm:text-5xl font-extrabold font-display uppercase tracking-wider text-ink leading-tight pr-6"
             >
               LET'S BUILD SOMETHING <span className="text-signal italic">MEANINGFUL.</span>
             </h2>

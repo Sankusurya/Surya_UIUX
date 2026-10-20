@@ -1,8 +1,98 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { THINKING_STORY } from '../../data/initialData';
+
+// Helper for exact illustration and sticker URLs
+const ill = (name) => `${import.meta.env.BASE_URL}assets/illustrations/${encodeURIComponent(name)}`;
+
+// Chapter illustration and sticker metadata
+const CHAPTER_VISUALS = [
+  {
+    // Chapter 01 - Listen
+    frame: 'frame-card',
+    image: 'Orange Speech Bubbles with App Feedback.png',
+    sticker: null,
+  },
+  {
+    // Chapter 02 - Frame
+    frame: 'frame-circle',
+    image: 'One Clear Idea Among Many.png',
+    sticker: {
+      name: 'Orange Pencil Scribble Sticker.png',
+      width: '90px',
+      position: { bottom: '24px', left: '-24px' },
+      rotate: '8deg',
+    },
+  },
+  {
+    // Chapter 03 - Explore
+    frame: 'frame-arch',
+    image: 'Orange Wireframe App Screens Emphasis-2.png',
+    sticker: {
+      name: 'Hick’s Law UI Sticker.png',
+      width: '120px',
+      position: { top: '-24px', right: '-24px' },
+      rotate: '-6deg',
+    },
+  },
+  {
+    // Chapter 04 - Check
+    frame: 'frame-card',
+    image: 'Hesitant Choice on Smartphone.png',
+    sticker: {
+      name: 'Test It Sticker Badge.png',
+      width: '110px',
+      position: { bottom: '-24px', right: '-24px' },
+      rotate: '5deg',
+    },
+  },
+  {
+    // Chapter 05 - Rethink
+    frame: 'frame-circle',
+    image: 'Orange Customer Support Exchange Icon.png',
+    sticker: null,
+  },
+  {
+    // Chapter 06 - Hand off
+    frame: 'frame-arch',
+    image: 'Wireframe to Code Transfer.png',
+    sticker: {
+      name: 'Ship It Rocket Sticker.png',
+      width: '120px',
+      position: { top: '-24px', left: '-24px' },
+      rotate: '-7deg',
+    },
+  },
+];
 
 export const ThinkingView = () => {
   const { header, chapters, ai, rules } = THINKING_STORY;
+
+  // Scroll reveal IntersectionObserver for frames
+  useEffect(() => {
+    const prefersReduced =
+      typeof window !== 'undefined' &&
+      window.matchMedia &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (prefersReduced) return;
+
+    const elements = document.querySelectorAll('.ill-reveal');
+    if (!elements.length) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+          }
+        });
+      },
+      { threshold: 0.15 }
+    );
+
+    elements.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
 
   const scrollToChapter = (id) => {
     const el = document.getElementById(id);
@@ -78,81 +168,25 @@ export const ThinkingView = () => {
         </div>
       </header>
 
-      {/* Chapters */}
+      {/* Chapters (vertical gap reduced by half so frames sit closer) */}
       <div className="story-chapters-list">
         {chapters.map((ch, idx) => {
-          /* Accent SVGs rotate through 3 decorative marks for visual rhythm */
-          const accentSvgs = [
-            /* Figma cursor spark */
-            <svg key="cursor" width="52" height="52" viewBox="0 0 52 52" fill="none" aria-hidden="true" style={{ opacity: 0.55 }}>
-              <path d="M10 6L10 38L19 29L25 45L30 43L24 27L36 27L10 6Z" fill="var(--signal)" stroke="var(--signal)" strokeWidth="1.5" strokeLinejoin="round"/>
-              <circle cx="40" cy="10" r="3" fill="var(--signal)" opacity="0.6"/>
-              <circle cx="46" cy="18" r="1.5" fill="var(--signal)" opacity="0.4"/>
-              <circle cx="44" cy="4" r="1.5" fill="var(--signal)" opacity="0.4"/>
-            </svg>,
-            /* Wireframe phone */
-            <svg key="phone" width="44" height="60" viewBox="0 0 44 60" fill="none" aria-hidden="true" style={{ opacity: 0.5 }}>
-              <rect x="3" y="3" width="38" height="54" rx="7" stroke="var(--signal)" strokeWidth="1.8"/>
-              <rect x="10" y="12" width="24" height="4" rx="2" fill="var(--signal)" opacity="0.5"/>
-              <rect x="10" y="20" width="24" height="8" rx="2" stroke="var(--signal)" strokeWidth="1.2" opacity="0.6"/>
-              <rect x="10" y="32" width="10" height="3" rx="1.5" fill="var(--signal)" opacity="0.4"/>
-              <rect x="10" y="37" width="24" height="3" rx="1.5" fill="var(--signal)" opacity="0.3"/>
-              <rect x="10" y="42" width="16" height="3" rx="1.5" fill="var(--signal)" opacity="0.3"/>
-              <circle cx="22" cy="7" r="2" fill="var(--signal)" opacity="0.4"/>
-            </svg>,
-            /* Sticky note + pencil */
-            <svg key="note" width="52" height="52" viewBox="0 0 52 52" fill="none" aria-hidden="true" style={{ opacity: 0.5 }}>
-              <rect x="4" y="8" width="36" height="36" rx="4" fill="var(--sheet)" stroke="var(--signal)" strokeWidth="1.8"/>
-              <rect x="10" y="18" width="24" height="2.5" rx="1.25" fill="var(--signal)" opacity="0.5"/>
-              <rect x="10" y="24" width="20" height="2.5" rx="1.25" fill="var(--signal)" opacity="0.4"/>
-              <rect x="10" y="30" width="16" height="2.5" rx="1.25" fill="var(--signal)" opacity="0.3"/>
-              <path d="M36 38L46 28L49 31L39 41Z" fill="var(--signal)" opacity="0.7"/>
-              <path d="M46 25L51 30L49 31L46 28Z" fill="var(--signal)"/>
-              <path d="M36 38L38 44L40 39Z" fill="var(--signal)" opacity="0.5"/>
-            </svg>,
-            /* Speech bubble */
-            <svg key="bubble" width="56" height="48" viewBox="0 0 56 48" fill="none" aria-hidden="true" style={{ opacity: 0.5 }}>
-              <rect x="2" y="2" width="46" height="34" rx="10" fill="var(--sheet)" stroke="var(--signal)" strokeWidth="1.8"/>
-              <path d="M14 36L8 46L22 38" fill="var(--sheet)" stroke="var(--signal)" strokeWidth="1.8" strokeLinejoin="round"/>
-              <path d="M10 14 Q12 11 15 14 Q18 17 21 14 Q24 11 27 14 Q30 17 33 14" stroke="var(--signal)" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.7"/>
-              <path d="M10 23 Q13 20 17 23 Q21 26 25 23" stroke="var(--signal)" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.5"/>
-            </svg>,
-            /* Loupe / search */
-            <svg key="loupe" width="50" height="50" viewBox="0 0 50 50" fill="none" aria-hidden="true" style={{ opacity: 0.5 }}>
-              <circle cx="20" cy="20" r="14" stroke="var(--signal)" strokeWidth="2"/>
-              <circle cx="20" cy="20" r="8" stroke="var(--signal)" strokeWidth="1.2" opacity="0.4"/>
-              <line x1="30" y1="30" x2="46" y2="46" stroke="var(--signal)" strokeWidth="2.5" strokeLinecap="round"/>
-              <circle cx="20" cy="14" r="2.5" fill="var(--signal)" opacity="0.35"/>
-            </svg>,
-            /* Component / grid */
-            <svg key="grid" width="50" height="50" viewBox="0 0 50 50" fill="none" aria-hidden="true" style={{ opacity: 0.5 }}>
-              <rect x="4" y="4" width="18" height="18" rx="4" stroke="var(--signal)" strokeWidth="1.8"/>
-              <rect x="28" y="4" width="18" height="18" rx="4" fill="var(--signal)" opacity="0.25" stroke="var(--signal)" strokeWidth="1.8"/>
-              <rect x="4" y="28" width="18" height="18" rx="4" fill="var(--signal)" opacity="0.25" stroke="var(--signal)" strokeWidth="1.8"/>
-              <rect x="28" y="28" width="18" height="18" rx="4" stroke="var(--signal)" strokeWidth="1.8"/>
-              <circle cx="13" cy="13" r="3" fill="var(--signal)" opacity="0.5"/>
-              <circle cx="37" cy="37" r="3" fill="var(--signal)" opacity="0.5"/>
-            </svg>,
-          ];
-          const accentSvg = accentSvgs[idx % accentSvgs.length];
+          const visual = CHAPTER_VISUALS[idx] || CHAPTER_VISUALS[0];
 
           return (
             <section
               key={ch.id}
               id={ch.id}
+              className="ill-section-grid"
               style={{
                 scrollMarginTop: '110px',
-                paddingTop: idx === 0 ? '36px' : 'clamp(56px, 7vw, 80px)',
-                marginTop: idx === 0 ? '0' : 'clamp(40px, 5vw, 56px)',
+                paddingTop: idx === 0 ? '24px' : 'clamp(28px, 3.5vw, 40px)',
+                marginTop: idx === 0 ? '0' : 'clamp(20px, 2.5vw, 28px)',
                 borderTop: '1px solid var(--line)',
-                display: 'grid',
-                gridTemplateColumns: '1fr auto',
-                gap: '24px',
-                alignItems: 'start',
               }}
             >
-              {/* Main chapter content */}
-              <div style={{ maxWidth: '640px', minWidth: 0 }}>
+              {/* Left Column: Text Content (~60%, max-width 640px) */}
+              <div className="ill-text-col">
                 {/* Chapter Tag */}
                 <div
                   className="mono"
@@ -310,20 +344,37 @@ export const ThinkingView = () => {
                 </div>
               </div>
 
-              {/* Right gutter accent — decorative SVG sticker, hidden on mobile */}
-              <div
-                className="thinking-chapter-accent"
-                aria-hidden="true"
-                style={{
-                  paddingTop: '16px',
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  justifyContent: 'center',
-                  width: '72px',
-                  flexShrink: 0,
-                }}
-              >
-                {accentSvg}
+              {/* Right Column: Frame + Sticker (~40%, sticky top 120px on desktop) */}
+              <div className="ill-frame-col">
+                <div className={`ill-frame ${visual.frame} ill-reveal`}>
+                  <img
+                    src={ill(visual.image)}
+                    className="ill-img"
+                    alt=""
+                    aria-hidden="true"
+                    loading="lazy"
+                    width={visual.frame === 'frame-circle' ? '360' : '380'}
+                    height={visual.frame === 'frame-circle' ? '360' : '475'}
+                  />
+                  {visual.sticker && (
+                    <img
+                      src={ill(visual.sticker.name)}
+                      className="sticker-img"
+                      alt=""
+                      aria-hidden="true"
+                      loading="lazy"
+                      width={parseInt(visual.sticker.width, 10)}
+                      height={parseInt(visual.sticker.width, 10)}
+                      style={{
+                        ...visual.sticker.position,
+                        width: visual.sticker.width,
+                        height: 'auto',
+                        '--base-rot': `rotate(${visual.sticker.rotate})`,
+                        transform: `rotate(${visual.sticker.rotate})`,
+                      }}
+                    />
+                  )}
+                </div>
               </div>
             </section>
           );
@@ -332,13 +383,14 @@ export const ThinkingView = () => {
 
       {/* Section: How I use AI */}
       <section
+        className="ill-section-grid"
         style={{
-          marginTop: 'clamp(64px, 8vw, 96px)',
-          paddingTop: 'clamp(48px, 6vw, 64px)',
+          marginTop: 'clamp(48px, 6vw, 72px)',
+          paddingTop: 'clamp(36px, 5vw, 52px)',
           borderTop: '1px solid var(--line)',
         }}
       >
-        <div style={{ maxWidth: '640px' }}>
+        <div className="ill-text-col">
           <div className="sh" style={{ marginBottom: '20px' }}>
             <h2>{ai.title}</h2>
             <span className="mono">{ai.label}</span>
@@ -364,17 +416,32 @@ export const ThinkingView = () => {
             </p>
           </div>
         </div>
+
+        <div className="ill-frame-col">
+          <div className="ill-frame frame-card ill-reveal" style={{ width: '400px' }}>
+            <img
+              src={ill("Collaborative AI UX Sketching.png")}
+              className="ill-img"
+              alt=""
+              aria-hidden="true"
+              loading="lazy"
+              width="400"
+              height="500"
+            />
+          </div>
+        </div>
       </section>
 
       {/* Section: The rules I keep */}
       <section
+        className="ill-section-grid"
         style={{
-          marginTop: 'clamp(64px, 8vw, 96px)',
-          paddingTop: 'clamp(48px, 6vw, 64px)',
+          marginTop: 'clamp(48px, 6vw, 72px)',
+          paddingTop: 'clamp(36px, 5vw, 52px)',
           borderTop: '1px solid var(--line)',
         }}
       >
-        <div style={{ maxWidth: '640px' }}>
+        <div className="ill-text-col">
           <div className="sh" style={{ marginBottom: '24px' }}>
             <h2>{rules.title}</h2>
             <span className="mono">{rules.label}</span>
@@ -442,6 +509,20 @@ export const ThinkingView = () => {
             <a className="textlink" href="#work">
               See these habits in my case studies →
             </a>
+          </div>
+        </div>
+
+        <div className="ill-frame-col">
+          <div className="ill-frame frame-polaroid ill-reveal" style={{ width: '360px' }}>
+            <img
+              src={ill("Orange Concept Map Corkboard.png")}
+              className="ill-img"
+              alt=""
+              aria-hidden="true"
+              loading="lazy"
+              width="360"
+              height="270"
+            />
           </div>
         </div>
       </section>

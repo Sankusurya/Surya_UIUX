@@ -1,15 +1,67 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { usePortfolio } from '../../context/PortfolioContext';
 import { TodoText } from '../common/TodoText';
 import { resolveAssetUrl } from '../../data/initialData';
 
+// Helper for exact illustration and sticker URLs
+const ill = (name) => `${import.meta.env.BASE_URL}assets/illustrations/${encodeURIComponent(name)}`;
+
 export const AboutView = () => {
   const { about, profile } = usePortfolio();
 
+  // Scroll reveal IntersectionObserver for frames
+  useEffect(() => {
+    const prefersReduced =
+      typeof window !== 'undefined' &&
+      window.matchMedia &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (prefersReduced) return;
+
+    const elements = document.querySelectorAll('.ill-reveal');
+    if (!elements.length) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+          }
+        });
+      },
+      { threshold: 0.15 }
+    );
+
+    elements.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <>
-      <header className="about-top">
-        <div style={{ display: 'grid', gap: '20px' }}>
+      <header className="about-top" style={{ position: 'relative' }}>
+        <div style={{ display: 'grid', gap: '20px', position: 'relative' }}>
+          {/* Curly Arrow Doodle: empty area above "← Home", pointing toward photo */}
+          <img
+            src={ill("Orange “That’s Me!” Curly Arrow Doodle.png")}
+            alt=""
+            aria-hidden="true"
+            loading="lazy"
+            width="160"
+            height="160"
+            className="about-hero-arrow"
+            style={{
+              position: 'absolute',
+              top: '-36px',
+              right: '10px',
+              width: '160px',
+              height: 'auto',
+              transform: 'rotate(-6deg)',
+              pointerEvents: 'none',
+              userSelect: 'none',
+              zIndex: 5,
+            }}
+          />
+
           <a className="back" href="#home">
             ← Home
           </a>
@@ -32,25 +84,68 @@ export const AboutView = () => {
             />
           </p>
         </div>
-        <div className="portrait">
+
+        {/* Photo with peeking stickers */}
+        <div style={{ position: 'relative', width: '100%', maxWidth: '380px', marginLeft: 'auto' }}>
+          {/* Top-right: Orange Pen Tool Sticker */}
           <img
-            src={resolveAssetUrl(about.photo || 'assets/surya-teja.jpg')}
-            alt={profile.name || 'Surya Teja'}
-            className="about-portrait-img"
+            src={ill("Orange Pen Tool Sticker Icon.png")}
+            alt=""
+            aria-hidden="true"
+            loading="lazy"
+            width="90"
+            height="90"
+            className="sticker-img"
+            style={{
+              top: '-20px',
+              right: '-20px',
+              width: '90px',
+              height: 'auto',
+              '--base-rot': 'rotate(10deg)',
+              transform: 'rotate(10deg)',
+            }}
           />
+
+          {/* Bottom-left: Orange Grade A Award Badge */}
+          <img
+            src={ill("Orange Grade A Award Badge.png")}
+            alt=""
+            aria-hidden="true"
+            loading="lazy"
+            width="110"
+            height="110"
+            className="sticker-img"
+            style={{
+              bottom: '-24px',
+              left: '-24px',
+              width: '110px',
+              height: 'auto',
+              '--base-rot': 'rotate(-8deg)',
+              transform: 'rotate(-8deg)',
+            }}
+          />
+
+          <div className="portrait">
+            <img
+              src={resolveAssetUrl(about.photo || 'assets/surya-teja.jpg')}
+              alt={profile.name || 'Surya Teja'}
+              className="about-portrait-img"
+            />
+          </div>
         </div>
       </header>
 
-      {/* Decorative UX illustration strip — fills the visual gap between header and accordion */}
+      {/* Decorative UX illustration strip — wraps on tablet and hides on small screens */}
       <div
         aria-hidden="true"
+        className="about-process-icons"
         style={{
           display: 'flex',
           alignItems: 'center',
-          gap: 'clamp(20px, 4vw, 48px)',
-          padding: '20px 0 8px',
-          overflowX: 'auto',
-          scrollbarWidth: 'none',
+          gap: 'clamp(16px, 3.5vw, 40px)',
+          padding: '24px 0 12px',
+          flexWrap: 'wrap',
+          overflow: 'hidden',
         }}
       >
         {/* Cursor spark */}
@@ -62,8 +157,8 @@ export const AboutView = () => {
         </svg>
 
         {/* Dotted connector */}
-        <svg width="80" height="4" viewBox="0 0 80 4" fill="none" style={{ flexShrink: 0, opacity: 0.25 }}>
-          <line x1="0" y1="2" x2="80" y2="2" stroke="var(--signal)" strokeWidth="2" strokeDasharray="6 5"/>
+        <svg width="60" height="4" viewBox="0 0 60 4" fill="none" style={{ flexShrink: 0, opacity: 0.25 }}>
+          <line x1="0" y1="2" x2="60" y2="2" stroke="var(--signal)" strokeWidth="2" strokeDasharray="6 5"/>
         </svg>
 
         {/* Wireframe phone */}
@@ -77,8 +172,8 @@ export const AboutView = () => {
         </svg>
 
         {/* Dotted connector */}
-        <svg width="80" height="4" viewBox="0 0 80 4" fill="none" style={{ flexShrink: 0, opacity: 0.25 }}>
-          <line x1="0" y1="2" x2="80" y2="2" stroke="var(--signal)" strokeWidth="2" strokeDasharray="6 5"/>
+        <svg width="60" height="4" viewBox="0 0 60 4" fill="none" style={{ flexShrink: 0, opacity: 0.25 }}>
+          <line x1="0" y1="2" x2="60" y2="2" stroke="var(--signal)" strokeWidth="2" strokeDasharray="6 5"/>
         </svg>
 
         {/* Sticky note + pencil */}
@@ -93,8 +188,8 @@ export const AboutView = () => {
         </svg>
 
         {/* Dotted connector */}
-        <svg width="80" height="4" viewBox="0 0 80 4" fill="none" style={{ flexShrink: 0, opacity: 0.25 }}>
-          <line x1="0" y1="2" x2="80" y2="2" stroke="var(--signal)" strokeWidth="2" strokeDasharray="6 5"/>
+        <svg width="60" height="4" viewBox="0 0 60 4" fill="none" style={{ flexShrink: 0, opacity: 0.25 }}>
+          <line x1="0" y1="2" x2="60" y2="2" stroke="var(--signal)" strokeWidth="2" strokeDasharray="6 5"/>
         </svg>
 
         {/* Component grid */}
@@ -108,8 +203,8 @@ export const AboutView = () => {
         </svg>
 
         {/* Dotted connector */}
-        <svg width="80" height="4" viewBox="0 0 80 4" fill="none" style={{ flexShrink: 0, opacity: 0.25 }}>
-          <line x1="0" y1="2" x2="80" y2="2" stroke="var(--signal)" strokeWidth="2" strokeDasharray="6 5"/>
+        <svg width="60" height="4" viewBox="0 0 60 4" fill="none" style={{ flexShrink: 0, opacity: 0.25 }}>
+          <line x1="0" y1="2" x2="60" y2="2" stroke="var(--signal)" strokeWidth="2" strokeDasharray="6 5"/>
         </svg>
 
         {/* Speech bubble */}
@@ -121,8 +216,8 @@ export const AboutView = () => {
         </svg>
 
         {/* Loupe */}
-        <svg width="80" height="4" viewBox="0 0 80 4" fill="none" style={{ flexShrink: 0, opacity: 0.25 }}>
-          <line x1="0" y1="2" x2="80" y2="2" stroke="var(--signal)" strokeWidth="2" strokeDasharray="6 5"/>
+        <svg width="60" height="4" viewBox="0 0 60 4" fill="none" style={{ flexShrink: 0, opacity: 0.25 }}>
+          <line x1="0" y1="2" x2="60" y2="2" stroke="var(--signal)" strokeWidth="2" strokeDasharray="6 5"/>
         </svg>
 
         <svg width="46" height="46" viewBox="0 0 50 50" fill="none" style={{ opacity: 0.4, flexShrink: 0 }}>
@@ -134,42 +229,112 @@ export const AboutView = () => {
       </div>
 
       <section style={{ paddingTop: '8px' }}>
-        <details open>
-          <summary>Background</summary>
-          <div className="in">
-            {about.background && Array.isArray(about.background) ? (
-              about.background.map((p, i) => (
-                <p key={i}>
-                  <TodoText text={p} />
-                </p>
-              ))
-            ) : (
-              <p>
-                <TodoText text={about.background} />
-              </p>
-            )}
+        {/* 2. "Background" section — 2-column layout with .frame-card + Chai sticker */}
+        <div className="ill-section-grid" style={{ borderTop: '1px solid var(--line)', paddingBlock: '4px' }}>
+          <div className="ill-text-col">
+            <details open style={{ border: 'none', padding: 0 }}>
+              <summary>Background</summary>
+              <div className="in">
+                {about.background && Array.isArray(about.background) ? (
+                  about.background.map((p, i) => (
+                    <p key={i}>
+                      <TodoText text={p} />
+                    </p>
+                  ))
+                ) : (
+                  <p>
+                    <TodoText text={about.background} />
+                  </p>
+                )}
+              </div>
+            </details>
           </div>
-        </details>
+          <div className="ill-frame-col">
+            <div className="ill-frame frame-card ill-reveal">
+              <img
+                src={ill("Orange Cable to Smartphone Schematic.png")}
+                className="ill-img"
+                alt=""
+                aria-hidden="true"
+                loading="lazy"
+                width="380"
+                height="475"
+              />
+              <img
+                src={ill("Powered by Chai Sticker.png")}
+                className="sticker-img"
+                alt=""
+                aria-hidden="true"
+                loading="lazy"
+                width="100"
+                height="100"
+                style={{
+                  bottom: '-24px',
+                  right: '-24px',
+                  width: '100px',
+                  height: 'auto',
+                  '--base-rot': 'rotate(6deg)',
+                  transform: 'rotate(6deg)',
+                }}
+              />
+            </div>
+          </div>
+        </div>
 
-        <details open>
-          <summary>Design philosophy</summary>
-          <div className="in">
-            {about.philosophy && Array.isArray(about.philosophy) ? (
-              about.philosophy.map((p, i) => (
-                <p key={i}>
-                  <TodoText text={p} />
-                </p>
-              ))
-            ) : (
-              <p>
-                <TodoText text={about.philosophy} />
-              </p>
-            )}
-            <a className="textlink" href="#thinking">
-              Read my full design thinking →
-            </a>
+        {/* 3. "Design philosophy" section — 2-column layout with .frame-circle + Less But Better sticker */}
+        <div className="ill-section-grid" style={{ borderTop: '1px solid var(--line)', paddingBlock: '4px' }}>
+          <div className="ill-text-col">
+            <details open style={{ border: 'none', padding: 0 }}>
+              <summary>Design philosophy</summary>
+              <div className="in">
+                {about.philosophy && Array.isArray(about.philosophy) ? (
+                  about.philosophy.map((p, i) => (
+                    <p key={i}>
+                      <TodoText text={p} />
+                    </p>
+                  ))
+                ) : (
+                  <p>
+                    <TodoText text={about.philosophy} />
+                  </p>
+                )}
+                <a className="textlink" href="#thinking">
+                  Read my full design thinking →
+                </a>
+              </div>
+            </details>
           </div>
-        </details>
+          <div className="ill-frame-col">
+            <div className="ill-frame frame-circle ill-reveal">
+              <img
+                src={ill("Orange Sticky Note Magnifier Sketch.png")}
+                className="ill-img"
+                alt=""
+                aria-hidden="true"
+                loading="lazy"
+                width="360"
+                height="360"
+              />
+              <img
+                src={ill("Less, But Better Sticker.png")}
+                className="sticker-img"
+                alt=""
+                aria-hidden="true"
+                loading="lazy"
+                width="130"
+                height="130"
+                style={{
+                  top: '16px',
+                  left: '-48px',
+                  width: '130px',
+                  height: 'auto',
+                  '--base-rot': 'rotate(-5deg)',
+                  transform: 'rotate(-5deg)',
+                }}
+              />
+            </div>
+          </div>
+        </div>
 
         <details>
           <summary>Experience</summary>
