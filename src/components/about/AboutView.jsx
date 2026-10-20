@@ -27,7 +27,7 @@ export const AboutView = () => {
             <TodoText
               text={
                 about.bio ||
-                'A UI/UX designer who designs end to end — research, flows, high-fidelity UI and developer-ready handoff — and backs every decision with what users actually said or did.'
+                'A UI/UX designer who takes products from idea to developer-ready screens — and talks to real users along the way.'
               }
             />
           </p>

@@ -151,11 +151,8 @@ export const PortfolioProvider = ({ children }) => {
     try {
       const saved = getStoredItemSync('surya_portfolio_about');
       if (saved) {
-        const isOldPhilosophy = typeof saved.philosophy === 'string';
-        const isOldBio = saved.bio && (
-          saved.bio.includes('uses AI-assisted coding to turn designs into working prototypes') ||
-          !saved.bio.includes('backs every decision with what users actually said or did')
-        );
+        const isOldPhilosophy = typeof saved.philosophy === 'string' || (Array.isArray(saved.philosophy) && saved.philosophy.some(p => p.includes('Listen before I draw')));
+        const isOldBio = saved.bio && !saved.bio.includes('talks to real users along the way');
         if (isOldPhilosophy || isOldBio) {
           return DEFAULT_ABOUT;
         }
@@ -234,11 +231,8 @@ export const PortfolioProvider = ({ children }) => {
 
         const idbAbout = await getStoredItemAsync('surya_portfolio_about');
         if (idbAbout && isMounted) {
-          const isOldPhilosophy = typeof idbAbout.philosophy === 'string';
-          const isOldBio = idbAbout.bio && (
-            idbAbout.bio.includes('uses AI-assisted coding to turn designs into working prototypes') ||
-            !idbAbout.bio.includes('backs every decision with what users actually said or did')
-          );
+          const isOldPhilosophy = typeof idbAbout.philosophy === 'string' || (Array.isArray(idbAbout.philosophy) && idbAbout.philosophy.some(p => p.includes('Listen before I draw')));
+          const isOldBio = idbAbout.bio && !idbAbout.bio.includes('talks to real users along the way');
           if (isOldPhilosophy || isOldBio) {
             setAbout(DEFAULT_ABOUT);
           } else {

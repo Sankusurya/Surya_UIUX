@@ -476,33 +476,33 @@ export const DEFAULT_PRINCIPLES = [
 
 export const DEFAULT_ABOUT = {
   headline: "Hi, I'm Surya Teja",
-  bio: "A UI/UX designer who designs end to end — research, flows, high-fidelity UI and developer-ready handoff — and backs every decision with what users actually said or did.",
+  bio: "A UI/UX designer who takes products from idea to developer-ready screens — and talks to real users along the way.",
   photo: "assets/surya-teja.jpg",
   background: [
-    "I'm a UI/UX Designer at Dilshaj Infotech, designing EduProva — an AI-powered learning and career super-app — across six product areas, with one shared component library so every module looks and works the same.",
-    "I didn't start in UX. After a B.Sc. in Mathematics, Electronics and Computer Science at Andhra University, I spent 1.5 years at Cyient turning scanned telecom records into precise network drawings. Every layer, symbol and label followed a standard, and every drawing was checked before anyone used it. That's where I learned the rule I still design by: if someone can't use it without asking me, it isn't finished.",
-    "I wanted that same care to reach people instead of cables. In 2025 I trained in UI/UX at Tech Mahindra SMART Academy, cleared the NSDC User Experience Designer assessment with Grade A, and moved into product design."
+    "I didn't start as a designer. After my B.Sc. in Maths, Electronics and Computer Science at Andhra University, I worked at Cyient for 1.5 years making telecom network drawings. Every drawing had strict rules, and every one was checked before anyone used it. That job taught me something I still follow: if people can't understand it without asking me, it isn't finished.",
+    "I liked making things clear — but I wanted to make them clear for people, not for cables. So in 2025 I trained in UI/UX at Tech Mahindra SMART Academy and passed the NSDC User Experience Designer exam with Grade A.",
+    "Today I'm a UI/UX Designer at Dilshaj Infotech. I design EduProva, a learning and career app with AI features, and I keep all six parts of it looking and working the same with one shared set of Figma components."
   ],
   philosophy: [
-    "Listen before I draw. I frame problems from real conversations, not assumptions. On Fuel N Fix, 11 interviews with riders and mechanics showed the real fear wasn't finding help — it was the price changing at the roadside. That one insight became the core feature: the price is locked before booking, and any change needs the rider's approval.",
-    "Every decision gets a reason I can show. In my case studies each decision comes with the moment that triggered it, the options I weighed, the trade-off I accepted, and an honest note on how far it has been validated. When riders couldn't tell my two home-screen boxes apart without reading, I switched to picture cards they understood at a glance. At EduProva, I reworked the AI auto-apply flow after usability feedback. When something isn't tested yet, I say so and write down how I'll test it.",
-    "Design for every user — and for the build. A mechanic told me, 'When we're busy, we don't take these jobs,' so I added an 'I'm busy' button: a two-sided product only works if both sides keep using it. And because I work closely with developers, I design with reusable components, clear Dev Mode specs and working prototypes built with AI-assisted coding, so what ships matches what was designed."
+    "Understand first. I talk to real people before I design, and I look for the real problem behind what they say.",
+    "Show my reasons. Every design decision should have a clear reason — and I'm honest about whether it has been tested yet.",
+    "Design for real life. I design for everyone who uses the product, and for the developers who build it, so what ships matches what I designed."
   ],
   experience: [
     {
       role: "UI/UX Designer · Dilshaj Infotech",
       period: "Nov 2025 – Present",
-      desc: "Designing EduProva end to end — 6 product areas (learning, AI tools, jobs, freelancing, community and supporting flows) in one visual language, backed by a reusable Figma component library and Dev Mode handoff. Improved the AI job board and auto-apply flows from usability feedback."
+      desc: "I design EduProva from start to finish — six product areas with one consistent look, built on a shared Figma component library. I improved the AI job board and auto-apply flows after usability feedback."
     },
     {
       role: "UI/UX Development Certification · Tech Mahindra SMART Academy",
       period: "Apr – Aug 2025",
-      desc: "Trained in research, information architecture, wireframing, prototyping and usability testing. Cleared the NSDC User Experience Designer assessment with Grade A."
+      desc: "Learned user research, wireframing, prototyping and usability testing. Passed the NSDC User Experience Designer exam with Grade A."
     },
     {
       role: "Design Specialist, Telecom Network Engineering · Cyient",
       period: "Oct 2023 – Apr 2025",
-      desc: "Led 12+ digitization projects turning scanned fiber and coax records into accurate network designs. Recognized by my project manager for consistently high-quality delivery."
+      desc: "Led 12+ projects turning old scanned network records into accurate digital drawings. Praised by my project manager for consistent, high-quality work."
     }
   ],
   tools: [
@@ -519,7 +519,7 @@ export const DEFAULT_ABOUT = {
     "LottieFiles",
     "HTML & CSS"
   ],
-  interests: "Outside client work I'm usually exploring motion with LottieFiles or turning Figma screens into working prototypes with AI coding tools — building things is how I learn them. PERSONAL_HOBBY_HERE"
+  interests: "Outside work, I like exploring motion with LottieFiles and turning my designs into working prototypes. MY_HOBBY"
 };
 
 export const THINKING_STORY = {
