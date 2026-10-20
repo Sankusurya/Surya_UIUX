@@ -125,27 +125,37 @@ export const ResumeModal = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
               <div className="p-2.5 rounded-xl bg-paper border border-line">
                 <span className="font-semibold text-ink block mb-0.5">Design Tools</span>
-                <p className="text-ink-2">Figma, Photoshop, Illustrator, Canva, LottieFiles for Figma</p>
+                <p className="text-ink-2">Figma, FigJam, Figma Make, Framer, Photoshop, Illustrator, Canva, LottieFiles for Figma</p>
+              </div>
+
+              <div className="p-2.5 rounded-xl bg-paper border border-line">
+                <span className="font-semibold text-ink block mb-0.5">Collaboration Tools</span>
+                <p className="text-ink-2">Notion, Miro</p>
               </div>
 
               <div className="p-2.5 rounded-xl bg-paper border border-line">
                 <span className="font-semibold text-ink block mb-0.5">UX Skills</span>
-                <p className="text-ink-2">User Research, Competitor Analysis, Information Architecture, User Flows, Wireframes, Prototypes, Usability Testing</p>
+                <p className="text-ink-2">User Research, Usability Testing, Competitor Analysis, Information Architecture, User Flows, Wireframes, Prototypes, UX Principles & Laws (Hick's, Fitts's, Jakob's)</p>
               </div>
 
               <div className="p-2.5 rounded-xl bg-paper border border-line">
                 <span className="font-semibold text-ink block mb-0.5">UI Skills</span>
-                <p className="text-ink-2">Responsive Design, Design Systems, Accessibility, Interaction Design, Visual Design Principles</p>
+                <p className="text-ink-2">Responsive Web Design, Design Systems, Accessibility, Interaction Design, Visual Design Principles</p>
               </div>
 
               <div className="p-2.5 rounded-xl bg-paper border border-line">
                 <span className="font-semibold text-ink block mb-0.5">Figma</span>
-                <p className="text-ink-2">Auto Layout, Components, Variants, Interactive Prototypes, Dev Mode Handoff, Figma MCP Server</p>
+                <p className="text-ink-2">Auto Layout, Components, Variants, Variables, Styles, Grids, Interactive Prototypes, Dev Mode Handoff</p>
               </div>
 
               <div className="p-2.5 rounded-xl bg-paper border border-line">
-                <span className="font-semibold text-ink block mb-0.5">AI & Vibe Coding</span>
-                <p className="text-ink-2">Vibe Coding (AI-assisted prototyping & front-end builds), AI-assisted design-to-code workflows</p>
+                <span className="font-semibold text-ink block mb-0.5">AI in Design</span>
+                <p className="text-ink-2">Figma Make, Figma MCP Server, AI-assisted research and ideation, knowing where AI fits in the design process</p>
+              </div>
+
+              <div className="p-2.5 rounded-xl bg-paper border border-line">
+                <span className="font-semibold text-ink block mb-0.5">AI-Assisted Builds (Vibe Coding)</span>
+                <p className="text-ink-2">Turning Figma designs into working prototypes with AI tools (JavaScript, React.js, Tailwind CSS, Git)</p>
               </div>
 
               <div className="p-2.5 rounded-xl bg-paper border border-line">
@@ -155,7 +165,7 @@ export const ResumeModal = () => {
 
               <div className="p-2.5 rounded-xl bg-paper border border-line">
                 <span className="font-semibold text-ink block mb-0.5">Front-end Basics</span>
-                <p className="text-ink-2">HTML, CSS</p>
+                <p className="text-ink-2">HTML5, CSS3 (Flexbox, Grid)</p>
               </div>
 
               <div className="p-2.5 rounded-xl bg-paper border border-line">
