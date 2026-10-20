@@ -476,7 +476,7 @@ export const DEFAULT_PRINCIPLES = [
 
 export const DEFAULT_ABOUT = {
   headline: "Hi, I'm Surya Teja",
-  bio: "A UI/UX designer who takes products from idea to developer-ready screens — and talks to real users along the way.",
+  bio: "A UI/UX designer who makes design decisions and iterates on user and stakeholder feedback until the product is ready to use.",
   photo: "assets/surya-teja.jpg",
   background: [
     "I didn't start as a designer. After my B.Sc. in Maths, Electronics and Computer Science at Andhra University, I worked at Cyient for 1.5 years making telecom network drawings. Every drawing had strict rules, and every one was checked before anyone used it. That job taught me something I still follow: if people can't understand it without asking me, it isn't finished.",

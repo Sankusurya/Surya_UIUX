@@ -152,7 +152,7 @@ export const PortfolioProvider = ({ children }) => {
       const saved = getStoredItemSync('surya_portfolio_about');
       if (saved) {
         const isOldPhilosophy = typeof saved.philosophy === 'string' || (Array.isArray(saved.philosophy) && saved.philosophy.some(p => p.includes('Listen before I draw')));
-        const isOldBio = saved.bio && !saved.bio.includes('talks to real users along the way');
+        const isOldBio = saved.bio && !saved.bio.includes('iterates on user and stakeholder feedback');
         if (isOldPhilosophy || isOldBio) {
           return DEFAULT_ABOUT;
         }
@@ -232,7 +232,7 @@ export const PortfolioProvider = ({ children }) => {
         const idbAbout = await getStoredItemAsync('surya_portfolio_about');
         if (idbAbout && isMounted) {
           const isOldPhilosophy = typeof idbAbout.philosophy === 'string' || (Array.isArray(idbAbout.philosophy) && idbAbout.philosophy.some(p => p.includes('Listen before I draw')));
-          const isOldBio = idbAbout.bio && !idbAbout.bio.includes('talks to real users along the way');
+          const isOldBio = idbAbout.bio && !idbAbout.bio.includes('iterates on user and stakeholder feedback');
           if (isOldPhilosophy || isOldBio) {
             setAbout(DEFAULT_ABOUT);
           } else {
