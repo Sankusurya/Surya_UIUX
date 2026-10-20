@@ -14,11 +14,17 @@ export const AdminProfileTab = () => {
     coreToolkit: profile.coreToolkit || profile.strengths || 'Figma, Design Systems, Prototyping, AI-assisted design-to-code',
     location: profile.location || profile.basedIn || 'Visakhapatnam, India · Open to remote & relocation',
     email: profile.email || 'suryasanku800@gmail.com',
-    socials: profile.socials || [
-      { label: 'LinkedIn', note: 'view profile', href: 'https://linkedin.com' },
+    socials: (profile.socials || [
+      { label: 'LinkedIn', note: 'view profile', href: 'https://www.linkedin.com/in/surya-teja-sanku-9b0a7b187' },
       { label: 'GitHub', note: 'view code', href: 'https://github.com/Sankusurya' },
       { label: 'Resume', note: 'view resume', href: '#resume' }
-    ]
+    ]).map((s) => {
+      if (s.label?.toLowerCase() === 'linkedin') {
+        const isGenericOrOld = !s.href || s.href === 'https://linkedin.com' || s.href === 'https://www.linkedin.com' || s.href.includes('/sankusurya');
+        return isGenericOrOld ? { ...s, href: 'https://www.linkedin.com/in/surya-teja-sanku-9b0a7b187' } : s;
+      }
+      return s;
+    })
   });
 
   const [savedSuccess, setSavedSuccess] = useState(false);

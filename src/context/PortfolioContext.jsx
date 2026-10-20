@@ -42,6 +42,27 @@ const syncChannel = typeof window !== 'undefined' && 'BroadcastChannel' in windo
   ? new BroadcastChannel('surya_portfolio_sync')
   : null;
 
+const normalizeSocials = (socialsList) => {
+  if (!socialsList || !Array.isArray(socialsList)) return DEFAULT_PROFILE.socials;
+  return socialsList.map((s) => {
+    if (s.label?.toLowerCase() === 'linkedin') {
+      const isGenericOrOld =
+        !s.href ||
+        s.href === 'https://linkedin.com' ||
+        s.href === 'https://www.linkedin.com' ||
+        s.href === 'https://linkedin.com/' ||
+        s.href === 'https://www.linkedin.com/' ||
+        s.href.includes('/sankusurya');
+      return isGenericOrOld ? { ...s, href: 'https://www.linkedin.com/in/surya-teja-sanku-9b0a7b187' } : s;
+    }
+    if (s.label?.toLowerCase() === 'github') {
+      const isGeneric = !s.href || s.href === 'https://github.com' || s.href === 'https://github.com/';
+      return isGeneric ? { ...s, href: 'https://github.com/Sankusurya' } : s;
+    }
+    return s;
+  });
+};
+
 export const PortfolioProvider = ({ children }) => {
   // Theme state ('light' | 'dark')
   const [theme, setTheme] = useState(() => {
@@ -99,6 +120,7 @@ export const PortfolioProvider = ({ children }) => {
         return {
           ...DEFAULT_PROFILE,
           ...saved,
+          socials: normalizeSocials(saved.socials),
           email: (saved.email && saved.email !== 'sankusurya@gmail.com') ? saved.email : DEFAULT_PROFILE.email,
           roleLine1: saved.roleLine1 && saved.roleLine1 !== 'UX/UI' && saved.roleLine1 !== 'PRODUCT' ? saved.roleLine1 : DEFAULT_PROFILE.roleLine1,
           roleLine2: saved.roleLine2 && saved.roleLine2 !== 'Designer' ? saved.roleLine2 : DEFAULT_PROFILE.roleLine2,
@@ -207,6 +229,9 @@ export const PortfolioProvider = ({ children }) => {
           }
           if (!merged.location || merged.location.includes('Open to Remote & Relocation') || merged.location.includes('Andhra Pradesh, India')) {
             merged.location = DEFAULT_PROFILE.location;
+          }
+          if (merged.socials) {
+            merged.socials = normalizeSocials(merged.socials);
           }
           setProfile((prev) => ({ ...prev, ...merged }));
         }

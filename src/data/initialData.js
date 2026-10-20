@@ -419,7 +419,7 @@ export const DEFAULT_PROFILE = {
   email: "suryasanku800@gmail.com",
   resumeUrl: "#resume",
   socials: [
-    { label: "LinkedIn", note: "view profile", href: "https://linkedin.com" },
+    { label: "LinkedIn", note: "view profile", href: "https://www.linkedin.com/in/surya-teja-sanku-9b0a7b187" },
     { label: "GitHub", note: "view code", href: "https://github.com/Sankusurya" },
     { label: "Resume", note: "view resume", href: "#resume" }
   ]

@@ -129,9 +129,16 @@ export const ContactSection = () => {
     setErrors({});
   };
 
+  const rawLinkedIn = profile.socials?.find((s) => s.label?.toLowerCase() === 'linkedin')?.href;
   const linkedInUrl =
-    profile.socials?.find((s) => s.label?.toLowerCase() === 'linkedin')?.href ||
-    'https://www.linkedin.com';
+    rawLinkedIn &&
+    rawLinkedIn !== 'https://linkedin.com' &&
+    rawLinkedIn !== 'https://www.linkedin.com' &&
+    rawLinkedIn !== 'https://linkedin.com/' &&
+    rawLinkedIn !== 'https://www.linkedin.com/' &&
+    !rawLinkedIn.includes('/sankusurya')
+      ? rawLinkedIn
+      : 'https://www.linkedin.com/in/surya-teja-sanku-9b0a7b187';
   const gitHubUrl =
     profile.socials?.find((s) => s.label?.toLowerCase() === 'github')?.href ||
     'https://github.com/Sankusurya';

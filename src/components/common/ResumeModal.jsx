@@ -97,7 +97,7 @@ export const ResumeModal = () => {
                 sankusurya.github.io/Surya_UIUX ↗
               </a>
               <span className="text-line">•</span>
-              <a href="https://linkedin.com/in/sankusurya" target="_blank" rel="noreferrer" className="hover:text-signal transition-colors underline">
+              <a href="https://www.linkedin.com/in/surya-teja-sanku-9b0a7b187" target="_blank" rel="noreferrer" className="hover:text-signal transition-colors underline">
                 LinkedIn ↗
               </a>
               <span className="text-line">•</span>
